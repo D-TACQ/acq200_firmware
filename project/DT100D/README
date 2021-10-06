@@ -1,0 +1,8 @@
+# dt100d - dt100d demon to run on ARM-linux (or any linux for that matter).
+# copy of dt100d original java coded server
+
+# listen on port 0xd100
+# on connect
+#	spawn server
+#		interpret commands
+
