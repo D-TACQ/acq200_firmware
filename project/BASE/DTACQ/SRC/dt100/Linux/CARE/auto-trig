@@ -1,0 +1,4 @@
+#!/bin/bash
+# auto-trig - demonstrate auto trigger
+
+./testbody $*

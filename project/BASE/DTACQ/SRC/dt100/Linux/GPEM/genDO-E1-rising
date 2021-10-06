@@ -1,0 +1,10 @@
+#!/bin/bash
+# genDO-E1-rising
+
+DF=${2:-~dt100/AO/doramp.dat}
+FN=DO
+
+E1="EV_TRIGGER_RISING DI2"
+E3="EV_TRUE"
+
+. ./genbody $1 $DF

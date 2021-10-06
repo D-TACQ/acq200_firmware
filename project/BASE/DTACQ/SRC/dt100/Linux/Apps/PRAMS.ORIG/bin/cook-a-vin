@@ -1,0 +1,71 @@
+#!/usr/bin/perl
+# cook-a-vin - cook vin file for use with octave
+# input $1 get.vin output, blanks, EOF
+# output octave initscript
+
+
+
+use strict;
+
+my $source_file = '';
+my $source_base = '';
+
+
+my @source_data;
+
+if ($#ARGV >= 0){
+	$source_file = $ARGV[0];
+	($source_base) = split( /\./, $source_file);
+}else{
+	die "please provide source file eg vin.log on command line"
+}
+
+my $ofile = $source_base . ".octave";
+
+sub get_source {
+	my $source_line;
+	open SOURCE, "$source_file" or die "ERROR failed to open $source_file";
+	while($source_line = <SOURCE>){
+		if ($source_line =~ /^$/){
+			;
+		}elsif ($source_line =~ /^EOF/){
+			;
+		}else{
+			$source_line =~ s/,/ /g;
+			push @source_data, $source_line;
+		}
+	}
+	close SOURCE;
+}
+
+sub get_date {
+	open DP, "date |" or die "ERROR failed to exec date\n";
+	my $date = <DP>;
+	close DP;
+	chomp $date;
+	return $date;
+}
+
+
+get_source;
+open OUT, ">$ofile" or die "ERROR failed to open $ofile";
+
+sub print_header {
+	my $date = get_date;
+	print OUT "# created by cook-a-vin $date $ENV{USER}\@$ENV{HOSTNAME}\n";
+	print OUT "# name: calvin\n";
+	print OUT "# type: matrix\n";
+	print OUT "# rows: $#source_data\n";
+	print OUT "# columns: 32\n";
+}
+sub print_source {
+	for (my $item = 0; $item != $#source_data; ++$item){
+		print OUT @source_data[$item];
+	}
+}
+printf "source file $source_file source_base $source_base ofile $ofile\n";
+
+
+print_header;
+print_source;
+

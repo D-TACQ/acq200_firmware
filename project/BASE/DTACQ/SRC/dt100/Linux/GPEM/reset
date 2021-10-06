@@ -1,0 +1,12 @@
+echo cleanup - fire all events, resetGUT
+acqcmd  fireEvent AI E1
+acqcmd  fireEvent AI E2
+acqcmd  fireEvent AI E3
+acqcmd  fireEvent AO E1
+acqcmd  fireEvent AO E2
+acqcmd  fireEvent AO E3
+acqcmd  fireEvent DO E1
+acqcmd  fireEvent DO E2
+acqcmd  fireEvent DO E3
+acqcmd setAbort
+acqcmd  resetGUT

@@ -1,0 +1,32 @@
+#!/bin/sh
+#
+# chkconfig: 
+# description: Starts and stops the D-TACQ dt100 server
+
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+echo "dt100d $1" >>/var/log/dt100d.log
+chown dt100.dt100 /var/log/dt100d.log
+
+# See how we were called.
+case "$1" in
+  start)
+	echo -n "Start dt100d:"
+        echo -n "Start dt100d" 
+	daemon ~dt100/bin/dt100d ~dt100/server/dt100d.sh
+	echo;;
+  stop)
+        echo -n "Stop dt100:"
+	killproc  ~dt100/bin/dt100d 
+	echo;;
+  restart)
+        $0 stop
+	$0 start
+	;;
+  *)
+	echo "Usage: dt100d {start|stop|restart}"
+	exit 1
+esac
+

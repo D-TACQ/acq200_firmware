@@ -1,0 +1,7 @@
+#!/bin/bash
+# cap-E1-rising-null-P1
+
+E1="EV_TRIGGER_RISING DI2"
+E2="EV_TRUE"
+
+. ./capbody ${1:-1} 0 $3 $4

@@ -1,0 +1,54 @@
+.TH "MU" 3 "1 Dec 2005" "llcontrol" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+MU \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "int \fBfd\fP"
+.br
+.ti -1c
+.RI "\fBr32\fP * \fBmailboxes\fP"
+.br
+.ti -1c
+.RI "\fBu32\fP \fBmailboxes_shadow\fP [4]"
+.br
+.ti -1c
+.RI "\fBu32\fP \fBmailboxes_lastwrite\fP [4]"
+.br
+.ti -1c
+.RI "\fBr32\fP * \fBinbound_q_port\fP"
+.br
+.ti -1c
+.RI "\fBr32\fP * \fBoutbound_q_port\fP"
+.br
+.ti -1c
+.RI "int \fBpoll_count\fP"
+.br
+.in -1c
+.SH "Field Documentation"
+.PP 
+.SS "int \fBMU::fd\fP"
+.PP
+.SS "\fBr32\fP* \fBMU::inbound_q_port\fP"
+.PP
+.SS "\fBr32\fP* \fBMU::mailboxes\fP"
+.PP
+.SS "\fBu32\fP \fBMU::mailboxes_lastwrite\fP[4]"
+.PP
+.SS "\fBu32\fP \fBMU::mailboxes_shadow\fP[4]"
+.PP
+.SS "\fBr32\fP* \fBMU::outbound_q_port\fP"
+.PP
+.SS "int \fBMU::poll_count\fP"
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for llcontrol from the source code.

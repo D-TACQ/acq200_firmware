@@ -1,0 +1,2 @@
+#!/bin/bash
+PRAMS=PRAMS/M5-vranges.bin SHOTS=20 NSAM=1024 NCHAN=12 ${0%*`basename $0`}job

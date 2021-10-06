@@ -1,0 +1,404 @@
+/*****************************************************************************
+ *
+ * File: llcontrol-sync2VAO32-core.c
+ *
+ * $RCSfile: llcontrol-sync2VAO32-core.c,v $
+ * 
+ * Copyright (C) 2001 D-TACQ Solutions Ltd
+ * not to be used without owner's permission
+ *
+ * Description:
+ *     application implementing the LOW LATENCY CONTROL feature
+ *
+ * $Id: llcontrol-sync2VAO32-core.c,v 1.6 2011/05/18 13:40:41 pgm Exp $
+ * $Log: llcontrol-sync2VAO32-core.c,v $
+ * Revision 1.6  2011/05/18 13:40:41  pgm
+ * *** empty log message ***
+ *
+ * Revision 1.5  2011/05/18 13:39:42  pgm
+ * initialse AO32 VO BEFORE ARM
+ *
+ * Revision 1.4  2009/04/02 13:19:01  pgm
+ * docs away
+ *
+ * Revision 1.3  2009/03/30 16:33:51  pgm
+ * AO32 output now WORKS
+ *
+ * Revision 1.2  2009/03/28 22:23:05  pgm
+ * ao32cpci first cut looks good
+ *
+ * Revision 1.1  2009/03/28 18:47:39  pgm
+ * sync2VAO32 take 1
+ *
+ * Revision 1.1  2009/03/26 14:52:03  pgm
+ * split sync2v, acq216 from main core
+ *
+ * Revision 1.1.4.27  2009/03/26 12:40:36  pgm
+ * reuse same dac_src for each card, avoid data overrun
+ */
+
+/** @file llcontrol-sync2VAO32-core.c 
+	demonstrates <b>SYNC_2V mode with AO32CPCI</b>. 
+
+ - llcontrol [opts] --dacs aoramps -W SYNC2V_AO32 ECM slave1 [..slaveN]
+  - aoramps is a simple binary ramp file provided as an example
+  - generates a "walking bit" pattern on DO64
+  - slave1 : slot # of first slave
+  - supports up to MAXAO32 (6) slaves
+  
+ - ao32cpci: x86 host driver must have been preloaded.
+  - the driver enumerates the PCI bus - remember, although ACQ196 is doing most of the data moving on the PCI bus, HOST is still the system slot card.
+  - driver enables all the AO32CPCI slave cards
+  - driver exposes the bus addresses of the slave cards. 
+  - LLCONTROL loads the slave bus addresses and communicates them to ACQ196
+*/
+
+#include "local.h"
+
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <errno.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <stdio.h>
+#include <unistd.h>
+
+#include <popt.h>
+
+#include "acq32ioctl.h"
+#include "acq32busprot.h"
+
+#include "llif.h"
+#include "llprotocol.h"
+
+
+#include "llcontrol.h"
+#include "x86timer.h"
+
+#define FLAVOR "ACQ196"
+#include "llcontrol-core.h"
+
+
+static void sync_2v_updateTstats(
+	u32 cmd, struct Card* card, struct TimingStats* tstats)
+/** updates timing stats from embedded host buffer data */
+{
+#define SAMPLE_SIZE (96*2)   /* WORKTODO */
+	u32* stats = getVaddr(card->buf, card->sync_2v_offset_status_hsbt);
+	tstats->tinst = llv2_extend32(stats[LLC_SYNC2V_IN_MBOX2], 
+				      stats[LLC_SYNC2V_IN_TINST]);
+	tstats->tprocess = LLC_GET_TCYCLE(stats[LLC_SYNC2V_IN_MBOX0]);
+}
+
+static u32 card_sync_2v_WaitDmaDone(struct Card* card)
+{
+	return card->tlatch = llv2WaitDmaDone_2v(card->mbx, 
+		  getVaddr(card->buf, card->sync_2v_offset_status_hsbt),
+		  card->tlatch
+	);
+}
+
+/*
+PA data from driver: one BAR per line:
+[dt100@kilda ~]$ cat /dev/ao32cpci/ctrl/ao32cpci.6/resource
+0x00000000fdefec00 0x00000000fdefec7f 0x0000000000000200
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+0x00000000fdefd000 0x00000000fdefdfff 0x0000000000000200
+0x00000000fdefc000 0x00000000fdefcfff 0x0000000000000200
+0x00000000fdefb000 0x00000000fdefbfff 0x0000000000000200
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+*/
+
+#define BAR_FIFO	3
+
+static u32 getSlavePa(int slot)
+{
+	char fname[128];
+	char line[80];
+	FILE *fp;
+	int bar;
+	u32 pa = 0;
+
+	sprintf(fname, "/dev/ao32cpci/ctrl/ao32cpci.%d/resource", slot);
+	
+	fp = fopen(fname, "r");
+	if (!fp){
+		fprintf(stderr, "ERROR: failed to open \"%s\"\n", fname);
+		exit(errno);
+	}
+
+	for (bar = 0; fgets(line, 80, fp); ++bar){
+		if (bar == BAR_FIFO){
+			long long pa0, pa1, len;
+			if (sscanf(line, 
+				"%Lx %Lx %Lx", &pa0, &pa1, &len) == 3){
+				pa = (u32)pa0;
+			}			
+		}
+	}
+	fclose(fp);
+
+	if (pa == 0){
+		fprintf(stderr, 
+			"ERROR: failed to get sensible PA for %d\n", slot);
+	}
+	return pa;
+}
+
+
+static void setSlaveData(u32* aovec, void* src)
+/** create some data for AO32CPCI.
+  AO32 gets AO16 data duplicated, DO64 gets a walking bit 
+*/
+{
+	static int ibit;
+	unsigned long long DO_PAT = 1ULL<<ibit;
+
+	if (++ibit > 64){
+		ibit = 0;
+	}
+
+	memcpy(aovec, src, 16*sizeof(short));
+	memcpy(aovec+8, src, 16*sizeof(short));
+	memcpy(aovec+16, &DO_PAT, sizeof(unsigned long long));
+}
+
+
+void appEnterLLC_SYNC_2VAO32(
+	int icard, struct MU *mu, struct TestDescription *td)
+/** set up LLCV2_INIT buffer and enter mode.
+ *  Buffer set up as 4K block at offset 0
+ * @todo - this overwrites settings from initV2Stats(), initV2Stats is therefore redundant.
+*/
+{
+	u32* init_buf = getVaddr(EACHBUF(td), 0);
+	u32 target_pa = getBusAddr(EACHBUF(td), 0);
+	struct Card* card = &td->cards[icard];
+	int islave = 0;
+	PRINTF(2)("appEnterLLC_SYNC_2V() va:%p pa:0x%08x %s slaves %d\n",
+		  init_buf, target_pa, MASTER? "MASTER": "",td->ao32_count);
+
+			
+	/** set up for single 4K buffer */
+	llcv2_hb_offset = 0;
+	card->sync_2v_offset_status_hsbt = 
+		LLCV2_AI_HSBT + td->channels*sizeof(short);
+	card->tlatch = 0;
+
+	/** uses V2 synchronization */
+	updateTstats = sync_2v_updateTstats;
+	waitDmaDone  = card_sync_2v_WaitDmaDone;
+
+	init_buf[LLCV2_INIT_MARKER] = LLCV2_INIT_MAGIC_AO32;
+	init_buf[LLCV2_INIT_AI_HSBT] = target_pa + LLCV2_AI_HSBT;
+	init_buf[LLCV2_INIT_AO_HSBS] = target_pa + LLCV2_AO_HSBS;
+
+/* make a zero terminated list of slave pa's */
+	if (MASTER){
+		for (islave = 0; islave < td->ao32_count; ++islave){
+			init_buf[LLCV2_INIT_AO32PA0+islave] =
+				getSlavePa(td->ao32_ids[islave]);
+		}
+	}
+	init_buf[LLCV2_INIT_AO32PA0+islave] = 0;
+
+	enterLLC_SYNC_ECM(
+		mu, td->clkpos, td->trpos, 
+		td->arg.divisor,td->internal_loopback,
+		BP_FC_SET_LLCV2_INIT,
+		target_pa );
+}
+
+int runSYNC_2VAO32(struct TestDescription *td, int soft_clock)
+/** runs the test SYNC_2V mode.
+ * PSEUDO-CODE:
+ *
+ - (1) Clear the latch timer
+ - (2) Set a local memory target address and arm the capture
+ - (3) Poll for counter running (hardware counter starts on external gate)
+ - (4) Iterate for required number of samples:
+ - (5)     [optionally send a soft clock command]  trigger an acquisition
+ - (6)     Wait for DMA Done - at this point data is available in target mem.
+ *         A "real" control application is probably getting most of its calcs 
+ *         done here rather than simply polling
+ - (7)     [Get the latch (sample) and current uSec counters from the boards - 
+ *          only if interested]
+ - (8)     Check the process has not stopped (external gate high)
+ - (b)     write data to host side buffer(LLCV2_AO_HSBS) 
+ - (b.1)
+	 * take the incoming value on feedback_channel
+	 * and propagate to all DACS.
+	 * default is to assume HAWG on DAC0
+	 * (so feedback_channel better be 0 !),
+         * but td->update_dacs makes a better test.
+	 * <b> NB: Feedback is on RTMAO, not AO32CPCI </b>
+ - (b.15)  
+	 * special case where we are DRIVING the
+	 * initial DAC signal from host side. 
+ - (b.2)
+	 *  simple feedforward case - just drive all DACS
+	 *  from AWG pattern.
+ */
+{
+	struct TimingStats tstats[MAXCARDS] = {};
+	struct DacBuf {
+		MFA mfa;
+		void* bbb;
+	} dac_buf[MAXCARDS];
+#define EACHBBB      (dac_buf[icard].bbb)
+#define EACHDAC_BASE (EACHBBB + LLCV2_AO_HSBS)
+#define EACHDAC_BASE16 ((u16*)EACHDAC_BASE)
+#define BASE_AO32(ic) ((u32*)EACHDAC_BASE+INDEX_OF_LLC_SYNC2V_AO32(ic))
+#define V2SETDACS(src, icard) \
+        memcpy(EACHDAC_BASE, (src)+(icard)*32, DAC_SAMPLE_SIZE)
+
+
+	u32 cmd = LLC_MAKE_DECIM(td->decimation);
+#define OFFSET 0
+
+	int uses_dacs = td->update_dacs || td->feedback;
+	void* dac_data;
+
+	EACHCARD_INIT;
+
+	if (uses_dacs) FOREACHCARD { /* (a) */
+		EACHBBB = getVaddr(EACHBUF(td), 0);
+		printf("card %d uses_dacs EACHBBB %p "
+		       "EACHDAC_BASE %p bus 0x%08x\n",
+		       icard, EACHBBB, EACHDAC_BASE,
+		       getBusAddr(EACHBUF(td), LLCV2_AO_HSBS) );
+	}
+
+	FOREACHCARD{ /* (1) */
+		llSetTlatch(EACHMBX(td), tstats[icard].tlatch = 0xffffffff);
+		llv2InitDmaDone(
+			getVaddr(EACHBUF(td), 
+				 EACHCARD(td)->sync_2v_offset_status_hsbt));
+	}
+   
+	FOREACHCARD{ /* (2) */
+		updateTargetAddr(cmd+LLC_CSR_M_ARM, EACHCARD(td), OFFSET);
+	}
+
+	if (td->update_dacs){
+		int islave;
+		dac_data = td_get_next_dac_data(td);	
+		FOREACHCARD{
+			V2SETDACS(dac_data, icard);
+		}
+		/** AO32 update: apply to MASTER only */
+		for(THIS_CARD = 0, islave = 0;
+				islave != td->ao32_count; ++islave){
+			setSlaveData(BASE_AO32(islave), dac_data);
+		}
+	}	
+
+#if 0
+	// wait for gate /* (3) */
+
+	while( !llCounterRunning(FIRSTMBX(td), cmd) ){ 
+		POLLALERT(ipoll, "Polling for Counter Running\n");
+	}
+#endif
+	INIT_TIMER;
+	/* WORKTODO - assumes all cards now running */
+
+	for ( td->iter = 0; td->iter != td->iterations; ++td->iter ){ /* (4) */
+		if (soft_clock) FOREACHCARD{ /* (5) */
+			llSetCmd(EACHMBX(td), cmd+LLC_CSR_M_SOFTCLOCK);
+		}
+	
+		FOREACHCARD{                                  /* (6)+(7) */
+			MARK_TIME(1, "waitDmaDone() before");
+			tstats[icard].tlatch = waitDmaDone(EACHCARD(td));
+			MARK_TIME(2, "waitDmaDone() after");
+		}
+
+		if (!td->min_latency_test) FOREACHCARD{        /* (6)+(7) */
+			updateTstats(cmd, EACHCARD(td), &tstats[icard]);    
+		}
+
+		
+		if (td->do_work){
+			doApplicationWork(td, OFFSET);
+		}
+
+		if (td->feedback) { /* (b.1) */
+			u16 *pvin = (u16 *)getVaddr(FIRSTBUF(td), OFFSET);
+			u16 vin = pvin[td->feedback_channel];
+			u32 feedback = vin << 16 | vin;
+
+			PRINTF(1)("feedback 0x%08x\n", feedback);
+
+			FOREACHCARD{   
+				MARK_TIME(3, "feedback 1");
+				memset32(EACHDAC_BASE, feedback, DAC_COUNT/2);
+
+				if (td->update_dacs){ /* (b.15) */
+
+					u16* excite = td_get_next_dac_data(td);
+				
+					EACHDAC_BASE16[td->feedback_channel] 
+					 = excite[td->feedback_channel];
+				}
+				MARK_TIME(4, "feedback 2");
+			}
+		}else if (td->update_dacs){ /** (b.2) */
+			int islave;
+
+			dac_data = td_get_next_dac_data(td);
+			FOREACHCARD{
+				V2SETDACS(dac_data, icard);
+				MARK_TIME(5, "update_dacs");
+			}
+
+			/** AO32 update: apply to MASTER only */
+			for(THIS_CARD = 0, islave = 0; 
+					islave != td->ao32_count; ++islave){
+				setSlaveData(BASE_AO32(islave), dac_data);
+			}
+		}
+
+#if IGNORE_COUNTER_STOP
+/** @todo - check counter running in local memory */
+	/* check process completion.
+         * if hardware_gateoff is employed, then the app would need
+         * to make use of a pre-arranged DIO encoding for on/off instead
+         */		 
+		if (!td->hardware_gate_off &&
+                     !llCounterRunning(FIRSTMBX(td), cmd )){          /* (8) */
+			fprintf( stderr, "Trigger is off - stop\n" );
+			break;
+		}
+#endif		
+		FOREACHCARD_MARK_TIME(9, "after llCounterRunning check");
+
+		if (td->tlog){          
+			FOREACHCARD{
+				tstats[icard].target_poll =
+					getMboxPollcount(EACHMBX(td));
+				MARK_TIME(10, "10");
+				updateTimingStats(
+					td->stats_buf[icard], 
+					td->iter, 
+					&tstats[icard]);
+			}
+		}       
+		TIMER_CHECK_OVERFLOW;
+	}
+
+	G_quit = 1;
+	return 0;
+#undef EACHMFA
+#undef EACHBBB
+#undef EACHDAC_BASE
+#undef EACHDAC_BASE16
+}
+

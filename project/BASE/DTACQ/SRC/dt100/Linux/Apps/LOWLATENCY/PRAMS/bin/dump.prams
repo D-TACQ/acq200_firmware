@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo 'marker,mask,dds_ftw[8],range[4],offsets[16],trig,channel_mask,int_clk'
+hexdump -e '2/4 "%08x," 8/1 "%02x" "," 
+	4/2 "%04x" ", {" 16/2 "%04x," "}," 3/4 "%08x," "\n"' $*

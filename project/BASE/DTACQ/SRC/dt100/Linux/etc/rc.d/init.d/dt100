@@ -1,0 +1,36 @@
+#!/bin/sh
+#
+# chkconfig: 
+# description: Starts and stops the D-TACQ dt100 device driver and nodes
+
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+
+# See how we were called.
+case "$1" in
+  start)
+	echo -n "Activate dt100:"
+        action "Configuring dt100 devices" ~dt100/modules/acq32.load 
+	echo
+	;;
+  stop)
+        echo -n "Deactivate dt100:"
+        action "Removing dt100 devices" /sbin/rmmod acq32-drv 
+        rm /dev/acq32/*
+        rmdir /dev/acq32
+	echo
+	;;
+  restart)
+        $0 stop
+	$0 start
+	;;
+  status)
+        cat /proc/acq32
+	;;
+  *)
+	echo "Usage: dt100 {start|stop|restart|status}"
+	exit 1
+esac
+

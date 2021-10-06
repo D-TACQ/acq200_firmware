@@ -1,0 +1,265 @@
+.TH "llprotocol.h" 3 "1 Dec 2005" "llcontrol" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+llprotocol.h \- API for bus level protocol. 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <setjmp.h>\fP
+.br
+
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBBP_MB_LLC_UPDATEDAC\fP   1"
+.br
+.ti -1c
+.RI "#define \fBLLC_CSR_M_UPDATEDACS\fP   'f'"
+.br
+.ti -1c
+.RI "#define \fBDAC_COUNT\fP   16"
+.br
+.ti -1c
+.RI "#define \fBDAC_SAMPLE_SIZE\fP   (DAC_COUNT*sizeof(\fBshort\fP))"
+.br
+.ti -1c
+.RI "#define \fBDAC_BASE\fP(bigbuf_base, mfa)   ((void*)bigbuf_base + (mfa))"
+.br
+.ti -1c
+.RI "#define \fBLLCV2_HB_OFFSET\fP   0x00100000"
+.br
+.RI "\fIV2 host buffer segmentation - for full V2, 4K is enough. \fP"
+.ti -1c
+.RI "#define \fBLLCV2_AI_HSBT\fP   0x000"
+.br
+.ti -1c
+.RI "#define \fBLLCV2_AO_HSBS\fP   0x400"
+.br
+.ti -1c
+.RI "#define \fBLLCV2_DO_HSBS\fP   0x800"
+.br
+.ti -1c
+.RI "#define \fBLLCV2_STATUS_HSBT\fP   0xc000"
+.br
+.ti -1c
+.RI "#define \fBLLCV2_OFFSET_AI_HSBT\fP   (\fBllcv2_hb_offset\fP+LLCV2_AI_HSBT)"
+.br
+.ti -1c
+.RI "#define \fBLLCV2_OFFSET_AO_HSBS\fP   (\fBllcv2_hb_offset\fP+LLCV2_AO_HSBS)"
+.br
+.ti -1c
+.RI "#define \fBLLCV2_OFFSET_DO_HSBS\fP   (\fBllcv2_hb_offset\fP+LLCV2_DO_HSBS)"
+.br
+.ti -1c
+.RI "#define \fBLLCV2_OFFSET_STATUS_HSBT\fP   (\fBllcv2_hb_offset\fP+LLCV2_STATUS_HSBT)"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "int \fBenterLLCSoftClock\fP (struct \fBMU\fP *m, int clkpos, int trpos, int internal_loopback, \fBu32\fP command_mods)"
+.br
+.ti -1c
+.RI "int \fBenterLLCExtClock\fP (struct \fBMU\fP *m, int clkpos, int trpos, unsigned \fBshort\fP divisor, int internal_loopback, \fBu32\fP command_mods)"
+.br
+.ti -1c
+.RI "int \fBenterLLC_SYNC_ECM\fP (struct \fBMU\fP *m, int clkpos, int trpos, unsigned \fBshort\fP divisor, int internal_loopback, \fBu32\fP command_mods, \fBu32\fP init_buf_baddr)"
+.br
+.RI "\fIEnter LowLatency Mode for EXTERNAL CLOCK capture. \fP"
+.ti -1c
+.RI "int \fBleaveLLC\fP (struct \fBMU\fP *m)"
+.br
+.ti -1c
+.RI "static \fBu32\fP \fBllPollSack\fP (struct \fBMU\fP *m)"
+.br
+.ti -1c
+.RI "static \fBu32\fP \fBllGetCsr\fP (struct \fBMU\fP *m)"
+.br
+.ti -1c
+.RI "static \fBu32\fP \fBllSetCmd\fP (struct \fBMU\fP *m, \fBu32\fP cmd)"
+.br
+.ti -1c
+.RI "static void \fBllSetAddr\fP (struct \fBMU\fP *m, \fBu32\fP addr, \fBu32\fP cmd)"
+.br
+.ti -1c
+.RI "static \fBu32\fP \fBllGetTlatch\fP (struct \fBMU\fP *m)"
+.br
+.ti -1c
+.RI "static int \fBllSetTlatch\fP (struct \fBMU\fP *m, \fBu32\fP value)"
+.br
+.ti -1c
+.RI "static \fBu32\fP \fBllGetTinst\fP (struct \fBMU\fP *m)"
+.br
+.ti -1c
+.RI "static \fBu32\fP \fBllGetTprocess\fP (struct \fBMU\fP *m)"
+.br
+.ti -1c
+.RI "\fBu32\fP \fBllWaitDmaDone\fP (struct \fBMU\fP *m)"
+.br
+.RI "\fIpolls until DMA has completed. \fP"
+.ti -1c
+.RI "\fBu32\fP \fBllv2WaitDmaDone\fP (struct \fBMU\fP *m, volatile \fBu32\fP *hstats)"
+.br
+.RI "\fIpolls until DMA has completed. \fP"
+.ti -1c
+.RI "void \fBllv2InitDmaDone\fP (volatile \fBu32\fP *hstats)"
+.br
+.RI "\fIpolls until DMA has completed. \fP"
+.ti -1c
+.RI "static int \fBllCounterRunning\fP (struct \fBMU\fP *m, \fBu32\fP csr)"
+.br
+.RI "\fIreturns TRUE when counters are running the process has started on GATE. \fP"
+.ti -1c
+.RI "static void \fBllSetDacs\fP (struct \fBMU\fP *mu, void *dacvals, char *bigbuf_base)"
+.br
+.RI "\fIuses i2o buffer Q. \fP"
+.ti -1c
+.RI "void \fBllPrimePollHB\fP (struct \fBDmaBuffer\fP *buf, int offset, int sample_len)"
+.br
+.ti -1c
+.RI "void \fBllPollHB\fP (struct \fBDmaBuffer\fP *buf, int offset, int sample_len)"
+.br
+.ti -1c
+.RI "\fBu32\fP \fBllv2_extend32\fP (\fBu32\fP old32, \fBu32\fP new12)"
+.br
+.RI "\fIreturn 32 bit count as function of old32, new12. \fP"
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "sigjmp_buf \fBG_env\fP"
+.br
+.ti -1c
+.RI "unsigned \fBllcv2_hb_offset\fP"
+.br
+.RI "\fIbut for future, simpler host side drivers, we'd like a single 4K buf, no offset. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+API for bus level protocol. 
+
+
+.SH "Define Documentation"
+.PP 
+.SS "#define BP_MB_LLC_UPDATEDAC   1"
+.PP
+.SS "#define DAC_BASE(bigbuf_base, mfa)   ((void*)bigbuf_base + (mfa))"
+.PP
+.SS "#define DAC_COUNT   16"
+.PP
+.SS "#define DAC_SAMPLE_SIZE   (DAC_COUNT*sizeof(\fBshort\fP))"
+.PP
+.SS "#define LLC_CSR_M_UPDATEDACS   'f'"
+.PP
+.SS "#define LLCV2_AI_HSBT   0x000"
+.PP
+.SS "#define LLCV2_AO_HSBS   0x400"
+.PP
+.SS "#define LLCV2_DO_HSBS   0x800"
+.PP
+.SS "#define LLCV2_HB_OFFSET   0x00100000"
+.PP
+V2 host buffer segmentation - for full V2, 4K is enough. 
+.PP
+.SS "#define LLCV2_OFFSET_AI_HSBT   (\fBllcv2_hb_offset\fP+LLCV2_AI_HSBT)"
+.PP
+.SS "#define LLCV2_OFFSET_AO_HSBS   (\fBllcv2_hb_offset\fP+LLCV2_AO_HSBS)"
+.PP
+.SS "#define LLCV2_OFFSET_DO_HSBS   (\fBllcv2_hb_offset\fP+LLCV2_DO_HSBS)"
+.PP
+.SS "#define LLCV2_OFFSET_STATUS_HSBT   (\fBllcv2_hb_offset\fP+LLCV2_STATUS_HSBT)"
+.PP
+.SS "#define LLCV2_STATUS_HSBT   0xc000"
+.PP
+.SH "Function Documentation"
+.PP 
+.SS "int enterLLC_SYNC_ECM (struct \fBMU\fP * m, int clkpos, int trpos, unsigned \fBshort\fP divisor, int internal_loopback, \fBu32\fP command_mods, \fBu32\fP init_buf_baddr)"
+.PP
+Enter LowLatency Mode for EXTERNAL CLOCK capture. 
+.PP
+.SS "int enterLLCExtClock (struct \fBMU\fP * m, int clkpos, int trpos, unsigned \fBshort\fP divisor, int internal_loopback, \fBu32\fP command_mods)"
+.PP
+.SS "int enterLLCSoftClock (struct \fBMU\fP * m, int clkpos, int trpos, int internal_loopback, \fBu32\fP command_mods)"
+.PP
+.SS "int leaveLLC (struct \fBMU\fP * m)"
+.PP
+.SS "static int llCounterRunning (struct \fBMU\fP * m, \fBu32\fP csr)\fC [inline, static]\fP"
+.PP
+returns TRUE when counters are running the process has started on GATE. 
+.PP
+.SS "static \fBu32\fP llGetCsr (struct \fBMU\fP * m)\fC [inline, static]\fP"
+.PP
+.SS "static \fBu32\fP llGetTinst (struct \fBMU\fP * m)\fC [inline, static]\fP"
+.PP
+.SS "static \fBu32\fP llGetTlatch (struct \fBMU\fP * m)\fC [inline, static]\fP"
+.PP
+.SS "static \fBu32\fP llGetTprocess (struct \fBMU\fP * m)\fC [inline, static]\fP"
+.PP
+.SS "void llPollHB (struct \fBDmaBuffer\fP * buf, int offset, int sample_len)"
+.PP
+.SS "static \fBu32\fP llPollSack (struct \fBMU\fP * m)\fC [inline, static]\fP"
+.PP
+.SS "void llPrimePollHB (struct \fBDmaBuffer\fP * buf, int offset, int sample_len)"
+.PP
+.SS "static void llSetAddr (struct \fBMU\fP * m, \fBu32\fP addr, \fBu32\fP cmd)\fC [inline, static]\fP"
+.PP
+.SS "static \fBu32\fP llSetCmd (struct \fBMU\fP * m, \fBu32\fP cmd)\fC [inline, static]\fP"
+.PP
+.SS "static void llSetDacs (struct \fBMU\fP * mu, void * dacvals, char * bigbuf_base)\fC [inline, static]\fP"
+.PP
+uses i2o buffer Q. 
+.PP
+.IP "\(bu" 2
+obtain a descriptor (MFA) from the target Q (1)
+.IP "\(bu" 2
+copy from client buffer to slave memory ref by MFA (2)
+.IP "\(bu" 2
+post descriptor to target Q (3)
+.PP
+.PP
+target is notified about the post, and uses the MFA to setup a DMA direct from host memory to DACs.
+.PP
+For MINIMUM latency
+.IP "\(bu" 2
+a/ split the function to mu_reserveOutbound(mu) ahead of time (don't pre-reserve more than one .. 100 this is a limited resource
+.IP "\(bu" 2
+b/ eliminate the memcpy (but this is quick, regardless).
+.PP
+
+.SS "static int llSetTlatch (struct \fBMU\fP * m, \fBu32\fP value)\fC [inline, static]\fP"
+.PP
+.SS "\fBu32\fP llv2_extend32 (\fBu32\fP old32, \fBu32\fP new12)"
+.PP
+return 32 bit count as function of old32, new12. 
+.PP
+.SS "void llv2InitDmaDone (volatile \fBu32\fP * hstats)"
+.PP
+polls until DMA has completed. 
+.PP
+Returns tlatch guaranteed DMA done when tlatch updated V2 method does NOT poll PCI
+.SS "\fBu32\fP llv2WaitDmaDone (struct \fBMU\fP * m, volatile \fBu32\fP * hstats)"
+.PP
+polls until DMA has completed. 
+.PP
+Returns tlatch guaranteed DMA done when tlatch updated V2 method does NOT poll PCI
+.SS "\fBu32\fP llWaitDmaDone (struct \fBMU\fP * m)"
+.PP
+polls until DMA has completed. 
+.PP
+Returns tlatch guaranteed DMA done when tlatch updated
+.SH "Variable Documentation"
+.PP 
+.SS "sigjmp_buf \fBG_env\fP"
+.PP
+.SS "unsigned \fBllcv2_hb_offset\fP"
+.PP
+but for future, simpler host side drivers, we'd like a single 4K buf, no offset. 
+.PP
+=> use a variable and set as appropriate
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for llcontrol from the source code.

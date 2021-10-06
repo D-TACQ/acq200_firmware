@@ -1,0 +1,90 @@
+.TH "x86timer.c" 3 "1 Dec 2005" "llcontrol" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+x86timer.c \- API for x86 time funcs. 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <stdio.h>\fP
+.br
+\fC#include <stdlib.h>\fP
+.br
+\fC#include <string.h>\fP
+.br
+\fC#include 'x86timer.h'\fP
+.br
+
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBrdtscll\fP(val)   __asm__ __volatile__ ('rdtsc' : '=A' (val))"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "unsigned long long \fBget_cpu_ticks\fP (void)"
+.br
+.ti -1c
+.RI "unsigned long long \fBget_cpu_usecs\fP (void)"
+.br
+.ti -1c
+.RI "unsigned int \fBget_cpu_clock_speed\fP (void)"
+.br
+.ti -1c
+.RI "static unsigned long \fB_get_elapsed_microseconds\fP (int reset, unsigned long long *start)"
+.br
+.ti -1c
+.RI "unsigned long \fBget_elapsed_microseconds\fP (int reset)"
+.br
+.ti -1c
+.RI "void \fBcpu_delay_awhile\fP (unsigned int delay_microseconds)"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "static unsigned int \fBCPU_CLOCK_SPEED\fP = -1"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+API for x86 time funcs. 
+
+thanks to Ben Penaflor
+.PP
+First run
+.PP
+. ./setup.clocks2 3 0 64 2 init_clocks_mbcb
+.PP
+telnet 192.5.166.179 /tmp/trigger_toggler
+.SH "Define Documentation"
+.PP 
+.SS "#define rdtscll(val)   __asm__ __volatile__ ('rdtsc' : '=A' (val))"
+.PP
+.SH "Function Documentation"
+.PP 
+.SS "static unsigned long _get_elapsed_microseconds (int reset, unsigned long long * start)\fC [static]\fP"
+.PP
+0x1234567890abcdefULL 
+.SS "void cpu_delay_awhile (unsigned int delay_microseconds)"
+.PP
+.SS "unsigned int get_cpu_clock_speed (void)"
+.PP
+.SS "unsigned long long get_cpu_ticks (void)"
+.PP
+.SS "unsigned long long get_cpu_usecs (void)"
+.PP
+.SS "unsigned long get_elapsed_microseconds (int reset)"
+.PP
+.SH "Variable Documentation"
+.PP 
+.SS "unsigned int \fBCPU_CLOCK_SPEED\fP = -1\fC [static]\fP"
+.PP
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for llcontrol from the source code.

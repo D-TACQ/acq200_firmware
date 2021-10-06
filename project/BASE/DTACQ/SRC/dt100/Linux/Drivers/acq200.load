@@ -1,0 +1,67 @@
+#!/bin/bash
+# acq200.load - loads acq200 device driver
+
+
+function replace_dir {
+    if [ -d $1 ]; then
+	rm -f $1/*
+    else
+	mkdir $1
+    fi
+}
+
+# if not in same dir as script, go to std prod dir and try there
+
+if [ ! -f acq200.load ]; 
+then
+    cd /home/dt100/modules
+fi
+
+module="acq32-drv"
+device="acq32"
+group="wheel"
+mode="a+rw"
+
+root="/dev/acq32"
+
+# add any custom prams here
+
+acq32_prams=
+acq32_boot_prams=`./cmdline_lookup acq32_ print_keyvalue_pair`
+
+echo "acq32 driver custom prams $acq32_prams $acq32_boot_prams"
+
+# load driver here, quit on fault
+
+/sbin/insmod acq200-drv.o $acq32_prams $acq32_boot_prams $* || exit 1
+
+
+# and now build all the device nodes
+
+# generally acq200.load runs behind acq32.load, so we don't want to
+# blow acq32's stuff away ... but we do need a target ..
+#replace_dir $root
+if [ ! -d $root ]; then
+    mkdir $root;
+fi
+
+replace_dir /dev/acq200
+
+# if slot based spec is on kernel command line, uncomment next line
+#slotbased=`./cmdline_lookup acq32.load_order`
+# else chose one of these options
+slotbased="slotbased"
+#slotbased="resourcebased"
+
+# script root procroot model slotbased [test]
+./acq32-mknod.pl $root /proc acq200 $slotbased
+
+chgrp $group $root/$device* /dev/acq200/*
+chmod $mode  $root/$device* /dev/acq200/*
+
+./acq32-init.pl $root /proc acq200 $slotbased
+
+
+
+
+

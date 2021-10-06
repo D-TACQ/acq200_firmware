@@ -1,0 +1,368 @@
+#!/bin/bash
+# sets up master slave clocking for LL test
+# usage setup.clocks [MB] [SB]
+# for a self hosted auto test, we defined a third card [CB]
+# default master, slave boards , numchannels
+#
+
+echo setup.clocks2 '$Revision: 1.1.4.8 $' mb:$MB SB:$SB NC:$NC
+
+#export `./cmdline_lookup acq32_ print_keyvalue_pair`
+
+ARGS_GOOD=0
+VERBOSE=1       ;# 0: quiet 1: do&show 2: show, no do
+
+ACQCMD=acqcmd
+# old style ACQ2SH - deprecated
+#ACQ2SH='/home/dt100/bin/acq2sh -b'
+ACQ2SH='acqcmd -s'
+
+which acqcmd >/dev/null
+if [ $? -ne 0 ];then
+	echo acqcmd not found in PATH
+	exit 1
+fi
+
+
+usage() {
+    echo usage source ./setup.clocks2 MB SB NC \[CB\]
+    echo please enter help for help
+}
+
+
+case $# in
+3|4) 	CB=$4
+        NC=$3
+        SB=$2
+        MB=$1
+	case $NC in
+	32|64|96) ARGS_GOOD=1;;
+	*) echo NC number of channels MUST BE 32, 64 or 96;;
+	esac;;
+esac
+
+
+
+help_regular() {
+    cat - <<EOF
+
+-------------------------------------------------------------------------------
+
+setup.clocks.twocard
+Prepares acq196 cards for either of two scenarios:
+
+1. Regular Master / Slave with front panel signaling
+Master Board MB $MB: 
+        Front panel 1MHz clock in LEMO on DI0
+        Front panel TRIG in LEMO on DI3
+
+        Divides 1MHz by ECM to give Sample Clock, OUTPUT on DO1
+
+        Connects 1MHz CLK to PXI via D0
+        Outputs Sample Clock to PXI via D1
+        Connects TRIG to PXI via D3
+Slave Board SB $SB
+        Inputs 1MHz CLK via PXI on D0
+        Inputs Sample Clock via PXI on D1
+        Inputs TRIG via PXI on D3
+
+-------------------------------------------------------------------------------
+EOF
+}
+
+help_autotrigger() {
+    cat - <<EOF
+
+-------------------------------------------------------------------------------
+2. Autotrigger Test - uses a third board for signaling stimulus
+Clock Board CB $CB
+        Sources 1MHz CLK from internal clock, output to PXI on D0
+        Sources TRIG from FPGA, output to PXI on D1
+
+Master Board MB $MB
+        Inputs 1MHz CLK via PXI on D0
+        Inputs TRIG via PXI on D3
+
+        Divides 1MHz by ECM to give Sample Clock, OUTPUT on DO1
+
+        Connects 1MHz CLK to PXI via D0
+        Outputs Sample Clock to PXI via D1
+        Connects TRIG to PXI via D3
+
+Slave Board SB $SB
+        Inputs 1MHz CLK via PXI on D0
+        Inputs Sample Clock via PXI on D1
+        Inputs TRIG via PXI on D3 
+
+-------------------------------------------------------------------------------
+
+EOF
+}
+
+if [ $ARGS_GOOD -eq 0 ]
+then
+    if [ "$1" = "help" ]
+    then
+	help_regular;help_autotrigger;
+    else
+	usage;
+    fi
+else
+
+
+help() {
+    if [ $CB -ne 0 ]
+    then
+	help_autotrigger
+    else
+	help_regular
+    fi
+}
+echo setup.clocks2 '$Revision: 1.1.4.8 $' mb:$MB SB:$SB NC:$NC
+
+# trigger toggle timeout
+TTT=2
+
+
+rsh() {
+    RSHB=$1;shift
+    if [ $VERBOSE -gt 0 ]
+    then
+	echo $ACQ2SH $RSHB "$@"
+    fi
+    if [ $VERBOSE -lt 2 ]
+    then
+	$ACQ2SH $RSHB "$@"
+    fi
+    RSHB=
+}
+
+
+acq() {
+    ACQB=$1;shift;
+    if [ $VERBOSE -gt 0 ]
+    then
+	echo $ACQCMD -b $ACQB "$@"
+    fi
+    if [ $VERBOSE -lt 2 ]
+    then
+        $ACQCMD -b $ACQB "$@"
+    fi
+    ACQB=
+}
+
+TT="/tmp/trigger_toggler"
+
+load_trigger_toggler_script() {
+# this script is going to run on the CB system
+    pushd /tmp
+    cat - <<EOF >/dev/acq200/acq200.$CB.01
+#!/bin/sh $TT
+# created by setup.clocks on $HOSTNAME
+# first sleep to allow host llcontrol to get going
+. /etc/profile
+(
+echo sleep >/dev/ttyS0
+acqcmd -- setDIO 1--1---
+sleep $TTT
+acqcmd -- setDIO 1--0---
+echo done >/dev/ttyS0) </dev/null 2>&1 >/dev/ttyS0 &
+echo toggler_trigger off in $TTT
+#
+EOF
+    rsh $CB "mv /tmp/acq200tmp_01 $TT;chmod a+rx $TT"
+    popd
+}
+
+toggle_trigger() {
+    if [ $CB -ne 0 ]
+    then
+	rsh $CB $TT
+    else
+	echo Please wait one second before flipping trigger
+    fi
+}
+
+
+init_clocks_common() {
+    CCB=$1;shift;
+
+    rsh $CCB set.route d0 in pxi out fpga  ;# 1MHz clock in
+    rsh $CCB set.route d3 in pxi out fpga  ;# Trigger In
+
+    rsh $CCB set.event event0 none
+    rsh $CCB set.event event1 none
+    rsh $CCB set.int_clk_src DI0 falling   ;# clk (counter) in
+    rsh $CCB set.ext_clk DI1 falling       ;# sample clock
+    rsh $CCB set.trig DI3 falling          ;# trigger
+#    rsh $CCB set.llc imask ffffffff        ;# disable target side ints
+    CCB=
+}
+
+
+init_clocks_mb() {
+    if [ $VERBOSE -gt 0 ];then
+	echo init_clocks_mb $MB
+    fi
+    init_clocks_common $MB
+    rsh $MB set.route d1 in fpga out pxi ;# Sample clock OUT
+
+    rsh $MB set.mas_clk DO1              ;# sample clock MASTER OUT
+    acq $MB -- setDIO -1------        ;# set D1 output from FPGA
+    acq $MB getDIO
+}
+
+init_clocks_sb() {
+    if [ $VERBOSE -gt 0 ];then
+	echo init_clocks_sb $SB
+    fi
+    init_clocks_common $SB
+    rsh $SB set.route d1 in pxi out fpga  ;# Sample clock IN
+}
+
+
+
+init_clocks_mbcb() {
+# regular run case where the 
+# clock init where MB sources clock from front panel
+    if [ $VERBOSE -gt 0 ];then
+	echo init_clocks_mbcb $MB
+    fi
+
+    init_clocks_mb                             ;# override routing:
+    rsh $MB set.route d0 in lemo out fpga pxi  ;# 1MHz in LEMO, out FPGA
+    rsh $MB set.route d3 in lemo out fpga pxi  ;# TRIG in LEMO, out FPGA
+    acq $MB setUserLed 4 FLASH
+}
+
+init_clocks_cb() {
+    if [ $VERBOSE -gt 0 ];then
+	echo init_clocks_cb $CB
+    fi
+
+    rsh $CB set.route d0 in fpga out pxi
+    rsh $CB set.route d3 in fpga out pxi
+# clock init where CB is the clock source using its internal clock
+    acq $CB setInternalClock 1000000 DO0
+    rsh $CB set.mas_clk DO0 falling
+    acq $CB -- setDIO 1--1--             ;# D0 D3 are FPGA OUTPUTS
+    acq $CB getDIO
+    load_trigger_toggler_script
+    toggle_trigger
+}
+
+init_clocks() {
+    if [ $CB -ne 0 ]
+    then
+	echo autotrigger MB:$MB SB:$SB NC:$NC CB:$CB
+	init_clocks_cb
+	init_clocks_mb
+    else
+	echo regular MB:$MB SB:$SB NC:$NC
+	init_clocks_mbcb
+    fi
+
+    if [ $SB -ne 0 ]
+    then
+	init_clocks_sb
+    fi
+}
+
+if [ $SB -ne 0 ]
+then
+    LLB="$MB,$SB"
+else
+    LLB=$MB
+fi
+
+
+run_llc() {
+    ./llcontrol -b $LLB --hbpoll -t --bigbuf --channels $NC -o /tmp/aidat $*
+}
+
+maxloop=1
+
+run_llc_auto_loop() {
+    let "ii=0"
+
+    estat=0
+
+    while [ $estat -eq 0 ]
+          [ $ii -lt $maxloop ]
+    do
+	echo Shot $ii
+	toggle_trigger
+	run_llc $* | tee /tmp/run_llc_auto_loop.log | tail &
+	wait;wait
+	estat=$?
+	let "ii=$ii+1"
+	echo ------------------------------------------------------------
+	echo
+    done
+
+    if [ $estat -ne 0 ]
+    then
+	echo FAILED with error $estat after $ii shots
+    fi
+}
+
+run_llc_auto() {
+    maxloop=100
+    run_llc_auto_loop $*
+}
+
+run_llc_once() {
+    maxloop=1
+    run_llc_auto_loop $*
+}
+
+run_capture_auto() {
+    let "ii=0"
+
+    estat=0
+
+    while [ $estat -eq 0 ]
+          [ $ii -lt 100 ]
+    do
+	echo Shot $ii
+	toggle_trigger
+	capture $* &
+	wait;wait
+	estat=$?
+	let "ii=$ii+1"
+	echo ------------------------------------------------------------
+	echo
+    done
+
+    if [ $estat -ne 0 ]
+    then
+	echo FAILED with error $estat after $ii shots
+    fi
+}
+
+
+echo "You are all set. Selected Mode:"
+
+if [ $CB != "" ]
+then
+    echo autotrigger mode MB $MB SB $SB NC $NC CB $CB
+else
+    echo regular front panel mode MB: $MB SB: $SB NC: $NC
+fi
+cat - <<EOF
+
+Available commands are:
+----------------------
+
+help : for help
+init_clocks : do this once to setup
+
+toggle_trigger : toggles trigger from master board
+run_llc     : runs llc, but use has to trigger
+run_llc_once : runs llc once, with autotrigger
+run_llc_auto: runs llc in a 100x loop
+echo llcontrol ./llcontrol -b $LLB --hbpoll -t --bigbuf --channels $NC -o /tmp/aidat opts
+EOF
+
+fi  # ARGS_GOOD
+

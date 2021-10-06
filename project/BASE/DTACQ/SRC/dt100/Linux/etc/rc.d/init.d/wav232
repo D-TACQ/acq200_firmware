@@ -1,0 +1,37 @@
+#!/bin/sh
+#
+# chkconfig: 
+# description: Starts and stops the D-TACQ dt100 device driver and nodes
+
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+
+# See how we were called.
+case "$1" in
+  start)
+	echo -n "Activate wav232:"
+        action "Configuring wav232 devices" ~dt100/modules/wav232.load 
+	echo
+	;;
+  stop)
+        echo -n "Deactivate wav232:"
+        action "Removing wav232 devices" /sbin/rmmod acq200-drv 
+	rm -Rf /dev/wav232
+        rm /dev/acq200/*
+        rmdir /dev/acq200
+	echo
+	;;
+  restart)
+        $0 stop
+	$0 start
+	;;
+  status)
+        cat /proc/acq200
+	;;
+  *)
+	echo "Usage: wav232 {start|stop|restart|status}"
+	exit 1
+esac
+

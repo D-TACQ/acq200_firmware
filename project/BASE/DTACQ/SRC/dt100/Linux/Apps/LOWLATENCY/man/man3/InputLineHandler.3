@@ -1,0 +1,76 @@
+.TH "InputLineHandler" 3 "1 Dec 2005" "llcontrol" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+InputLineHandler \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBInputLineHandler\fP ()"
+.br
+.ti -1c
+.RI "virtual \fB~InputLineHandler\fP ()"
+.br
+.ti -1c
+.RI "virtual void \fBhandleLine\fP (char myline[])"
+.br
+.ti -1c
+.RI "void \fBsetMaxCount\fP (int _maxcount)"
+.br
+.ti -1c
+.RI "void \fBsetArray\fP (T *_array)"
+.br
+.ti -1c
+.RI "int \fBgetCount\fP (void)"
+.br
+.in -1c
+.SS "Protected Attributes"
+
+.in +1c
+.ti -1c
+.RI "T * \fBarray\fP"
+.br
+.ti -1c
+.RI "int \fBmaxcount\fP"
+.br
+.ti -1c
+.RI "int \fBix\fP"
+.br
+.in -1c
+
+.SS "template<class T> class InputLineHandler< T >"
+
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "template<class T> \fBInputLineHandler\fP< T >::\fBInputLineHandler\fP ()\fC [inline]\fP"
+.PP
+.SS "template<class T> virtual \fBInputLineHandler\fP< T >::~\fBInputLineHandler\fP ()\fC [inline, virtual]\fP"
+.PP
+.SH "Member Function Documentation"
+.PP 
+.SS "template<class T> int \fBInputLineHandler\fP< T >::getCount (void)\fC [inline]\fP"
+.PP
+.SS "template<class T> virtual void \fBInputLineHandler\fP< T >::handleLine (char myline[])\fC [inline, virtual]\fP"
+.PP
+Reimplemented in \fBFtwHandler\fP, \fBQdacHandler\fP, \fBIntclkHandler\fP, \fBInputOffsetHandler\fP, and \fBVRangeHandler\fP.
+.SS "template<class T> void \fBInputLineHandler\fP< T >::setArray (T * _array)\fC [inline]\fP"
+.PP
+.SS "template<class T> void \fBInputLineHandler\fP< T >::setMaxCount (int _maxcount)\fC [inline]\fP"
+.PP
+.SH "Field Documentation"
+.PP 
+.SS "template<class T> T* \fBInputLineHandler\fP< T >::\fBarray\fP\fC [protected]\fP"
+.PP
+.SS "template<class T> int \fBInputLineHandler\fP< T >::\fBix\fP\fC [protected]\fP"
+.PP
+.SS "template<class T> int \fBInputLineHandler\fP< T >::\fBmaxcount\fP\fC [protected]\fP"
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for llcontrol from the source code.

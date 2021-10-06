@@ -1,0 +1,15 @@
+#!/bin/bash
+# list.all - list all flash contents on all boards
+
+for board in 1 2 3 4
+do
+    device="/dev/acq32/acq32.$board.flash"
+
+    if [ -c $device ];
+    then
+        echo device $device ...
+        pfmu -b $board list
+        echo
+    fi
+done
+

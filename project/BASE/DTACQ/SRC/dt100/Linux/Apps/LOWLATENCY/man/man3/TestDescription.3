@@ -1,0 +1,242 @@
+.TH "TestDescription" 3 "1 Dec 2005" "llcontrol" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+TestDescription \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <llcontrol.h>\fP
+.PP
+.SS "Public Types"
+
+.in +1c
+.ti -1c
+.RI "enum \fBMode\fP { \fBM_NULL\fP, \fBM_SCM\fP, \fBM_ECS\fP, \fBM_ECM\fP, \fBM_SYNC_ECM\fP, \fBM_MEASURE_BRIDGE\fP }"
+.br
+.RI "\fIdefines a test [shot] . \fP"
+.in -1c
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "enum \fBTestDescription::Mode\fP \fBmode\fP"
+.br
+.RI "\fIdefines a test [shot] . \fP"
+.ti -1c
+.RI "struct {"
+.br
+.ti -1c
+.RI "   int \fBinterval\fP"
+.br
+.ti -1c
+.RI "   int \fBdivisor\fP"
+.br
+.ti -1c
+.RI "} \fBarg\fP"
+.br
+.ti -1c
+.RI "int \fBiter\fP"
+.br
+.ti -1c
+.RI "int \fBiterations\fP"
+.br
+.ti -1c
+.RI "int \fBdecimation\fP"
+.br
+.ti -1c
+.RI "int \fBoverwrite\fP"
+.br
+.ti -1c
+.RI "const char * \fBoutfname\fP"
+.br
+.ti -1c
+.RI "int \fBdo_work\fP"
+.br
+.ti -1c
+.RI "int \fBclkpos\fP"
+.br
+.ti -1c
+.RI "int \fBtrpos\fP"
+.br
+.ti -1c
+.RI "int \fBinternal_loopback\fP"
+.br
+.ti -1c
+.RI "int \fBmin_latency_test\fP"
+.br
+.ti -1c
+.RI "int \fBmask_ints\fP"
+.br
+.ti -1c
+.RI "int \fBmask_ints_mask\fP"
+.br
+.ti -1c
+.RI "int \fBncards\fP"
+.br
+.ti -1c
+.RI "\fBCard\fP \fBcards\fP [MAXCARDS]"
+.br
+.ti -1c
+.RI "\fBTimingStats\fP * \fBstats_buf\fP [MAXCARDS]"
+.br
+.ti -1c
+.RI "void * \fBwork_buf\fP [MAXCARDS]"
+.br
+.ti -1c
+.RI "int \fBchannels\fP"
+.br
+.ti -1c
+.RI "int \fBsamples\fP"
+.br
+.ti -1c
+.RI "int \fBhb_polling\fP"
+.br
+.ti -1c
+.RI "int \fBupdate_dacs\fP"
+.br
+.ti -1c
+.RI "char * \fBdac_data_file\fP"
+.br
+.ti -1c
+.RI "char * \fBdac_data\fP"
+.br
+.ti -1c
+.RI "int \fBdac_data_samples\fP"
+.br
+.ti -1c
+.RI "int \fBdac_cursor\fP"
+.br
+.ti -1c
+.RI "int \fBfeedback\fP"
+.br
+.ti -1c
+.RI "int \fBfeedback_channel\fP"
+.br
+.ti -1c
+.RI "int \fBtlog\fP"
+.br
+.ti -1c
+.RI "const char * \fBtlog_binfile\fP"
+.br
+.ti -1c
+.RI "int \fBsample_offset\fP"
+.br
+.ti -1c
+.RI "int \fBhardware_gate_off\fP"
+.br
+.ti -1c
+.RI "\fBu32\fP \fBV2_BUFS\fP [8]"
+.br
+.ti -1c
+.RI "\fBLLC200_INIT\fP * \fBllc200_init\fP"
+.br
+.ti -1c
+.RI "int \fBllc200_init_count\fP"
+.br
+.in -1c
+.SH "Member Enumeration Documentation"
+.PP 
+.SS "enum \fBTestDescription::Mode\fP"
+.PP
+defines a test [shot] . 
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fIM_NULL \fP\fP
+.TP
+\fB\fIM_SCM \fP\fP
+.TP
+\fB\fIM_ECS \fP\fP
+.TP
+\fB\fIM_ECM \fP\fP
+.TP
+\fB\fIM_SYNC_ECM \fP\fP
+.TP
+\fB\fIM_MEASURE_BRIDGE \fP\fP
+
+.SH "Field Documentation"
+.PP 
+.SS "struct { ... } 
+	 \fBTestDescription::arg\fP"
+.PP
+.SS "struct \fBCard\fP \fBTestDescription::cards\fP[MAXCARDS]"
+.PP
+.SS "int \fBTestDescription::channels\fP"
+.PP
+.SS "int \fBTestDescription::clkpos\fP"
+.PP
+.SS "int \fBTestDescription::dac_cursor\fP"
+.PP
+.SS "char* \fBTestDescription::dac_data\fP"
+.PP
+.SS "char* \fBTestDescription::dac_data_file\fP"
+.PP
+.SS "int \fBTestDescription::dac_data_samples\fP"
+.PP
+.SS "int \fBTestDescription::decimation\fP"
+.PP
+.SS "int \fBTestDescription::divisor\fP"
+.PP
+.SS "int \fBTestDescription::do_work\fP"
+.PP
+.SS "int \fBTestDescription::feedback\fP"
+.PP
+.SS "int \fBTestDescription::feedback_channel\fP"
+.PP
+.SS "int \fBTestDescription::hardware_gate_off\fP"
+.PP
+.SS "int \fBTestDescription::hb_polling\fP"
+.PP
+.SS "int \fBTestDescription::internal_loopback\fP"
+.PP
+.SS "int \fBTestDescription::interval\fP"
+.PP
+.SS "int \fBTestDescription::iter\fP"
+.PP
+.SS "int \fBTestDescription::iterations\fP"
+.PP
+.SS "struct \fBLLC200_INIT\fP* \fBTestDescription::llc200_init\fP"
+.PP
+.SS "int \fBTestDescription::llc200_init_count\fP"
+.PP
+.SS "int \fBTestDescription::mask_ints\fP"
+.PP
+.SS "int \fBTestDescription::mask_ints_mask\fP"
+.PP
+.SS "int \fBTestDescription::min_latency_test\fP"
+.PP
+.SS "enum \fBTestDescription::Mode\fP  \fBTestDescription::mode\fP"
+.PP
+defines a test [shot] . 
+.PP
+.SS "int \fBTestDescription::ncards\fP"
+.PP
+.SS "const char* \fBTestDescription::outfname\fP"
+.PP
+.SS "int \fBTestDescription::overwrite\fP"
+.PP
+.SS "int \fBTestDescription::sample_offset\fP"
+.PP
+.SS "int \fBTestDescription::samples\fP"
+.PP
+.SS "struct \fBTimingStats\fP* \fBTestDescription::stats_buf\fP[MAXCARDS]"
+.PP
+.SS "int \fBTestDescription::tlog\fP"
+.PP
+.SS "const char* \fBTestDescription::tlog_binfile\fP"
+.PP
+.SS "int \fBTestDescription::trpos\fP"
+.PP
+.SS "int \fBTestDescription::update_dacs\fP"
+.PP
+.SS "\fBu32\fP \fBTestDescription::V2_BUFS\fP[8]"
+.PP
+.SS "void* \fBTestDescription::work_buf\fP[MAXCARDS]"
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for llcontrol from the source code.

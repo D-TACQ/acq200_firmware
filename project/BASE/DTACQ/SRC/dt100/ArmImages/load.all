@@ -1,0 +1,11 @@
+#!/bin/sh
+# load all ... load all flash funcs
+
+BOOTCODE=$1;shift;
+
+pfmu $* \
+     "deleteall" \
+     "program 0 $BOOTCODE $BOOTCODE.axf 0" \
+     "program 1 lca lca-loader.axf 14" \
+     "list"
+

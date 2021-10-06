@@ -1,0 +1,12 @@
+
+function testa {
+	echo using $@
+	cp $@ /dev/acq200.0
+	cp /dev/acq200.0 /tmp/$@
+	echo compare $@ /tmp/$@
+	cmp $@ /tmp/$@
+}
+
+testa $1
+testa $2
+	

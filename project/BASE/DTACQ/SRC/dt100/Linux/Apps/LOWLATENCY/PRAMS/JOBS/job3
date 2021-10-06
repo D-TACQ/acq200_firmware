@@ -1,0 +1,2 @@
+#!/bin/bash
+PRAMS=PRAMS/rampfast.ftw.bin SHOTS=20 NSAM=4096 NCHAN=4 ${0%*`basename $0`}job

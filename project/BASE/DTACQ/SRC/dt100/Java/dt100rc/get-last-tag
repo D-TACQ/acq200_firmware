@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+
+# extract first tag from file, but read the whole file to avoid broken pipes
+
+$found_one = 0;
+
+while( <> ){
+	if ( $found_one==0 && (( $tag ) = /(dt100rc_acq\w+):/) ){
+		print $tag;
+		$found_one++;
+	}
+}

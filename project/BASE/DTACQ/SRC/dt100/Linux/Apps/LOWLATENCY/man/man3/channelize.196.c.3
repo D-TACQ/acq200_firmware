@@ -1,0 +1,111 @@
+.TH "channelize.196.c" 3 "1 Dec 2005" "llcontrol" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+channelize.196.c \- takes a block of data and dechannelize to logical channels. 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <assert.h>\fP
+.br
+\fC#include <stdio.h>\fP
+.br
+\fC#include <stdlib.h>\fP
+.br
+\fC#include <unistd.h>\fP
+.br
+\fC#include <errno.h>\fP
+.br
+\fC#include <sys/types.h>\fP
+.br
+\fC#include <sys/stat.h>\fP
+.br
+\fC#include <fcntl.h>\fP
+.br
+
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBSSZ\fP   (sizeof(\fBshort\fP))"
+.br
+.ti -1c
+.RI "#define \fBINPUT\fP   \fBfd_in\fP"
+.br
+.ti -1c
+.RI "#define \fBOUTPUT\fP   \fBfd_out\fP"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "int \fBacq200_lookup_pchan\fP (int lchannel)"
+.br
+.ti -1c
+.RI "int \fBacq200_lookup_lchan\fP (int pchan)"
+.br
+.ti -1c
+.RI "static void \fBopen_files\fP (const char *fname_in)"
+.br
+.ti -1c
+.RI "static int \fBload\fP (\fBshort\fP *input, int ndata)"
+.br
+.ti -1c
+.RI "static void \fBchannelize\fP (\fBshort\fP *output, \fBshort\fP *input, int nchan, int nsamples)"
+.br
+.ti -1c
+.RI "static void \fBstore\fP (\fBshort\fP *output, int ndata)"
+.br
+.ti -1c
+.RI "int \fBmain\fP (int argc, char *argv[])"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "int \fBfd_in\fP"
+.br
+.ti -1c
+.RI "FILE * \fBfd_out\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+takes a block of data and dechannelize to logical channels. 
+
+usage: channelize.196 [nchan]
+.SH "Define Documentation"
+.PP 
+.SS "#define INPUT   \fBfd_in\fP"
+.PP
+.SS "#define OUTPUT   \fBfd_out\fP"
+.PP
+.SS "#define SSZ   (sizeof(\fBshort\fP))"
+.PP
+.SH "Function Documentation"
+.PP 
+.SS "int acq200_lookup_lchan (int pchan)"
+.PP
+.SS "int acq200_lookup_pchan (int lchannel)"
+.PP
+.SS "static void channelize (\fBshort\fP * output, \fBshort\fP * input, int nchan, int nsamples)\fC [static]\fP"
+.PP
+.SS "static int load (\fBshort\fP * input, int ndata)\fC [static]\fP"
+.PP
+.SS "int main (int argc, char * argv[])"
+.PP
+.SS "static void open_files (const char * fname_in)\fC [static]\fP"
+.PP
+.SS "static void store (\fBshort\fP * output, int ndata)\fC [static]\fP"
+.PP
+.SH "Variable Documentation"
+.PP 
+.SS "int \fBfd_in\fP"
+.PP
+.SS "FILE* \fBfd_out\fP"
+.PP
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for llcontrol from the source code.

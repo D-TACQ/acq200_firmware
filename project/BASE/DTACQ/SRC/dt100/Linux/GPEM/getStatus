@@ -1,0 +1,21 @@
+#!/bin/bash
+
+cd /tmp
+acqcmd -v 1 << EOF | perl -n -e $PSCRIPT '
+	if ( !($cmd =~ /\w+/) ){ 
+		$cmd = $_; chomp( $cmd ); 
+	}else{ 
+		$res = $_;$res =~ s/ACQ32:/:/; 
+		printf( "%-35s %s", $cmd, $res ); $cmd=" " 
+	}'
+getPhase AI P1 state
+getPhase AI P1 requested-samples
+getPhase AI P1 actual-samples
+getPhase AI P2 state
+getPhase AI P2 requested-samples
+getPhase AI P2 actual-samples
+getPhase AO P1 state
+getPhase AO P1 requested-samples
+getPhase AO P2 state
+getPhase AO P2 requested-samples
+EOF

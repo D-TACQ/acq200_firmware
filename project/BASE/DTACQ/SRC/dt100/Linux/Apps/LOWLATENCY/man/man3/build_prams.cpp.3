@@ -1,0 +1,186 @@
+.TH "build_prams.cpp" 3 "1 Dec 2005" "llcontrol" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+build_prams.cpp \- ACQ216 precooking file. 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'local.h'\fP
+.br
+\fC#include <assert.h>\fP
+.br
+\fC#include <stdio.h>\fP
+.br
+\fC#include <stdlib.h>\fP
+.br
+\fC#include <errno.h>\fP
+.br
+\fC#include <fcntl.h>\fP
+.br
+\fC#include <sys/ioctl.h>\fP
+.br
+\fC#include <sys/mman.h>\fP
+.br
+\fC#include <sys/stat.h>\fP
+.br
+\fC#include <sys/time.h>\fP
+.br
+\fC#include <sys/types.h>\fP
+.br
+\fC#include <unistd.h>\fP
+.br
+\fC#include <ctype.h>\fP
+.br
+\fC#include <popt.h>\fP
+.br
+\fC#include 'acq32busprot.h'\fP
+.br
+\fC#include 'llcontrol.h'\fP
+.br
+\fC#include 'CONSTS/M2-consts.h'\fP
+.br
+\fC#include 'CONSTS/M5-consts.h'\fP
+.br
+\fC#include 'CONSTS/M2-consts.c'\fP
+.br
+\fC#include 'CONSTS/M5-consts.c'\fP
+.br
+
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fBULL_LUT\fP"
+.br
+.ti -1c
+.RI "class \fBInputLineHandler< T >\fP"
+.br
+.ti -1c
+.RI "class \fBTextFileReader\fP"
+.br
+.ti -1c
+.RI "class \fBDefinitionFileHandler< T >\fP"
+.br
+.ti -1c
+.RI "class \fBFtwHandler\fP"
+.br
+.RI "\fIprocesses DDS Frequency Tuning Word. \fP"
+.ti -1c
+.RI "class \fBQdacHandler\fP"
+.br
+.RI "\fIprocesses DDS Frequency Tuning Word. \fP"
+.ti -1c
+.RI "class \fBIntclkHandler\fP"
+.br
+.RI "\fIprocesses Internal Clock settings. \fP"
+.ti -1c
+.RI "class \fBInputOffsetHandler\fP"
+.br
+.RI "\fIInput Offsets are value,value,value 16 per line. \fP"
+.ti -1c
+.RI "class \fBVRangeHandler\fP"
+.br
+.in -1c
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBMAXLINE\fP   256"
+.br
+.in -1c
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef unsigned \fBu32\fP"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "static unsigned char \fBhexval\fP (char hexchar)"
+.br
+.RI "\fIASCII coding assumed. \fP"
+.ti -1c
+.RI "static void \fBinitBuf\fP (\fBDefinitionFileHandler\fP< struct \fBLLC200_INIT\fP > *fileHandler)"
+.br
+.ti -1c
+.RI "static void \fBload\fP (\fBInputLineHandler\fP< struct \fBLLC200_INIT\fP > *lineHandler, const char *def_file)"
+.br
+.ti -1c
+.RI "int \fBstrsplit\fP (char *str, char *argv[], int maxargs, const char *delim)"
+.br
+.RI "\fI\fBstrsplit()\fP splits str into args, returns args. \fP"
+.ti -1c
+.RI "static char * \fBchomp\fP (char *str)"
+.br
+.ti -1c
+.RI "static void \fBwriteOutput\fP (const char *outfile)"
+.br
+.ti -1c
+.RI "int \fBmain\fP (int argc, const char *argv[])"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "\fBLLC200_INIT\fP * \fBllc200_init\fP"
+.br
+.ti -1c
+.RI "int \fBllc200_init_count\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+ACQ216 precooking file. 
+
+.IP "\(bu" 2
+Build a struct \fBLLC200_INIT\fP[] parameter array for use with ACQ216
+.IP "\(bu" 2
+This is an example application, backing test definitions of parameter settings into a binary array. llcontrol loads this binary array, one record per shot.
+.IP "\(bu" 2
+This application is not rocket science, it simply interprets the definitions * and packs them.
+.IP "\(bu" 2
+RESTRICTION: only supports changing one parameter type at a time. It should be possible to OR together records. llcontrol supports this.
+.PP
+
+.SH "Define Documentation"
+.PP 
+.SS "#define MAXLINE   256"
+.PP
+.SH "Typedef Documentation"
+.PP 
+.SS "typedef unsigned \fBu32\fP"
+.PP
+.SH "Function Documentation"
+.PP 
+.SS "static char* chomp (char * str)\fC [static]\fP"
+.PP
+.SS "static unsigned char hexval (char hexchar)\fC [static]\fP"
+.PP
+ASCII coding assumed. 
+.PP
+.SS "static void initBuf (\fBDefinitionFileHandler\fP< struct \fBLLC200_INIT\fP > * fileHandler)\fC [static]\fP"
+.PP
+.SS "static void load (\fBInputLineHandler\fP< struct \fBLLC200_INIT\fP > * lineHandler, const char * def_file)\fC [static]\fP"
+.PP
+.SS "int main (int argc, const char * argv[])"
+.PP
+.SS "int strsplit (char * str, char * argv[], int maxargs, const char * delim)"
+.PP
+\fBstrsplit()\fP splits str into args, returns args. 
+.PP
+.SS "static void writeOutput (const char * outfile)\fC [static]\fP"
+.PP
+.SH "Variable Documentation"
+.PP 
+.SS "struct \fBLLC200_INIT\fP* \fBllc200_init\fP"
+.PP
+.SS "int \fBllc200_init_count\fP"
+.PP
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for llcontrol from the source code.

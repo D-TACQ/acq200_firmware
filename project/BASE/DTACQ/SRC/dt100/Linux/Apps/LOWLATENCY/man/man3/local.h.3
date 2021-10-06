@@ -1,0 +1,148 @@
+.TH "local.h" 3 "1 Dec 2005" "llcontrol" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+local.h \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <string.h>\fP
+.br
+
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBpgm_getchar\fP   getchar"
+.br
+.ti -1c
+.RI "#define \fBSTREQ\fP(s1, s2)   (strcmp( s1, s2 ) == 0)"
+.br
+.ti -1c
+.RI "#define \fBSTREQN\fP(s1, s2, n)   (strncmp( s1, s2, n ) == 0)"
+.br
+.ti -1c
+.RI "#define \fBSTREQNL\fP(s1, s2)   (strncmp( s1, s2, strlen(s2) ) == 0)"
+.br
+.ti -1c
+.RI "#define \fBIN_RANGE\fP(xx, ll, rr)   ((xx)>=(ll)&&(xx)<=(rr))"
+.br
+.ti -1c
+.RI "#define \fBCLAMP\fP(xx, ll, rr)   ((xx) = (xx)<(ll)? (ll): (xx)>(rr)? (rr): (xx))"
+.br
+.ti -1c
+.RI "#define \fBSWAP\fP(aa, bb, tt)   ( tt = aa, aa = bb, bb = tt )"
+.br
+.ti -1c
+.RI "#define \fBMAX\fP(aa, bb)   ((aa)>=(bb)?(aa):(bb))"
+.br
+.ti -1c
+.RI "#define \fBMIN\fP(aa, bb)   ((aa)<=(bb)?(aa):(bb))"
+.br
+.ti -1c
+.RI "#define \fBABS\fP(aa)   ((aa)>=0?(aa):-(aa))"
+.br
+.ti -1c
+.RI "#define \fBSQR\fP(aa)   ((aa)*(aa))"
+.br
+.ti -1c
+.RI "#define \fBSIGN\fP(aa)   ((aa)>=0? 1: -1)"
+.br
+.ti -1c
+.RI "#define \fBOK\fP   0"
+.br
+.ti -1c
+.RI "#define \fBERR\fP   -1"
+.br
+.ti -1c
+.RI "#define \fBFALSE\fP   0"
+.br
+.ti -1c
+.RI "#define \fBTRUE\fP   1"
+.br
+.ti -1c
+.RI "#define \fBON\fP   1"
+.br
+.ti -1c
+.RI "#define \fBOFF\fP   0"
+.br
+.ti -1c
+.RI "#define \fBPDEBUG\fP(fmt, args...)   fprintf(stderr, fmt, ## args)"
+.br
+.ti -1c
+.RI "#define \fBPDEBUGG\fP(fmt, args...)"
+.br
+.ti -1c
+.RI "#define \fBKB\fP   0x400"
+.br
+.ti -1c
+.RI "#define \fBMB\fP   0x100000"
+.br
+.ti -1c
+.RI "#define \fBASSERT\fP(cond)"
+.br
+.ti -1c
+.RI "#define \fBWORKTODO\fP   (-1)"
+.br
+.in -1c
+.SH "Define Documentation"
+.PP 
+.SS "#define ABS(aa)   ((aa)>=0?(aa):-(aa))"
+.PP
+.SS "#define ASSERT(cond)"
+.PP
+\fBValue:\fP
+.PP
+.nf
+if ( !(cond) ){ \
+                fprintf( stderr, 'ASSERTION: %s %d',__FILE__,__LINE__ );\
+                exit( 1 );\
+            }
+.fi
+.SS "#define CLAMP(xx, ll, rr)   ((xx) = (xx)<(ll)? (ll): (xx)>(rr)? (rr): (xx))"
+.PP
+.SS "#define ERR   -1"
+.PP
+.SS "#define FALSE   0"
+.PP
+.SS "#define IN_RANGE(xx, ll, rr)   ((xx)>=(ll)&&(xx)<=(rr))"
+.PP
+.SS "#define KB   0x400"
+.PP
+.SS "#define MAX(aa, bb)   ((aa)>=(bb)?(aa):(bb))"
+.PP
+.SS "#define MB   0x100000"
+.PP
+.SS "#define MIN(aa, bb)   ((aa)<=(bb)?(aa):(bb))"
+.PP
+.SS "#define OFF   0"
+.PP
+.SS "#define OK   0"
+.PP
+.SS "#define ON   1"
+.PP
+.SS "#define PDEBUG(fmt, args...)   fprintf(stderr, fmt, ## args)"
+.PP
+.SS "#define PDEBUGG(fmt, args...)"
+.PP
+.SS "#define pgm_getchar   getchar"
+.PP
+.SS "#define SIGN(aa)   ((aa)>=0? 1: -1)"
+.PP
+.SS "#define SQR(aa)   ((aa)*(aa))"
+.PP
+.SS "#define STREQ(s1, s2)   (strcmp( s1, s2 ) == 0)"
+.PP
+.SS "#define STREQN(s1, s2, n)   (strncmp( s1, s2, n ) == 0)"
+.PP
+.SS "#define STREQNL(s1, s2)   (strncmp( s1, s2, strlen(s2) ) == 0)"
+.PP
+.SS "#define SWAP(aa, bb, tt)   ( tt = aa, aa = bb, bb = tt )"
+.PP
+.SS "#define TRUE   1"
+.PP
+.SS "#define WORKTODO   (-1)"
+.PP
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for llcontrol from the source code.

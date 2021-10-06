@@ -1,0 +1,11 @@
+#!/bin/bash
+PRAMS=${PRAMS:-PRAMS/M5-vranges.bin}
+NSAM=${NSAM:-512}
+SHOTS=${SHOTS:-1000}
+NCHAN=${NCHAN:-16}
+OUTFILE=/tmp/dds.ftw-$SHOTS-$NCHAN-$NSAM
+export ACQ216=1
+./llcontrol -M ffff -b 3 -t --hbpoll --bigbuf \
+	-n $SHOTS -c $NCHAN --samples $NSAM --prams $PRAMS -O -W -o $OUTFILE \
+	 SCM 2>/dev/null | tail -n 3
+echo output `ls -l ${OUTFILE}*userbuf`

@@ -1,0 +1,2221 @@
+.TH "acq32busprot.h" 3 "1 Dec 2005" "llcontrol" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+acq32busprot.h \- pci bus command protocol definition. 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fBLLC200_INIT\fP"
+.br
+.RI "\fILLC200_INIT acq216 host side buffer for host side initialisation. \fP"
+.ti -1c
+.RI "struct \fBSTATUS_CHANGE_NOTIFICATION_REQUEST\fP"
+.br
+.ti -1c
+.RI "struct \fBHOST_REQUEST_DATA_RECORD\fP"
+.br
+.ti -1c
+.RI "struct \fBACQ32_PULL_OUTPUT_DATA_RECORD\fP"
+.br
+.ti -1c
+.RI "struct \fBMESSAGE_HEADER\fP"
+.br
+.ti -1c
+.RI "struct \fBMESSAGE\fP"
+.br
+.RI "\fII2O message handling. \fP"
+.in -1c
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBBP_REV\fP   '$Revision: 1.85.2.18 $'"
+.br
+.ti -1c
+.RI "#define \fBBP_MB_COMMAND\fP   0"
+.br
+.ti -1c
+.RI "#define \fBBP_MB_A3\fP   1"
+.br
+.ti -1c
+.RI "#define \fBBP_MB_A4\fP   2"
+.br
+.ti -1c
+.RI "#define \fBBP_MB_STATUS\fP   3"
+.br
+.ti -1c
+.RI "#define \fBBP_CI_ACK_BIT\fP   31"
+.br
+.ti -1c
+.RI "#define \fBBP_CI_DONE_BIT\fP   30"
+.br
+.ti -1c
+.RI "#define \fBBP_CI_COMMAND_BIT\fP   29"
+.br
+.ti -1c
+.RI "#define \fBBP_CI_QUERY_BIT\fP   28"
+.br
+.ti -1c
+.RI "#define \fBBP_CI_A3_BIT\fP   27"
+.br
+.ti -1c
+.RI "#define \fBBP_CI_A4_BIT\fP   26"
+.br
+.ti -1c
+.RI "#define \fBMASK\fP(bit)   (1U<<(bit))"
+.br
+.ti -1c
+.RI "#define \fBBP_CI_ACK\fP   MASK(BP_CI_ACK_BIT)"
+.br
+.ti -1c
+.RI "#define \fBBP_CI_DONE\fP   MASK(BP_CI_DONE_BIT)"
+.br
+.ti -1c
+.RI "#define \fBBP_CI_A3\fP   MASK(BP_CI_A3_BIT)"
+.br
+.ti -1c
+.RI "#define \fBBP_CI_A4\fP   MASK(BP_CI_A4_BIT)"
+.br
+.ti -1c
+.RI "#define \fBBP_CI_QUERY\fP   MASK(BP_CI_QUERY_BIT)"
+.br
+.ti -1c
+.RI "#define \fBBP_CI_COMMAND\fP   MASK(BP_CI_COMMAND_BIT)"
+.br
+.ti -1c
+.RI "#define \fBBP_GET_FUNCODE\fP(command)   (((command)>>16)&0x0ff)"
+.br
+.ti -1c
+.RI "#define \fBBP_SET_FUNCODE\fP(funcode)   ((funcode)<<16)"
+.br
+.ti -1c
+.RI "#define \fBBP_GET_A1\fP(command)   (((command)>>8)&0x0ff)"
+.br
+.ti -1c
+.RI "#define \fBBP_SET_A1\fP(a1)   ((a1)<<8)"
+.br
+.ti -1c
+.RI "#define \fBBP_GET_A2\fP(command)   ((command)&0x0ff)"
+.br
+.ti -1c
+.RI "#define \fBBP_SET_A2\fP(a2)   (a2)"
+.br
+.ti -1c
+.RI "#define \fBBP_GET_MODE\fP(status)   (((status)>>24)&0x07f)"
+.br
+.ti -1c
+.RI "#define \fBBP_SET_MODE\fP(mode)   ((mode)<<24)"
+.br
+.ti -1c
+.RI "#define \fBBP_GET_ERROR\fP(status)   ((status&0x80000000)!=0)"
+.br
+.ti -1c
+.RI "#define \fBBP_SET_ERROR\fP(status)   ((status)<<31)"
+.br
+.ti -1c
+.RI "#define \fBBP_GET_STATE\fP(status)   (((status)>>16)&0x0ff)"
+.br
+.ti -1c
+.RI "#define \fBBP_SET_STATE\fP(state)   ((state)<<16)"
+.br
+.ti -1c
+.RI "#define \fBBP_GET_CYCLE\fP(status)   (((status)>>12)&0xf)"
+.br
+.ti -1c
+.RI "#define \fBBP_SET_CYCLE\fP(status)   ((status)<<12)"
+.br
+.ti -1c
+.RI "#define \fBBP_GET_HEARTBEAT\fP(status)   ((status)&0x0fff)"
+.br
+.ti -1c
+.RI "#define \fBBP_SET_HEARTBEAT\fP(status)   ((status)&0x0fff)"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_DEBUG\fP   fcb"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_INTERRUPTS\fP   FCI"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_INTCLOCK\fP   fci"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_GET_INTCLOCK\fP   fci"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_EXTCLOCK\fP   fce"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_GET_EXTCLOCK\fP   fce"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_TAGGING\fP   FCT"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_HOST_DMABUF\fP   FCB"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_SPIN\fP   FCY"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_BIG_DUMP\fP   FCU"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_GET_FWREV\fP   FCR"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_GET_CONFIG\fP   FCV"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_GET_CALINFO\fP   FCW"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_GET_CAPTURESTATS\fP   FCE"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_DEBUG_GET_REGS\fP   FCQ"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_GET_NUMSAMPLES\fP   FCN"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_ROUTE\fP   fcr"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_MASK_RAW\fP   'r'"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_MASK_ROW\fP   'R'"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_MASK_CHAN\fP   'C'"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_CALDACS\fP   FCC"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_DACPOT\fP   FCP"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_DACPOT_UP\fP   BP_SET_A2( 'u' )"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_DACPOT_DN\fP   BP_SET_A2( 'd' )"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_MODE\fP   FCM"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_MODE_GC\fP   FCG"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_MODE_TC\fP   FCH"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SM_FLAGS_DEB\fP   0x80"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SM_FLAGS_NEM\fP   0x40"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_ARM\fP   FCA"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_ABORT\fP   FCZ"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_MASK\fP   FCK"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_GET_MASK\fP   FCK"
+.br
+.ti -1c
+.RI "#define \fBBPFC_GET_MODEL\fP   fck"
+.br
+.ti -1c
+.RI "#define \fBBPFC_GET_NCHANNELS\fP   fcn"
+.br
+.ti -1c
+.RI "#define \fBBPFC_GET_RANGE\fP   fcm"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_RESERVE_AO\fP   fca"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_QUERY_AO\fP   fca"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_DACS\fP   FCD"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_DO\fP   fcf"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_XO_FUNCTION\fP   'F'"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_XO_CLEAR\fP   0x80"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_XO_END\fP   0x40"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_XO_DATA\fP   0x02"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_XO_CYCLE\fP   0x01"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SC_GET_DIO\fP   fcd"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SC_SET_DIO\fP   fcd"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SC_SET_CHANNEL\fP   fcc"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SC_SET_CHANNEL_CH_LSB\fP   24"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SC_SET_CHANNEL_G1_LSB\fP   16"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SC_SET_CHANNEL_G2_LSB\fP   8"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SC_SET_CHANNEL_V_EX_LSB\fP   0"
+.br
+.ti -1c
+.RI "#define \fBBYTE_ENCODE_BIT\fP(lsb, val)   ((val)<<(lsb))"
+.br
+.ti -1c
+.RI "#define \fBBYTE_DECODE_BIT\fP(lsb, val)   (((val)>>(lsb))&0xff)"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SC_POT\fP   fcp"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SC_POT_BOARD0\fP   0x00"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SC_POT_BOARD1\fP   0x80"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SC_POT_1V\fP   0x00"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SC_POT_2V\fP   0x04"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SC_POT_5V\fP   0x08"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SC_POT_10V\fP   0x0c"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_DISTRIBUTOR\fP   fcs"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_DIST_NORMAL\fP   0"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_DIST_ID\fP   1"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_DIST_ID_ALL\fP   2"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_DATA_TRIGGER\fP   0x0d"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_DATA_TRIGGER_MULTI\fP   0x0e"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_DATA_EDGE_TRIGGER\fP   0x1d"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_DATA_EDGE_TRIGGER_MULTI\fP   0x1e"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_DATA_FAST_TRIGGER_MULTI\fP   0x1f"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SELECT_CALSET\fP   fcl"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_GET_ATRIGGER\fP   fc80"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_ADJUST_TRIGGER\fP   fc80"
+.br
+.ti -1c
+.RI "#define \fBBP_GUT_FC_FX_AI\fP   0x80"
+.br
+.ti -1c
+.RI "#define \fBBP_GUT_FC_FX_AO\fP   0x40"
+.br
+.ti -1c
+.RI "#define \fBBP_GUT_FC_FX_DO\fP   0x20"
+.br
+.ti -1c
+.RI "#define \fBBP_GUT_FC_EV\fP   0x10"
+.br
+.ti -1c
+.RI "#define \fBBP_GUT_FC_EPMASK\fP   0x0f"
+.br
+.ti -1c
+.RI "#define \fBBP_GUT_SETPHASE\fP   fc1"
+.br
+.ti -1c
+.RI "#define \fBBP_GUT_GETPHASE\fP   fc1"
+.br
+.ti -1c
+.RI "#define \fBBP_GUT_SETEVENT\fP   fc2"
+.br
+.ti -1c
+.RI "#define \fBBP_GUT_GETEVENT\fP   fc2"
+.br
+.ti -1c
+.RI "#define \fBBP_GUT_FIREEVENT\fP   fc3"
+.br
+.ti -1c
+.RI "#define \fBBP_GUT_SETCLOCK\fP   fc4"
+.br
+.ti -1c
+.RI "#define \fBBP_GUT_CLOCKNOW\fP   fc5"
+.br
+.ti -1c
+.RI "#define \fBBP_GUT_RESET\fP   fc6"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_DATA_THRESHOLD\fP   fct"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_USER\fP   fcu"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_USER_LED3_ON\fP   0x1"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_USER_LED3_OFF\fP   0x2"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_USER_LED3_FLIP\fP   0x3"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_USER_LED4_ON\fP   0x4"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_USER_LED4_OFF\fP   0x8"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_USER_LED4_FLIP\fP   0xc"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_WAIT_EVENT\fP   fcw"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_FETCH_DATA\fP   FCF"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_TXDATA\fP   FCX"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_STREAM\fP   FCS"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_STREAM_MEAN\fP   0x01"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_STREAM_NPAIRS\fP   0xf0"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_STREAM_BURST\fP   0x02"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_GET_NPAIRS\fP(f)   (((f)&BP_FC_STREAM_NPAIRS)>>4)"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_NPAIRS\fP(p)   (((p)<<4)&BP_FC_STREAM_NPAIRS)"
+.br
+.ti -1c
+.RI "#define \fBBP_INT_COMMAND_ACK\fP   0x0001"
+.br
+.ti -1c
+.RI "#define \fBBP_INT_STATUS_CHANGE\fP   0x0002"
+.br
+.ti -1c
+.RI "#define \fBBP_INT_LLC_DMA_DONE\fP   0x0004"
+.br
+.ti -1c
+.RI "#define \fBBP_INT_LLC_ERROR\fP   0x0008"
+.br
+.ti -1c
+.RI "#define \fBBS_16K\fP   0x4000"
+.br
+.ti -1c
+.RI "#define \fBBS_1K\fP   0x400"
+.br
+.ti -1c
+.RI "#define \fBBP_A1_START_BS_16K\fP   0x01"
+.br
+.ti -1c
+.RI "#define \fBBP_A1_LENGTH_BS_16K\fP   0x02"
+.br
+.ti -1c
+.RI "#define \fBBP_A1_START_BS_1K\fP   0x04"
+.br
+.ti -1c
+.RI "#define \fBBP_A1_LENGTH_BS_1K\fP   0x08"
+.br
+.ti -1c
+.RI "#define \fBBP_A1_FETCH_PRETRIGGER\fP   0x10"
+.br
+.ti -1c
+.RI "#define \fBMAX_START_CODING\fP   0xffffU"
+.br
+.ti -1c
+.RI "#define \fBMAX_LENGTH_CODING\fP   0xffffU"
+.br
+.ti -1c
+.RI "#define \fBSF0\fP   0xfe"
+.br
+.ti -1c
+.RI "#define \fBSF1\fP   0xed"
+.br
+.ti -1c
+.RI "#define \fBSUBFRAME_MASK\fP   0x3f"
+.br
+.ti -1c
+.RI "#define \fBNSUBFRAMES\fP   0x40"
+.br
+.ti -1c
+.RI "#define \fBNID_BITS\fP   0x30"
+.br
+.ti -1c
+.RI "#define \fBnX_bit\fP   15"
+.br
+.ti -1c
+.RI "#define \fBT_bit\fP   14"
+.br
+.ti -1c
+.RI "#define \fBs0_bit\fP   8"
+.br
+.ti -1c
+.RI "#define \fBMFX_SF0\fP   0"
+.br
+.ti -1c
+.RI "#define \fBMFX_SF1\fP   1"
+.br
+.ti -1c
+.RI "#define \fBMFX_MF2\fP   2"
+.br
+.ti -1c
+.RI "#define \fBMFX_MF3\fP   3"
+.br
+.ti -1c
+.RI "#define \fBMFX_FNa\fP   4"
+.br
+.ti -1c
+.RI "#define \fBMFX_FNb\fP   5"
+.br
+.ti -1c
+.RI "#define \fBMFX_Ja\fP   6"
+.br
+.ti -1c
+.RI "#define \fBMFX_Jb\fP   7"
+.br
+.ti -1c
+.RI "#define \fBMFX_Jc\fP   8"
+.br
+.ti -1c
+.RI "#define \fBMFX_Jd\fP   9"
+.br
+.ti -1c
+.RI "#define \fBMFX_ESa\fP   10"
+.br
+.ti -1c
+.RI "#define \fBMFX_ESb\fP   11"
+.br
+.ti -1c
+.RI "#define \fBMFX_ESc\fP   12"
+.br
+.ti -1c
+.RI "#define \fBMFX_ESd\fP   13"
+.br
+.ti -1c
+.RI "#define \fBMFX_ESOFa\fP   14"
+.br
+.ti -1c
+.RI "#define \fBMFX_ESOFb\fP   15"
+.br
+.ti -1c
+.RI "#define \fBMFX_ESOFc\fP   16"
+.br
+.ti -1c
+.RI "#define \fBMFX_DIO\fP   17"
+.br
+.ti -1c
+.RI "#define \fBMFX_EDIOa\fP   18"
+.br
+.ti -1c
+.RI "#define \fBMFX_EDIOb\fP   19"
+.br
+.ti -1c
+.RI "#define \fBMFX_EDIOc\fP   20"
+.br
+.ti -1c
+.RI "#define \fBMFX_EDIOd\fP   21"
+.br
+.ti -1c
+.RI "#define \fBMFX_BLENa\fP   22"
+.br
+.ti -1c
+.RI "#define \fBMFX_BLENb\fP   23"
+.br
+.ti -1c
+.RI "#define \fBMFX_BDELa\fP   24"
+.br
+.ti -1c
+.RI "#define \fBMFX_BDELb\fP   25"
+.br
+.ti -1c
+.RI "#define \fBMFX_OVER\fP   26"
+.br
+.ti -1c
+.RI "#define \fBMFX_MFNa\fP   28"
+.br
+.ti -1c
+.RI "#define \fBMFX_MFNb\fP   29"
+.br
+.ti -1c
+.RI "#define \fBMFX_MFNc\fP   30"
+.br
+.ti -1c
+.RI "#define \fBMFX_MFNd\fP   31"
+.br
+.ti -1c
+.RI "#define \fBMFX_TVSa\fP   32"
+.br
+.ti -1c
+.RI "#define \fBMFX_TVSb\fP   33"
+.br
+.ti -1c
+.RI "#define \fBMFX_TVSc\fP   34"
+.br
+.ti -1c
+.RI "#define \fBMFX_TVSd\fP   35"
+.br
+.ti -1c
+.RI "#define \fBMFX_TVUSa\fP   36"
+.br
+.ti -1c
+.RI "#define \fBMFX_TVUSb\fP   37"
+.br
+.ti -1c
+.RI "#define \fBMFX_TVUSc\fP   38"
+.br
+.ti -1c
+.RI "#define \fBMFX_TVUSd\fP   39"
+.br
+.ti -1c
+.RI "#define \fBMF_MF2\fP   0xf0"
+.br
+.ti -1c
+.RI "#define \fBMF_MF3\fP   0x01"
+.br
+.ti -1c
+.RI "#define \fBMF_FILLa\fP   0xf1"
+.br
+.ti -1c
+.RI "#define \fBMF_FILLb\fP   0x11"
+.br
+.ti -1c
+.RI "#define \fBMT_TYPE_SHIFT\fP   24"
+.br
+.ti -1c
+.RI "#define \fBMT_TYPE_MASK\fP   (0xffU<<MT_TYPE_SHIFT)"
+.br
+.ti -1c
+.RI "#define \fBMT_PRAM_MASK\fP   ~(MT_TYPE_MASK)"
+.br
+.ti -1c
+.RI "#define \fBMT_ID\fP(type)   ((type)&MT_TYPE_MASK)"
+.br
+.ti -1c
+.RI "#define \fBMT_PRAM\fP(type)   ((type)&MT_PRAM_MASK)"
+.br
+.ti -1c
+.RI "#define \fBMT_STREAM\fP   (BP_FC_STREAM<<MT_TYPE_SHIFT)"
+.br
+.ti -1c
+.RI "#define \fBMTP_STREAM_IS_TAGGED\fP   0x800000"
+.br
+.ti -1c
+.RI "#define \fBMTP_STREAM_END_PACKET\fP   0x400000"
+.br
+.ti -1c
+.RI "#define \fBMTP_STREAM_NCHAN_MASK\fP   0x0000ff"
+.br
+.ti -1c
+.RI "#define \fBMTP_STREAM_NSAM_MASK\fP   0x00ff00"
+.br
+.ti -1c
+.RI "#define \fBMTP_STREAM_NCHAN\fP(type)   ((type)&MTP_STREAM_NCHAN_MASK)"
+.br
+.ti -1c
+.RI "#define \fBMTP_STREAM_NSAM\fP(type)   (((type)&MTP_STREAM_NSAM_MASK)>>8)"
+.br
+.ti -1c
+.RI "#define \fBMTP_STREAM_SLEN\fP(type)   ((MTP_STREAM_NCHAN(type)+(((type)&MTP_STREAM_IS_TAGGED)!=0?2:0))*2)"
+.br
+.ti -1c
+.RI "#define \fBMT_FWREV\fP   (BP_FC_GET_FWREV<<MT_TYPE_SHIFT)"
+.br
+.ti -1c
+.RI "#define \fBMT_BIGDUMP_COMPLETE\fP   (BP_FC_BIG_DUMP<<MT_TYPE_SHIFT)"
+.br
+.ti -1c
+.RI "#define \fBMT_GETCONFIG\fP   BP_FC_GET_CONFIG"
+.br
+.ti -1c
+.RI "#define \fBFLAVOR_KEY\fP   'FLAVOR'"
+.br
+.ti -1c
+.RI "#define \fBMT_GETCALINFO\fP   (BP_FC_GET_CALINFO<<MT_TYPE_SHIFT)"
+.br
+.ti -1c
+.RI "#define \fBMT_GETCAPTURESTATS\fP   (BP_FC_GET_CAPTURESTATS<<MT_TYPE_SHIFT)"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_MODE_LLC\fP   FCL"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_MODE_LLC_SOFTCLOCK\fP   0x80"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_MODE_LLC_EXTCLOCK\fP   0x40"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_MODE_LLC_CLKPOL_POS\fP   0x20"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_MODE_LLC_TRPOL_POS\fP   0x10"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_LLCV2_INIT\fP   0x08"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_RTCLOCK_TIMING\fP   0x04"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_MODE_LLC_INTSOFT_CLK\fP   0x01"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SET_MODE_LLC_INTDIV_CLK\fP   0x02"
+.br
+.ti -1c
+.RI "#define \fBBP_MB_LLC_CSR\fP   0"
+.br
+.ti -1c
+.RI "#define \fBBP_MB_LLC_DATA_ADDR\fP   1"
+.br
+.ti -1c
+.RI "#define \fBBP_MB_LLC_TADC\fP   2"
+.br
+.ti -1c
+.RI "#define \fBBP_MB_LLC_TINST\fP   3"
+.br
+.ti -1c
+.RI "#define \fBLLC_CSR_SACK\fP   0x80000000"
+.br
+.ti -1c
+.RI "#define \fBLLC_CSR_SNACK\fP   0x40000000"
+.br
+.ti -1c
+.RI "#define \fBLLC_CSR_READY\fP   0x10000000"
+.br
+.ti -1c
+.RI "#define \fBLLC_CSR_S_IS_ARMED\fP   0x08000000"
+.br
+.ti -1c
+.RI "#define \fBLLC_CSR_S_CTR_RUN\fP   0x04000000"
+.br
+.ti -1c
+.RI "#define \fBLLC_CSR_S_DMA_DONE\fP   0x02000000"
+.br
+.ti -1c
+.RI "#define \fBLLC_CSR_S_ERROR\fP   0x01000000"
+.br
+.ti -1c
+.RI "#define \fBLLC_CSR_S_TCYCLE\fP   0x00ff0000"
+.br
+.ti -1c
+.RI "#define \fBLLC_MAKE_TCYCLE\fP(tc)   ((tc)<<16)"
+.br
+.ti -1c
+.RI "#define \fBLLC_GET_TCYCLE\fP(csr)   (((csr)&LLC_CSR_S_TCYCLE)>>16)"
+.br
+.ti -1c
+.RI "#define \fBLLC_CSR_M_DECIM\fP   0x00000f00"
+.br
+.ti -1c
+.RI "#define \fBLLC_MAKE_DECIM\fP(decim)   ((decim)<<8)"
+.br
+.ti -1c
+.RI "#define \fBLLC_GET_DECIM\fP(csr)   (((csr)&LLC_CSR_M_DECIM)>>8)"
+.br
+.ti -1c
+.RI "#define \fBLLC_CSR_M_LLC200_INIT\fP   0x00000080"
+.br
+.ti -1c
+.RI "#define \fBLLC_CSR_M_AUTOINCR\fP   0x00000020"
+.br
+.ti -1c
+.RI "#define \fBLLC_CSR_M_SETADDR\fP   0x00000010"
+.br
+.ti -1c
+.RI "#define \fBLLC_CSR_M_READCTR\fP   0x00000008"
+.br
+.ti -1c
+.RI "#define \fBLLC_CSR_M_ESC\fP   0x00000004"
+.br
+.ti -1c
+.RI "#define \fBLLC_CSR_M_ARM\fP   0x00000002"
+.br
+.ti -1c
+.RI "#define \fBLLC_CSR_M_SOFTCLOCK\fP   0x00000001"
+.br
+.ti -1c
+.RI "#define \fBLLCV2_INIT_MAGIC_MARKER\fP   0xfeedc0de"
+.br
+.RI "\fILLCV2 . \fP"
+.ti -1c
+.RI "#define \fBLLCV2_INIT_MARKER\fP   0"
+.br
+.ti -1c
+.RI "#define \fBLLCV2_INIT_AI_HSBT\fP   1"
+.br
+.ti -1c
+.RI "#define \fBLLCV2_INIT_AO_HSBS\fP   2"
+.br
+.ti -1c
+.RI "#define \fBLLCV2_INIT_DO_HSBS\fP   3"
+.br
+.ti -1c
+.RI "#define \fBLLCV2_INIT_STATUS_HSBT\fP   4"
+.br
+.ti -1c
+.RI "#define \fBLLCV2_INIT_LAST\fP   5"
+.br
+.ti -1c
+.RI "#define \fBLLC200_INIT_MAGIC_MARKER\fP   0x200cafe0"
+.br
+.ti -1c
+.RI "#define \fBLLC200_INIT_MASK_DDS_FTW\fP   0x0001"
+.br
+.RI "\fILLC200_INIT_MASK change the parameter when its mask is set. \fP"
+.ti -1c
+.RI "#define \fBLLC200_INIT_MASK_RANGE\fP   0x0002"
+.br
+.ti -1c
+.RI "#define \fBLLC200_INIT_MASK_OFFSETS\fP   0x0004"
+.br
+.ti -1c
+.RI "#define \fBLLC200_INIT_MASK_TRIG\fP   0x0008"
+.br
+.ti -1c
+.RI "#define \fBLLC200_INIT_MASK_CHANNEL\fP   0x0010"
+.br
+.ti -1c
+.RI "#define \fBLLC200_INIT_MASK_INTCLK\fP   0x0020"
+.br
+.ti -1c
+.RI "#define \fBLLC200_INIT_MASK_DDS_QDAC\fP   0x0040"
+.br
+.ti -1c
+.RI "#define \fBLLC200_INIT_TRIG_EXTRIG\fP   0x0010"
+.br
+.ti -1c
+.RI "#define \fBLLC200_INIT_TRIG_EXTLINE\fP   0x000f"
+.br
+.ti -1c
+.RI "#define \fBLLC200_INIT_TRIG_RISING\fP   0x0020"
+.br
+.ti -1c
+.RI "#define \fBLLCV2_STATUS_MBOX0\fP   0"
+.br
+.RI "\fIformat of host side status area u32[index]. \fP"
+.ti -1c
+.RI "#define \fBLLCV2_STATUS_MBOX1\fP   1"
+.br
+.ti -1c
+.RI "#define \fBLLCV2_STATUS_MBOX2\fP   2"
+.br
+.ti -1c
+.RI "#define \fBLLCV2_STATUS_MBOX3\fP   3"
+.br
+.ti -1c
+.RI "#define \fBLLCV2_STATUS_DIO\fP   4"
+.br
+.ti -1c
+.RI "#define \fBLLCV2_STATUS_TINST\fP   5"
+.br
+.ti -1c
+.RI "#define \fBLLCV2_STATUS_TLATCH\fP   6"
+.br
+.ti -1c
+.RI "#define \fBLLCV2_STATUS_BDR\fP   7"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SETMODE_HTM\fP   fch"
+.br
+.RI "\fIHTM HTM HTM HTM HTM. \fP"
+.ti -1c
+.RI "#define \fBBP_FC_SETMODE_HTM_V2\fP   0x80"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SETMODE_HTM_STATUSBUF\fP   0x40"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_SETMODE_HTM_HOFF\fP   0x1f"
+.br
+.ti -1c
+.RI "#define \fBHTM_V2_STATUS_OVERRUN\fP   0x1"
+.br
+.ti -1c
+.RI "#define \fBHTM_V2_STATUS_COMPLETE\fP   0x2"
+.br
+.ti -1c
+.RI "#define \fBBP_MB_HTM_CSR\fP   0"
+.br
+.ti -1c
+.RI "#define \fBBP_MB_HTM_DATA_ADDR\fP   1"
+.br
+.ti -1c
+.RI "#define \fBBP_MB_HTM_STATUS_ADDR\fP   2"
+.br
+.ti -1c
+.RI "#define \fBBP_MB_HTM_CURRENT_ADDR\fP   3"
+.br
+.ti -1c
+.RI "#define \fBHTM_CSR_SACK\fP   0x80000000"
+.br
+.ti -1c
+.RI "#define \fBHTM_CSR_SNACK\fP   0x40000000"
+.br
+.ti -1c
+.RI "#define \fBHTM_CSR_READY\fP   0x10000000"
+.br
+.ti -1c
+.RI "#define \fBHTM_CSR_S_IS_ARMED\fP   0x08000000"
+.br
+.ti -1c
+.RI "#define \fBHTM_CSR_S_OVERRUN\fP   0x04000000"
+.br
+.ti -1c
+.RI "#define \fBHTM_CSR_S_COMPLETE\fP   0x02000000"
+.br
+.ti -1c
+.RI "#define \fBHTM_CSR_M_SETADDR\fP   0x00000010"
+.br
+.ti -1c
+.RI "#define \fBHTM_CSR_M_RECYCLE\fP   0x00000020"
+.br
+.ti -1c
+.RI "#define \fBHTM_CSR_M_INTERRUPT\fP   0x00000100"
+.br
+.ti -1c
+.RI "#define \fBHTM_HOSTBUF_MB\fP   0x00fff000"
+.br
+.ti -1c
+.RI "#define \fBHTM_CSR_M_ESC\fP   0x00000004"
+.br
+.ti -1c
+.RI "#define \fBHTM_CSR_M_ARM\fP   0x00000002"
+.br
+.ti -1c
+.RI "#define \fBHTM_GET_BUFFLEN_BYTES\fP(csr)   ( ((csr)&HTM_HOSTBUF_MB)<<(20-12) )"
+.br
+.ti -1c
+.RI "#define \fBHTM_SET_BUFFLEN_BYTES\fP(\fBlen\fP)   ( ((\fBlen\fP)>>20)<<12 )"
+.br
+.ti -1c
+.RI "#define \fBMT_COMMAND_PACKET\fP   (fcz<<MT_TYPE_SHIFT)"
+.br
+.ti -1c
+.RI "#define \fBMAKE_MT_COMMAND\fP(subtype)   (MT_COMMAND_PACKET|(subtype))"
+.br
+.ti -1c
+.RI "#define \fBHRD_CHAN_IS_FILE\fP   0x8000"
+.br
+.ti -1c
+.RI "#define \fBHRD_CHAN_EOF\fP   0x0400"
+.br
+.ti -1c
+.RI "#define \fBHRD_CHECKED\fP   0x4000"
+.br
+.ti -1c
+.RI "#define \fBHRD_CHANNEL\fP(hrd)   (((hrd)->chan)&0x0ff)"
+.br
+.ti -1c
+.RI "#define \fBHRD_SPCLID\fP(hrd)   (((hrd)->chan)&0x07f)"
+.br
+.ti -1c
+.RI "#define \fBHRD_WAVETRACK\fP   0x2000"
+.br
+.ti -1c
+.RI "#define \fBHRD_TRACK\fP(chan)   ((chan>>5)&0x7)"
+.br
+.ti -1c
+.RI "#define \fBHRD_CHAN\fP(chan)   (((chan)&0x1f)+1)"
+.br
+.ti -1c
+.RI "#define \fBHRD_SPCLID_BATCHTO\fP   99"
+.br
+.ti -1c
+.RI "#define \fBHRD_SPCLID_BATCHOUT\fP   100"
+.br
+.ti -1c
+.RI "#define \fBHRD_SPCLID_BATCHIO\fP   101"
+.br
+.ti -1c
+.RI "#define \fBHRD_SPCLID_BATCHRSH\fP   102"
+.br
+.ti -1c
+.RI "#define \fBREQUESTMAXBYTES\fP(hrdr)   ((hrdr).nsamples)"
+.br
+.ti -1c
+.RI "#define \fBSTART_LATEST\fP   0xFFFFFFFF"
+.br
+.ti -1c
+.RI "#define \fBT_ISAMPLE_BIT\fP   0x0040"
+.br
+.ti -1c
+.RI "#define \fBT_SUBFRAME_MASK\fP   0x003f"
+.br
+.ti -1c
+.RI "#define \fBT_CHANNEL_MASK\fP   0x0f80"
+.br
+.ti -1c
+.RI "#define \fBT_TRIGGER_BIT\fP   0x8000"
+.br
+.ti -1c
+.RI "#define \fBT_RAMP_MASK\fP   0x7000"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_CPCI_SET_ROUTE\fP   fcy"
+.br
+.ti -1c
+.RI "#define \fBBP_FC_CPCI_GETROUTE_STATUS\fP   fcy"
+.br
+.ti -1c
+.RI "#define \fBMAKE_ID_DTACQ\fP(n)   (((n)&0x7f)<<8|0xDC)"
+.br
+.ti -1c
+.RI "#define \fBIS_ID_DTACQ\fP(id)   (((id)&0xff)==0xDC)"
+.br
+.ti -1c
+.RI "#define \fBGET_IDN\fP(id)   ((id)>>8)"
+.br
+.ti -1c
+.RI "#define \fBMID_NOT_VALID\fP   0x8000"
+.br
+.ti -1c
+.RI "#define \fBMESSAGE_HEADER_SIZE\fP   (sizeof(\fBMessageHeader\fP))"
+.br
+.ti -1c
+.RI "#define \fBMESSAGE_LEN\fP   (0x400)"
+.br
+.ti -1c
+.RI "#define \fBMESSAGE_DATA_LEN\fP   (MESSAGE_LEN-MESSAGE_HEADER_SIZE)"
+.br
+.ti -1c
+.RI "#define \fBHRDR_SZ\fP   (sizeof(struct \fBHOST_REQUEST_DATA_RECORD\fP))"
+.br
+.ti -1c
+.RI "#define \fBMESSAGE_HRDR_LEN\fP   (MESSAGE_DATA_LEN/HRDR_SZ)"
+.br
+.in -1c
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef \fBSTATUS_CHANGE_NOTIFICATION_REQUEST\fP \fBStatusChangeNotificationRequest\fP"
+.br
+.ti -1c
+.RI "typedef \fBHOST_REQUEST_DATA_RECORD\fP \fBHostRequestDataRecord\fP"
+.br
+.ti -1c
+.RI "typedef \fBACQ32_PULL_OUTPUT_DATA_RECORD\fP \fBAcq32PullOutputDataRecord\fP"
+.br
+.ti -1c
+.RI "typedef \fBMESSAGE_HEADER\fP \fBMessageHeader\fP"
+.br
+.ti -1c
+.RI "typedef \fBMESSAGE\fP \fBMessage\fP"
+.br
+.RI "\fII2O message handling. \fP"
+.in -1c
+.SS "Enumerations"
+
+.in +1c
+.ti -1c
+.RI "enum \fBFUNCODES\fP { \fBFCA\fP =  'A', \fBFCB\fP =  'B', \fBFCC\fP =  'C', \fBFCD\fP =  'D', \fBFCE\fP =  'E', \fBFCF\fP =  'F', \fBFCG\fP =  'G', \fBFCH\fP =  'H', \fBFCI\fP =  'I', \fBFCK\fP =  'K', \fBFCL\fP =  'L', \fBFCM\fP =  'M', \fBFCN\fP =  'N', \fBFCP\fP =  'P', \fBFCQ\fP =  'Q', \fBFCR\fP =  'R', \fBFCS\fP =  'S', \fBFCT\fP =  'T', \fBFCU\fP =  'U', \fBFCV\fP =  'V', \fBFCW\fP =  'W', \fBFCX\fP =  'X', \fBFCY\fP =  'Y', \fBFCZ\fP =  'Z', \fBfca\fP =  'a', \fBfcb\fP =  'b', \fBfcc\fP =  'c', \fBfcd\fP =  'd', \fBfce\fP =  'e', \fBfcf\fP =  'f', \fBfch\fP =  'h', \fBfci\fP =  'i', \fBfck\fP =  'k', \fBfcl\fP =  'l', \fBfcm\fP =  'm', \fBfcn\fP =  'n', \fBfcp\fP =  'p', \fBfcr\fP =  'r', \fBfcs\fP =  's', \fBfct\fP =  't', \fBfcu\fP =  'u', \fBfcw\fP =  'w', \fBfcy\fP =  'y', \fBfcz\fP =  'z', \fBfc1\fP =  '1', \fBfc2\fP =  '2', \fBfc3\fP =  '3', \fBfc4\fP =  '4', \fBfc5\fP =  '5', \fBfc6\fP =  '6', \fBfc80\fP =  '\\x80', \fBkeep_arm_sdt_happy\fP =  0xdead }"
+.br
+.ti -1c
+.RI "enum \fBACQXX_FLAVOR\fP { \fBACQXX_FLAVOR32\fP =  32, \fBACQXX_FLAVOR16\fP =  16, \fBACQXX_FLAVOR_NOT_FOUND\fP }"
+.br
+.ti -1c
+.RI "enum \fBACQ32_DIOSELECT\fP { \fBACQ32_DIO_NONE\fP =  0, \fBACQ32_DI_0\fP =  MASK(0), \fBACQ32_DI_1\fP =  MASK(1), \fBACQ32_DI_2\fP =  MASK(2), \fBACQ32_DI_3\fP =  MASK(3), \fBACQ32_DI_4\fP =  MASK(4), \fBACQ32_DI_5\fP =  MASK(5), \fBACQ32_DO_0\fP =  MASK(0), \fBACQ32_DO_1\fP =  MASK(1), \fBACQ32_DO_2\fP =  MASK(2), \fBACQ32_DO_3\fP =  MASK(3), \fBACQ32_DO_4\fP =  MASK(4), \fBACQ32_DO_5\fP =  MASK(5) }"
+.br
+.ti -1c
+.RI "enum \fBBPFC_RANGE\fP { \fBBPFC_RANGE_UNKNOWN\fP =  0, \fBBPFC_RANGE_10_10\fP =  1, \fBBPFC_RANGE_05_05\fP, \fBBPFC_RANGE_02_02\fP, \fBBPFC_RANGE_01_01\fP, \fBBPFC_RANGE_2p5_2p5\fP }"
+.br
+.ti -1c
+.RI "enum \fBPHASE_PROPERTY\fP { \fBPP_REQUESTED_SAMPLES\fP =  1, \fBPP_ACTUAL_SAMPLES\fP, \fBPP_STATE\fP }"
+.br
+.ti -1c
+.RI "enum \fBEVENT_CONDITION\fP { \fBEC_NONE\fP, \fBEC_TRUE\fP, \fBEC_SOFT\fP, \fBEC_TRIGGER_RISING\fP, \fBEC_TRIGGER_FALLING\fP, \fBEC_DATA_ABOVE\fP, \fBEC_DATA_BELOW\fP }"
+.br
+.ti -1c
+.RI "enum \fBCLOCK_SOURCE\fP { \fBCS_DI0\fP, \fBCS_DI1\fP, \fBCS_DI2\fP, \fBCS_DI3\fP, \fBCS_DI4\fP, \fBCS_DI5\fP, \fBCS_SOFT_CLOCK\fP, \fBCS_INT_CLOCK\fP }"
+.br
+.ti -1c
+.RI "enum \fBMTC_SUBTYPES\fP { \fBMTC_TEST\fP, \fBMTC_HOST_REQUEST_DATA\fP, \fBMTC_LOAD_AO\fP, \fBMTC_LOAD_DO\fP, \fBMTC_DEBUG_TEXT\fP, \fBMTC_HOST_REQUEST_X_DATA\fP, \fBMTC_REQUEST_STATUS_CHANGE_NOTIFICATION\fP, \fBMTC_HOST_REQUEST_DATA_HOSTBOUND\fP, \fBMTC_HOST_REQUEST_DATA_ACQBOUND\fP, \fBMTC_LAST\fP }"
+.br
+.ti -1c
+.RI "enum \fBQ32C_SR_FUNC\fP { \fBQ32C_SR_FUNC_DI0\fP, \fBQ32C_SR_FUNC_DI1\fP, \fBQ32C_SR_FUNC_DI2\fP, \fBQ32C_SR_FUNC_DI3\fP, \fBQ32C_SR_FUNC_DI4\fP, \fBQ32C_SR_FUNC_DI5\fP, \fBQ32C_SR_FUNC_AICLK\fP =  0, \fBQ32C_SR_FUNC_AITRIG\fP, \fBQ32C_SR_FUNC_AOCLK\fP, \fBQ32C_SR_FUNC_AOTRIG\fP, \fBQ32C_SR_FUNC_DOCLK\fP, \fBQ32C_SR_FUNC_DOTRIG\fP }"
+.br
+.ti -1c
+.RI "enum \fBQ32C_SR_DEST\fP { \fBQ32C_SR_DEST_NONE\fP =  0x00, \fBQ32C_SR_DEST_MIx\fP =  0x01, \fBQ32C_SR_DEST_MOx\fP =  0x02, \fBQ32C_SR_DEST_J50\fP =  0x04, \fBQ32C_SR_DEST_J51\fP =  0x04, \fBQ32C_SR_DEST_J52\fP =  0x04, \fBQ32C_SR_DEST_J53\fP =  0x04, \fBQ32C_SR_DEST_J34\fP =  0x04, \fBQ32C_SR_DEST_J35\fP =  0x04, \fBQ32C_SR_DEST_PXI_TRIG0\fP =  0x08, \fBQ32C_SR_DEST_PXI_TRIG1\fP =  0x08, \fBQ32C_SR_DEST_PXI_TRIG2\fP =  0x08, \fBQ32C_SR_DEST_PXI_TRIG3\fP =  0x08, \fBQ32C_SR_DEST_PXI_TRIG4\fP =  0x08, \fBQ32C_SR_DEST_PXI_TRIG5\fP =  0x08, \fBQ32C_SR_DEST_PXI_TRIG6\fP =  0x10, \fBQ32C_SR_DEST_PXI_TRIG7\fP =  0x10, \fBQ32C_SR_DEST_PXI_STAR\fP =  0x10, \fBQ32C_SR_DEST_PXI_CLK10\fP =  0x10 }"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "\fBLLC200_INIT\fP \fBpacked\fP"
+.br
+.RI "\fI\fBLLC200_INIT\fP acq216 host side buffer for host side initialisation. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+pci bus command protocol definition. 
+
+Applies to all D-TACQ pci/CompactPCI products
+.PP
+.IP "\(bu" 2
+ACQ32 is controlled via commands issued thru the PCI mailboxes
+.PP
+.PP
+.IP "\(bu" 2
+MAILBOX_[0,1,2] are used for master slave commands and responses
+.IP "\(bu" 2
+MAILBOX_3 is used for unsolicited ACQ32 status output
+.PP
+.PP
+.IP "\(bu" 2
+Master slave commands have the following format
+.PP
+.PP
+The Host PC is the Master, ACQ32 is the Slave
+.PP
+.IP "\(bu" 2
+COMMAND <31:0> is MAILBOX_0
+.IP "\(bu" 2
+A3 <31:0> is MAILBOX_1 ; optional 32 bit parameter
+.IP "\(bu" 2
+A4 <31:0> is MAILBOX_2 ; optional 32 bit parameter
+.PP
+.PP
+.IP "\(bu" 2
+STATUS <31:0> is MAILBOX_3
+.PP
+.PP
+.IP "\(bu" 2
+COMMAND <31:0> : breaks up into
+.IP "  \(bu" 4
+Immediate <31:24>:
+.IP "    \(bu" 6
+CI_ACK 31 cleared by M, set by S on completion
+.IP "    \(bu" 6
+CI_DONE 30 set by M when a commmand is complete may be cleared by S to indicate fault
+.IP "    \(bu" 6
+CI_A3 28 set by M to indicate A3 valid
+.IP "    \(bu" 6
+CI_A4 27 set by M to indicate A4 valid
+.PP
+
+.PP
+
+.PP
+.PP
+.IP "\(bu" 2
+CI_COMMAND 26 set by M to indicate COMMAND
+.IP "\(bu" 2
+CI_QUERY 25 set by M to indicate QUERY
+.PP
+.PP
+can be cleared by S to validate COMMAND
+.IP "\(bu" 2
+FunCode <23:16>: function code
+.IP "\(bu" 2
+A1 <15:8>: optional 8 bit parameter
+.IP "\(bu" 2
+A2 <8:0>: optional 8 bit parameter
+.PP
+.PP
+.IP "\(bu" 2
+STATUS <31:0> : breaks up into
+.IP "  \(bu" 4
+ST_MODE <31:24> : current mode
+.IP "  \(bu" 4
+ST_STATE <23:16> : current state
+.IP "  \(bu" 4
+CYCLE <15:12> : cycle (shot number).
+.IP "  \(bu" 4
+HEARTBEAT <11:0> : number increments indicating card is alive.
+.PP
+
+.PP
+
+.SH "Define Documentation"
+.PP 
+.SS "#define BP_A1_FETCH_PRETRIGGER   0x10"
+.PP
+.SS "#define BP_A1_LENGTH_BS_16K   0x02"
+.PP
+.SS "#define BP_A1_LENGTH_BS_1K   0x08"
+.PP
+.SS "#define BP_A1_START_BS_16K   0x01"
+.PP
+.SS "#define BP_A1_START_BS_1K   0x04"
+.PP
+.SS "#define BP_CI_A3   MASK(BP_CI_A3_BIT)"
+.PP
+.SS "#define BP_CI_A3_BIT   27"
+.PP
+.SS "#define BP_CI_A4   MASK(BP_CI_A4_BIT)"
+.PP
+.SS "#define BP_CI_A4_BIT   26"
+.PP
+.SS "#define BP_CI_ACK   MASK(BP_CI_ACK_BIT)"
+.PP
+.SS "#define BP_CI_ACK_BIT   31"
+.PP
+.SS "#define BP_CI_COMMAND   MASK(BP_CI_COMMAND_BIT)"
+.PP
+.SS "#define BP_CI_COMMAND_BIT   29"
+.PP
+.SS "#define BP_CI_DONE   MASK(BP_CI_DONE_BIT)"
+.PP
+.SS "#define BP_CI_DONE_BIT   30"
+.PP
+.SS "#define BP_CI_QUERY   MASK(BP_CI_QUERY_BIT)"
+.PP
+.SS "#define BP_CI_QUERY_BIT   28"
+.PP
+.SS "#define BP_FC_ADJUST_TRIGGER   fc80"
+.PP
+.SS "#define BP_FC_BIG_DUMP   FCU"
+.PP
+.SS "#define BP_FC_CPCI_GETROUTE_STATUS   fcy"
+.PP
+.SS "#define BP_FC_CPCI_SET_ROUTE   fcy"
+.PP
+.SS "#define BP_FC_DEBUG_GET_REGS   FCQ"
+.PP
+.SS "#define BP_FC_FETCH_DATA   FCF"
+.PP
+.SS "#define BP_FC_GET_ATRIGGER   fc80"
+.PP
+.SS "#define BP_FC_GET_CALINFO   FCW"
+.PP
+.SS "#define BP_FC_GET_CAPTURESTATS   FCE"
+.PP
+.SS "#define BP_FC_GET_CONFIG   FCV"
+.PP
+.SS "#define BP_FC_GET_EXTCLOCK   fce"
+.PP
+.SS "#define BP_FC_GET_FWREV   FCR"
+.PP
+.SS "#define BP_FC_GET_INTCLOCK   fci"
+.PP
+.SS "#define BP_FC_GET_MASK   FCK"
+.PP
+.SS "#define BP_FC_GET_NPAIRS(f)   (((f)&BP_FC_STREAM_NPAIRS)>>4)"
+.PP
+.SS "#define BP_FC_GET_NUMSAMPLES   FCN"
+.PP
+.SS "#define BP_FC_QUERY_AO   fca"
+.PP
+.SS "#define BP_FC_RESERVE_AO   fca"
+.PP
+.SS "#define BP_FC_SC_GET_DIO   fcd"
+.PP
+.SS "#define BP_FC_SC_POT   fcp"
+.PP
+.SS "#define BP_FC_SC_POT_10V   0x0c"
+.PP
+.SS "#define BP_FC_SC_POT_1V   0x00"
+.PP
+.SS "#define BP_FC_SC_POT_2V   0x04"
+.PP
+.SS "#define BP_FC_SC_POT_5V   0x08"
+.PP
+.SS "#define BP_FC_SC_POT_BOARD0   0x00"
+.PP
+.SS "#define BP_FC_SC_POT_BOARD1   0x80"
+.PP
+.SS "#define BP_FC_SC_SET_CHANNEL   fcc"
+.PP
+.SS "#define BP_FC_SC_SET_CHANNEL_CH_LSB   24"
+.PP
+.SS "#define BP_FC_SC_SET_CHANNEL_G1_LSB   16"
+.PP
+.SS "#define BP_FC_SC_SET_CHANNEL_G2_LSB   8"
+.PP
+.SS "#define BP_FC_SC_SET_CHANNEL_V_EX_LSB   0"
+.PP
+.SS "#define BP_FC_SC_SET_DIO   fcd"
+.PP
+.SS "#define BP_FC_SELECT_CALSET   fcl"
+.PP
+.SS "#define BP_FC_SET_ABORT   FCZ"
+.PP
+.SS "#define BP_FC_SET_ARM   FCA"
+.PP
+.SS "#define BP_FC_SET_CALDACS   FCC"
+.PP
+.SS "#define BP_FC_SET_DACPOT   FCP"
+.PP
+.SS "#define BP_FC_SET_DACPOT_DN   BP_SET_A2( 'd' )"
+.PP
+.SS "#define BP_FC_SET_DACPOT_UP   BP_SET_A2( 'u' )"
+.PP
+.SS "#define BP_FC_SET_DACS   FCD"
+.PP
+.SS "#define BP_FC_SET_DATA_EDGE_TRIGGER   0x1d"
+.PP
+.SS "#define BP_FC_SET_DATA_EDGE_TRIGGER_MULTI   0x1e"
+.PP
+.SS "#define BP_FC_SET_DATA_FAST_TRIGGER_MULTI   0x1f"
+.PP
+.SS "#define BP_FC_SET_DATA_THRESHOLD   fct"
+.PP
+.SS "#define BP_FC_SET_DATA_TRIGGER   0x0d"
+.PP
+.SS "#define BP_FC_SET_DATA_TRIGGER_MULTI   0x0e"
+.PP
+.SS "#define BP_FC_SET_DEBUG   fcb"
+.PP
+.SS "#define BP_FC_SET_DIST_ID   1"
+.PP
+.SS "#define BP_FC_SET_DIST_ID_ALL   2"
+.PP
+.SS "#define BP_FC_SET_DIST_NORMAL   0"
+.PP
+.SS "#define BP_FC_SET_DISTRIBUTOR   fcs"
+.PP
+.SS "#define BP_FC_SET_DO   fcf"
+.PP
+.SS "#define BP_FC_SET_EXTCLOCK   fce"
+.PP
+.SS "#define BP_FC_SET_HOST_DMABUF   FCB"
+.PP
+.SS "#define BP_FC_SET_INTCLOCK   fci"
+.PP
+.SS "#define BP_FC_SET_INTERRUPTS   FCI"
+.PP
+.SS "#define BP_FC_SET_LLCV2_INIT   0x08"
+.PP
+.SS "#define BP_FC_SET_MASK   FCK"
+.PP
+.SS "#define BP_FC_SET_MASK_CHAN   'C'"
+.PP
+.SS "#define BP_FC_SET_MASK_RAW   'r'"
+.PP
+.SS "#define BP_FC_SET_MASK_ROW   'R'"
+.PP
+.SS "#define BP_FC_SET_MODE   FCM"
+.PP
+.SS "#define BP_FC_SET_MODE_GC   FCG"
+.PP
+.SS "#define BP_FC_SET_MODE_LLC   FCL"
+.PP
+.SS "#define BP_FC_SET_MODE_LLC_CLKPOL_POS   0x20"
+.PP
+.SS "#define BP_FC_SET_MODE_LLC_EXTCLOCK   0x40"
+.PP
+.SS "#define BP_FC_SET_MODE_LLC_INTDIV_CLK   0x02"
+.PP
+.SS "#define BP_FC_SET_MODE_LLC_INTSOFT_CLK   0x01"
+.PP
+.SS "#define BP_FC_SET_MODE_LLC_SOFTCLOCK   0x80"
+.PP
+.SS "#define BP_FC_SET_MODE_LLC_TRPOL_POS   0x10"
+.PP
+.SS "#define BP_FC_SET_MODE_TC   FCH"
+.PP
+.SS "#define BP_FC_SET_NPAIRS(p)   (((p)<<4)&BP_FC_STREAM_NPAIRS)"
+.PP
+.SS "#define BP_FC_SET_ROUTE   fcr"
+.PP
+.SS "#define BP_FC_SET_RTCLOCK_TIMING   0x04"
+.PP
+.SS "#define BP_FC_SET_SPIN   FCY"
+.PP
+.SS "#define BP_FC_SET_TAGGING   FCT"
+.PP
+.SS "#define BP_FC_SET_XO_CLEAR   0x80"
+.PP
+.SS "#define BP_FC_SET_XO_CYCLE   0x01"
+.PP
+.SS "#define BP_FC_SET_XO_DATA   0x02"
+.PP
+.SS "#define BP_FC_SET_XO_END   0x40"
+.PP
+.SS "#define BP_FC_SET_XO_FUNCTION   'F'"
+.PP
+.SS "#define BP_FC_SETMODE_HTM   fch"
+.PP
+HTM HTM HTM HTM HTM. 
+.PP
+High thruput streaming modes
+.PP
+Works like this:
+.PP
+prams for setup command BP_FC_SETMODE_HTM A1 = prams
+.SS "#define BP_FC_SETMODE_HTM_HOFF   0x1f"
+.PP
+.SS "#define BP_FC_SETMODE_HTM_STATUSBUF   0x40"
+.PP
+.SS "#define BP_FC_SETMODE_HTM_V2   0x80"
+.PP
+.SS "#define BP_FC_SM_FLAGS_DEB   0x80"
+.PP
+.SS "#define BP_FC_SM_FLAGS_NEM   0x40"
+.PP
+.SS "#define BP_FC_STREAM   FCS"
+.PP
+.SS "#define BP_FC_STREAM_BURST   0x02"
+.PP
+.SS "#define BP_FC_STREAM_MEAN   0x01"
+.PP
+.SS "#define BP_FC_STREAM_NPAIRS   0xf0"
+.PP
+.SS "#define BP_FC_TXDATA   FCX"
+.PP
+.SS "#define BP_FC_USER   fcu"
+.PP
+.SS "#define BP_FC_USER_LED3_FLIP   0x3"
+.PP
+.SS "#define BP_FC_USER_LED3_OFF   0x2"
+.PP
+.SS "#define BP_FC_USER_LED3_ON   0x1"
+.PP
+.SS "#define BP_FC_USER_LED4_FLIP   0xc"
+.PP
+.SS "#define BP_FC_USER_LED4_OFF   0x8"
+.PP
+.SS "#define BP_FC_USER_LED4_ON   0x4"
+.PP
+.SS "#define BP_FC_WAIT_EVENT   fcw"
+.PP
+.SS "#define BP_GET_A1(command)   (((command)>>8)&0x0ff)"
+.PP
+.SS "#define BP_GET_A2(command)   ((command)&0x0ff)"
+.PP
+.SS "#define BP_GET_CYCLE(status)   (((status)>>12)&0xf)"
+.PP
+.SS "#define BP_GET_ERROR(status)   ((status&0x80000000)!=0)"
+.PP
+.SS "#define BP_GET_FUNCODE(command)   (((command)>>16)&0x0ff)"
+.PP
+.SS "#define BP_GET_HEARTBEAT(status)   ((status)&0x0fff)"
+.PP
+.SS "#define BP_GET_MODE(status)   (((status)>>24)&0x07f)"
+.PP
+.SS "#define BP_GET_STATE(status)   (((status)>>16)&0x0ff)"
+.PP
+.SS "#define BP_GUT_CLOCKNOW   fc5"
+.PP
+.SS "#define BP_GUT_FC_EPMASK   0x0f"
+.PP
+.SS "#define BP_GUT_FC_EV   0x10"
+.PP
+.SS "#define BP_GUT_FC_FX_AI   0x80"
+.PP
+.SS "#define BP_GUT_FC_FX_AO   0x40"
+.PP
+.SS "#define BP_GUT_FC_FX_DO   0x20"
+.PP
+.SS "#define BP_GUT_FIREEVENT   fc3"
+.PP
+.SS "#define BP_GUT_GETEVENT   fc2"
+.PP
+.SS "#define BP_GUT_GETPHASE   fc1"
+.PP
+.SS "#define BP_GUT_RESET   fc6"
+.PP
+.SS "#define BP_GUT_SETCLOCK   fc4"
+.PP
+.SS "#define BP_GUT_SETEVENT   fc2"
+.PP
+.SS "#define BP_GUT_SETPHASE   fc1"
+.PP
+.SS "#define BP_INT_COMMAND_ACK   0x0001"
+.PP
+.SS "#define BP_INT_LLC_DMA_DONE   0x0004"
+.PP
+.SS "#define BP_INT_LLC_ERROR   0x0008"
+.PP
+.SS "#define BP_INT_STATUS_CHANGE   0x0002"
+.PP
+.SS "#define BP_MB_A3   1"
+.PP
+.SS "#define BP_MB_A4   2"
+.PP
+.SS "#define BP_MB_COMMAND   0"
+.PP
+.SS "#define BP_MB_HTM_CSR   0"
+.PP
+.SS "#define BP_MB_HTM_CURRENT_ADDR   3"
+.PP
+.SS "#define BP_MB_HTM_DATA_ADDR   1"
+.PP
+.SS "#define BP_MB_HTM_STATUS_ADDR   2"
+.PP
+.SS "#define BP_MB_LLC_CSR   0"
+.PP
+.SS "#define BP_MB_LLC_DATA_ADDR   1"
+.PP
+.SS "#define BP_MB_LLC_TADC   2"
+.PP
+.SS "#define BP_MB_LLC_TINST   3"
+.PP
+.SS "#define BP_MB_STATUS   3"
+.PP
+.SS "#define BP_REV   '$Revision: 1.85.2.18 $'"
+.PP
+.SS "#define BP_SET_A1(a1)   ((a1)<<8)"
+.PP
+.SS "#define BP_SET_A2(a2)   (a2)"
+.PP
+.SS "#define BP_SET_CYCLE(status)   ((status)<<12)"
+.PP
+.SS "#define BP_SET_ERROR(status)   ((status)<<31)"
+.PP
+.SS "#define BP_SET_FUNCODE(funcode)   ((funcode)<<16)"
+.PP
+.SS "#define BP_SET_HEARTBEAT(status)   ((status)&0x0fff)"
+.PP
+.SS "#define BP_SET_MODE(mode)   ((mode)<<24)"
+.PP
+.SS "#define BP_SET_STATE(state)   ((state)<<16)"
+.PP
+.SS "#define BPFC_GET_MODEL   fck"
+.PP
+.SS "#define BPFC_GET_NCHANNELS   fcn"
+.PP
+.SS "#define BPFC_GET_RANGE   fcm"
+.PP
+.SS "#define BS_16K   0x4000"
+.PP
+.SS "#define BS_1K   0x400"
+.PP
+.SS "#define BYTE_DECODE_BIT(lsb, val)   (((val)>>(lsb))&0xff)"
+.PP
+.SS "#define BYTE_ENCODE_BIT(lsb, val)   ((val)<<(lsb))"
+.PP
+.SS "#define FLAVOR_KEY   'FLAVOR'"
+.PP
+.SS "#define GET_IDN(id)   ((id)>>8)"
+.PP
+.SS "#define HRD_CHAN(chan)   (((chan)&0x1f)+1)"
+.PP
+.SS "#define HRD_CHAN_EOF   0x0400"
+.PP
+.SS "#define HRD_CHAN_IS_FILE   0x8000"
+.PP
+.SS "#define HRD_CHANNEL(hrd)   (((hrd)->chan)&0x0ff)"
+.PP
+.SS "#define HRD_CHECKED   0x4000"
+.PP
+.SS "#define HRD_SPCLID(hrd)   (((hrd)->chan)&0x07f)"
+.PP
+.SS "#define HRD_SPCLID_BATCHIO   101"
+.PP
+.SS "#define HRD_SPCLID_BATCHOUT   100"
+.PP
+.SS "#define HRD_SPCLID_BATCHRSH   102"
+.PP
+.SS "#define HRD_SPCLID_BATCHTO   99"
+.PP
+.SS "#define HRD_TRACK(chan)   ((chan>>5)&0x7)"
+.PP
+.SS "#define HRD_WAVETRACK   0x2000"
+.PP
+.SS "#define HRDR_SZ   (sizeof(struct \fBHOST_REQUEST_DATA_RECORD\fP))"
+.PP
+.SS "#define HTM_CSR_M_ARM   0x00000002"
+.PP
+.SS "#define HTM_CSR_M_ESC   0x00000004"
+.PP
+.SS "#define HTM_CSR_M_INTERRUPT   0x00000100"
+.PP
+.SS "#define HTM_CSR_M_RECYCLE   0x00000020"
+.PP
+.SS "#define HTM_CSR_M_SETADDR   0x00000010"
+.PP
+.SS "#define HTM_CSR_READY   0x10000000"
+.PP
+.SS "#define HTM_CSR_S_COMPLETE   0x02000000"
+.PP
+.SS "#define HTM_CSR_S_IS_ARMED   0x08000000"
+.PP
+.SS "#define HTM_CSR_S_OVERRUN   0x04000000"
+.PP
+.SS "#define HTM_CSR_SACK   0x80000000"
+.PP
+.SS "#define HTM_CSR_SNACK   0x40000000"
+.PP
+.SS "#define HTM_GET_BUFFLEN_BYTES(csr)   ( ((csr)&HTM_HOSTBUF_MB)<<(20-12) )"
+.PP
+.SS "#define HTM_HOSTBUF_MB   0x00fff000"
+.PP
+.SS "#define HTM_SET_BUFFLEN_BYTES(\fBlen\fP)   ( ((\fBlen\fP)>>20)<<12 )"
+.PP
+.SS "#define HTM_V2_STATUS_COMPLETE   0x2"
+.PP
+.SS "#define HTM_V2_STATUS_OVERRUN   0x1"
+.PP
+.SS "#define IS_ID_DTACQ(id)   (((id)&0xff)==0xDC)"
+.PP
+.SS "#define LLC200_INIT_MAGIC_MARKER   0x200cafe0"
+.PP
+.SS "#define LLC200_INIT_MASK_CHANNEL   0x0010"
+.PP
+.SS "#define LLC200_INIT_MASK_DDS_FTW   0x0001"
+.PP
+LLC200_INIT_MASK change the parameter when its mask is set. 
+.PP
+.SS "#define LLC200_INIT_MASK_DDS_QDAC   0x0040"
+.PP
+.SS "#define LLC200_INIT_MASK_INTCLK   0x0020"
+.PP
+.SS "#define LLC200_INIT_MASK_OFFSETS   0x0004"
+.PP
+.SS "#define LLC200_INIT_MASK_RANGE   0x0002"
+.PP
+.SS "#define LLC200_INIT_MASK_TRIG   0x0008"
+.PP
+.SS "#define LLC200_INIT_TRIG_EXTLINE   0x000f"
+.PP
+.SS "#define LLC200_INIT_TRIG_EXTRIG   0x0010"
+.PP
+.SS "#define LLC200_INIT_TRIG_RISING   0x0020"
+.PP
+.SS "#define LLC_CSR_M_ARM   0x00000002"
+.PP
+.SS "#define LLC_CSR_M_AUTOINCR   0x00000020"
+.PP
+.SS "#define LLC_CSR_M_DECIM   0x00000f00"
+.PP
+.SS "#define LLC_CSR_M_ESC   0x00000004"
+.PP
+.SS "#define LLC_CSR_M_LLC200_INIT   0x00000080"
+.PP
+.SS "#define LLC_CSR_M_READCTR   0x00000008"
+.PP
+.SS "#define LLC_CSR_M_SETADDR   0x00000010"
+.PP
+.SS "#define LLC_CSR_M_SOFTCLOCK   0x00000001"
+.PP
+.SS "#define LLC_CSR_READY   0x10000000"
+.PP
+.SS "#define LLC_CSR_S_CTR_RUN   0x04000000"
+.PP
+.SS "#define LLC_CSR_S_DMA_DONE   0x02000000"
+.PP
+.SS "#define LLC_CSR_S_ERROR   0x01000000"
+.PP
+.SS "#define LLC_CSR_S_IS_ARMED   0x08000000"
+.PP
+.SS "#define LLC_CSR_S_TCYCLE   0x00ff0000"
+.PP
+.SS "#define LLC_CSR_SACK   0x80000000"
+.PP
+.SS "#define LLC_CSR_SNACK   0x40000000"
+.PP
+.SS "#define LLC_GET_DECIM(csr)   (((csr)&LLC_CSR_M_DECIM)>>8)"
+.PP
+.SS "#define LLC_GET_TCYCLE(csr)   (((csr)&LLC_CSR_S_TCYCLE)>>16)"
+.PP
+.SS "#define LLC_MAKE_DECIM(decim)   ((decim)<<8)"
+.PP
+.SS "#define LLC_MAKE_TCYCLE(tc)   ((tc)<<16)"
+.PP
+.SS "#define LLCV2_INIT_AI_HSBT   1"
+.PP
+.SS "#define LLCV2_INIT_AO_HSBS   2"
+.PP
+.SS "#define LLCV2_INIT_DO_HSBS   3"
+.PP
+.SS "#define LLCV2_INIT_LAST   5"
+.PP
+.SS "#define LLCV2_INIT_MAGIC_MARKER   0xfeedc0de"
+.PP
+LLCV2 . 
+.PP
+.. host side buffer for host side initialization treat as u32[index]
+.SS "#define LLCV2_INIT_MARKER   0"
+.PP
+.SS "#define LLCV2_INIT_STATUS_HSBT   4"
+.PP
+.SS "#define LLCV2_STATUS_BDR   7"
+.PP
+.SS "#define LLCV2_STATUS_DIO   4"
+.PP
+.SS "#define LLCV2_STATUS_MBOX0   0"
+.PP
+format of host side status area u32[index]. 
+.PP
+.SS "#define LLCV2_STATUS_MBOX1   1"
+.PP
+.SS "#define LLCV2_STATUS_MBOX2   2"
+.PP
+.SS "#define LLCV2_STATUS_MBOX3   3"
+.PP
+.SS "#define LLCV2_STATUS_TINST   5"
+.PP
+.SS "#define LLCV2_STATUS_TLATCH   6"
+.PP
+.SS "#define MAKE_ID_DTACQ(n)   (((n)&0x7f)<<8|0xDC)"
+.PP
+.SS "#define MAKE_MT_COMMAND(subtype)   (MT_COMMAND_PACKET|(subtype))"
+.PP
+.SS "#define MASK(bit)   (1U<<(bit))"
+.PP
+.SS "#define MAX_LENGTH_CODING   0xffffU"
+.PP
+.SS "#define MAX_START_CODING   0xffffU"
+.PP
+.SS "#define MESSAGE_DATA_LEN   (MESSAGE_LEN-MESSAGE_HEADER_SIZE)"
+.PP
+.SS "#define MESSAGE_HEADER_SIZE   (sizeof(\fBMessageHeader\fP))"
+.PP
+.SS "#define MESSAGE_HRDR_LEN   (MESSAGE_DATA_LEN/HRDR_SZ)"
+.PP
+.SS "#define MESSAGE_LEN   (0x400)"
+.PP
+.SS "#define MF_FILLa   0xf1"
+.PP
+.SS "#define MF_FILLb   0x11"
+.PP
+.SS "#define MF_MF2   0xf0"
+.PP
+.SS "#define MF_MF3   0x01"
+.PP
+.SS "#define MFX_BDELa   24"
+.PP
+.SS "#define MFX_BDELb   25"
+.PP
+.SS "#define MFX_BLENa   22"
+.PP
+.SS "#define MFX_BLENb   23"
+.PP
+.SS "#define MFX_DIO   17"
+.PP
+.SS "#define MFX_EDIOa   18"
+.PP
+.SS "#define MFX_EDIOb   19"
+.PP
+.SS "#define MFX_EDIOc   20"
+.PP
+.SS "#define MFX_EDIOd   21"
+.PP
+.SS "#define MFX_ESa   10"
+.PP
+.SS "#define MFX_ESb   11"
+.PP
+.SS "#define MFX_ESc   12"
+.PP
+.SS "#define MFX_ESd   13"
+.PP
+.SS "#define MFX_ESOFa   14"
+.PP
+.SS "#define MFX_ESOFb   15"
+.PP
+.SS "#define MFX_ESOFc   16"
+.PP
+.SS "#define MFX_FNa   4"
+.PP
+.SS "#define MFX_FNb   5"
+.PP
+.SS "#define MFX_Ja   6"
+.PP
+.SS "#define MFX_Jb   7"
+.PP
+.SS "#define MFX_Jc   8"
+.PP
+.SS "#define MFX_Jd   9"
+.PP
+.SS "#define MFX_MF2   2"
+.PP
+.SS "#define MFX_MF3   3"
+.PP
+.SS "#define MFX_MFNa   28"
+.PP
+.SS "#define MFX_MFNb   29"
+.PP
+.SS "#define MFX_MFNc   30"
+.PP
+.SS "#define MFX_MFNd   31"
+.PP
+.SS "#define MFX_OVER   26"
+.PP
+.SS "#define MFX_SF0   0"
+.PP
+.SS "#define MFX_SF1   1"
+.PP
+.SS "#define MFX_TVSa   32"
+.PP
+.SS "#define MFX_TVSb   33"
+.PP
+.SS "#define MFX_TVSc   34"
+.PP
+.SS "#define MFX_TVSd   35"
+.PP
+.SS "#define MFX_TVUSa   36"
+.PP
+.SS "#define MFX_TVUSb   37"
+.PP
+.SS "#define MFX_TVUSc   38"
+.PP
+.SS "#define MFX_TVUSd   39"
+.PP
+.SS "#define MID_NOT_VALID   0x8000"
+.PP
+.SS "#define MT_BIGDUMP_COMPLETE   (BP_FC_BIG_DUMP<<MT_TYPE_SHIFT)"
+.PP
+.SS "#define MT_COMMAND_PACKET   (fcz<<MT_TYPE_SHIFT)"
+.PP
+.SS "#define MT_FWREV   (BP_FC_GET_FWREV<<MT_TYPE_SHIFT)"
+.PP
+.SS "#define MT_GETCALINFO   (BP_FC_GET_CALINFO<<MT_TYPE_SHIFT)"
+.PP
+.SS "#define MT_GETCAPTURESTATS   (BP_FC_GET_CAPTURESTATS<<MT_TYPE_SHIFT)"
+.PP
+.SS "#define MT_GETCONFIG   BP_FC_GET_CONFIG"
+.PP
+.SS "#define MT_ID(type)   ((type)&MT_TYPE_MASK)"
+.PP
+.SS "#define MT_PRAM(type)   ((type)&MT_PRAM_MASK)"
+.PP
+.SS "#define MT_PRAM_MASK   ~(MT_TYPE_MASK)"
+.PP
+.SS "#define MT_STREAM   (BP_FC_STREAM<<MT_TYPE_SHIFT)"
+.PP
+.SS "#define MT_TYPE_MASK   (0xffU<<MT_TYPE_SHIFT)"
+.PP
+.SS "#define MT_TYPE_SHIFT   24"
+.PP
+.SS "#define MTP_STREAM_END_PACKET   0x400000"
+.PP
+.SS "#define MTP_STREAM_IS_TAGGED   0x800000"
+.PP
+.SS "#define MTP_STREAM_NCHAN(type)   ((type)&MTP_STREAM_NCHAN_MASK)"
+.PP
+.SS "#define MTP_STREAM_NCHAN_MASK   0x0000ff"
+.PP
+.SS "#define MTP_STREAM_NSAM(type)   (((type)&MTP_STREAM_NSAM_MASK)>>8)"
+.PP
+.SS "#define MTP_STREAM_NSAM_MASK   0x00ff00"
+.PP
+.SS "#define MTP_STREAM_SLEN(type)   ((MTP_STREAM_NCHAN(type)+(((type)&MTP_STREAM_IS_TAGGED)!=0?2:0))*2)"
+.PP
+.SS "#define NID_BITS   0x30"
+.PP
+.SS "#define NSUBFRAMES   0x40"
+.PP
+.SS "#define nX_bit   15"
+.PP
+.SS "#define REQUESTMAXBYTES(hrdr)   ((hrdr).nsamples)"
+.PP
+.SS "#define s0_bit   8"
+.PP
+.SS "#define SF0   0xfe"
+.PP
+.SS "#define SF1   0xed"
+.PP
+.SS "#define START_LATEST   0xFFFFFFFF"
+.PP
+.SS "#define SUBFRAME_MASK   0x3f"
+.PP
+.SS "#define T_bit   14"
+.PP
+.SS "#define T_CHANNEL_MASK   0x0f80"
+.PP
+.SS "#define T_ISAMPLE_BIT   0x0040"
+.PP
+.SS "#define T_RAMP_MASK   0x7000"
+.PP
+.SS "#define T_SUBFRAME_MASK   0x003f"
+.PP
+.SS "#define T_TRIGGER_BIT   0x8000"
+.PP
+.SH "Typedef Documentation"
+.PP 
+.SS "typedef struct \fBACQ32_PULL_OUTPUT_DATA_RECORD\fP
+     \fBAcq32PullOutputDataRecord\fP"
+.PP
+.SS "typedef struct \fBHOST_REQUEST_DATA_RECORD\fP
+     \fBHostRequestDataRecord\fP"
+.PP
+.SS "typedef struct \fBMESSAGE\fP
+     \fBMessage\fP"
+.PP
+I2O message handling. 
+.PP
+.SS "typedef struct \fBMESSAGE_HEADER\fP
+         \fBMessageHeader\fP"
+.PP
+.SS "typedef struct \fBSTATUS_CHANGE_NOTIFICATION_REQUEST\fP
+     \fBStatusChangeNotificationRequest\fP"
+.PP
+.SH "Enumeration Type Documentation"
+.PP 
+.SS "enum \fBACQ32_DIOSELECT\fP"
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fIACQ32_DIO_NONE \fP\fP
+.TP
+\fB\fIACQ32_DI_0 \fP\fP
+.TP
+\fB\fIACQ32_DI_1 \fP\fP
+.TP
+\fB\fIACQ32_DI_2 \fP\fP
+.TP
+\fB\fIACQ32_DI_3 \fP\fP
+.TP
+\fB\fIACQ32_DI_4 \fP\fP
+.TP
+\fB\fIACQ32_DI_5 \fP\fP
+.TP
+\fB\fIACQ32_DO_0 \fP\fP
+.TP
+\fB\fIACQ32_DO_1 \fP\fP
+.TP
+\fB\fIACQ32_DO_2 \fP\fP
+.TP
+\fB\fIACQ32_DO_3 \fP\fP
+.TP
+\fB\fIACQ32_DO_4 \fP\fP
+.TP
+\fB\fIACQ32_DO_5 \fP\fP
+
+.SS "enum \fBACQXX_FLAVOR\fP"
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fIACQXX_FLAVOR32 \fP\fP
+.TP
+\fB\fIACQXX_FLAVOR16 \fP\fP
+.TP
+\fB\fIACQXX_FLAVOR_NOT_FOUND \fP\fP
+
+.SS "enum \fBBPFC_RANGE\fP"
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fIBPFC_RANGE_UNKNOWN \fP\fP
+.TP
+\fB\fIBPFC_RANGE_10_10 \fP\fP
+.TP
+\fB\fIBPFC_RANGE_05_05 \fP\fP
+.TP
+\fB\fIBPFC_RANGE_02_02 \fP\fP
+.TP
+\fB\fIBPFC_RANGE_01_01 \fP\fP
+.TP
+\fB\fIBPFC_RANGE_2p5_2p5 \fP\fP
+
+.SS "enum \fBCLOCK_SOURCE\fP"
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fICS_DI0 \fP\fP
+.TP
+\fB\fICS_DI1 \fP\fP
+.TP
+\fB\fICS_DI2 \fP\fP
+.TP
+\fB\fICS_DI3 \fP\fP
+.TP
+\fB\fICS_DI4 \fP\fP
+.TP
+\fB\fICS_DI5 \fP\fP
+.TP
+\fB\fICS_SOFT_CLOCK \fP\fP
+.TP
+\fB\fICS_INT_CLOCK \fP\fP
+
+.SS "enum \fBEVENT_CONDITION\fP"
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fIEC_NONE \fP\fP
+.TP
+\fB\fIEC_TRUE \fP\fP
+.TP
+\fB\fIEC_SOFT \fP\fP
+.TP
+\fB\fIEC_TRIGGER_RISING \fP\fP
+.TP
+\fB\fIEC_TRIGGER_FALLING \fP\fP
+.TP
+\fB\fIEC_DATA_ABOVE \fP\fP
+.TP
+\fB\fIEC_DATA_BELOW \fP\fP
+
+.SS "enum \fBFUNCODES\fP"
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fIFCA \fP\fP
+.TP
+\fB\fIFCB \fP\fP
+.TP
+\fB\fIFCC \fP\fP
+.TP
+\fB\fIFCD \fP\fP
+.TP
+\fB\fIFCE \fP\fP
+.TP
+\fB\fIFCF \fP\fP
+.TP
+\fB\fIFCG \fP\fP
+.TP
+\fB\fIFCH \fP\fP
+.TP
+\fB\fIFCI \fP\fP
+.TP
+\fB\fIFCK \fP\fP
+.TP
+\fB\fIFCL \fP\fP
+.TP
+\fB\fIFCM \fP\fP
+.TP
+\fB\fIFCN \fP\fP
+.TP
+\fB\fIFCP \fP\fP
+.TP
+\fB\fIFCQ \fP\fP
+.TP
+\fB\fIFCR \fP\fP
+.TP
+\fB\fIFCS \fP\fP
+.TP
+\fB\fIFCT \fP\fP
+.TP
+\fB\fIFCU \fP\fP
+.TP
+\fB\fIFCV \fP\fP
+.TP
+\fB\fIFCW \fP\fP
+.TP
+\fB\fIFCX \fP\fP
+.TP
+\fB\fIFCY \fP\fP
+.TP
+\fB\fIFCZ \fP\fP
+.TP
+\fB\fIfca \fP\fP
+.TP
+\fB\fIfcb \fP\fP
+.TP
+\fB\fIfcc \fP\fP
+.TP
+\fB\fIfcd \fP\fP
+.TP
+\fB\fIfce \fP\fP
+.TP
+\fB\fIfcf \fP\fP
+.TP
+\fB\fIfch \fP\fP
+.TP
+\fB\fIfci \fP\fP
+.TP
+\fB\fIfck \fP\fP
+.TP
+\fB\fIfcl \fP\fP
+.TP
+\fB\fIfcm \fP\fP
+.TP
+\fB\fIfcn \fP\fP
+.TP
+\fB\fIfcp \fP\fP
+.TP
+\fB\fIfcr \fP\fP
+.TP
+\fB\fIfcs \fP\fP
+.TP
+\fB\fIfct \fP\fP
+.TP
+\fB\fIfcu \fP\fP
+.TP
+\fB\fIfcw \fP\fP
+.TP
+\fB\fIfcy \fP\fP
+.TP
+\fB\fIfcz \fP\fP
+.TP
+\fB\fIfc1 \fP\fP
+.TP
+\fB\fIfc2 \fP\fP
+.TP
+\fB\fIfc3 \fP\fP
+.TP
+\fB\fIfc4 \fP\fP
+.TP
+\fB\fIfc5 \fP\fP
+.TP
+\fB\fIfc6 \fP\fP
+.TP
+\fB\fIfc80 \fP\fP
+.TP
+\fB\fIkeep_arm_sdt_happy \fP\fP
+
+.SS "enum \fBMTC_SUBTYPES\fP"
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fIMTC_TEST \fP\fP
+.TP
+\fB\fIMTC_HOST_REQUEST_DATA \fP\fP
+.TP
+\fB\fIMTC_LOAD_AO \fP\fP
+.TP
+\fB\fIMTC_LOAD_DO \fP\fP
+.TP
+\fB\fIMTC_DEBUG_TEXT \fP\fP
+.TP
+\fB\fIMTC_HOST_REQUEST_X_DATA \fP\fP
+.TP
+\fB\fIMTC_REQUEST_STATUS_CHANGE_NOTIFICATION \fP\fP
+.TP
+\fB\fIMTC_HOST_REQUEST_DATA_HOSTBOUND \fP\fP
+.TP
+\fB\fIMTC_HOST_REQUEST_DATA_ACQBOUND \fP\fP
+.TP
+\fB\fIMTC_LAST \fP\fP
+
+.SS "enum \fBPHASE_PROPERTY\fP"
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fIPP_REQUESTED_SAMPLES \fP\fP
+.TP
+\fB\fIPP_ACTUAL_SAMPLES \fP\fP
+.TP
+\fB\fIPP_STATE \fP\fP
+
+.SS "enum \fBQ32C_SR_DEST\fP"
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fIQ32C_SR_DEST_NONE \fP\fP
+.TP
+\fB\fIQ32C_SR_DEST_MIx \fP\fP
+.TP
+\fB\fIQ32C_SR_DEST_MOx \fP\fP
+.TP
+\fB\fIQ32C_SR_DEST_J50 \fP\fP
+.TP
+\fB\fIQ32C_SR_DEST_J51 \fP\fP
+.TP
+\fB\fIQ32C_SR_DEST_J52 \fP\fP
+.TP
+\fB\fIQ32C_SR_DEST_J53 \fP\fP
+.TP
+\fB\fIQ32C_SR_DEST_J34 \fP\fP
+.TP
+\fB\fIQ32C_SR_DEST_J35 \fP\fP
+.TP
+\fB\fIQ32C_SR_DEST_PXI_TRIG0 \fP\fP
+.TP
+\fB\fIQ32C_SR_DEST_PXI_TRIG1 \fP\fP
+.TP
+\fB\fIQ32C_SR_DEST_PXI_TRIG2 \fP\fP
+.TP
+\fB\fIQ32C_SR_DEST_PXI_TRIG3 \fP\fP
+.TP
+\fB\fIQ32C_SR_DEST_PXI_TRIG4 \fP\fP
+.TP
+\fB\fIQ32C_SR_DEST_PXI_TRIG5 \fP\fP
+.TP
+\fB\fIQ32C_SR_DEST_PXI_TRIG6 \fP\fP
+.TP
+\fB\fIQ32C_SR_DEST_PXI_TRIG7 \fP\fP
+.TP
+\fB\fIQ32C_SR_DEST_PXI_STAR \fP\fP
+.TP
+\fB\fIQ32C_SR_DEST_PXI_CLK10 \fP\fP
+
+.SS "enum \fBQ32C_SR_FUNC\fP"
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fIQ32C_SR_FUNC_DI0 \fP\fP
+.TP
+\fB\fIQ32C_SR_FUNC_DI1 \fP\fP
+.TP
+\fB\fIQ32C_SR_FUNC_DI2 \fP\fP
+.TP
+\fB\fIQ32C_SR_FUNC_DI3 \fP\fP
+.TP
+\fB\fIQ32C_SR_FUNC_DI4 \fP\fP
+.TP
+\fB\fIQ32C_SR_FUNC_DI5 \fP\fP
+.TP
+\fB\fIQ32C_SR_FUNC_AICLK \fP\fP
+.TP
+\fB\fIQ32C_SR_FUNC_AITRIG \fP\fP
+.TP
+\fB\fIQ32C_SR_FUNC_AOCLK \fP\fP
+.TP
+\fB\fIQ32C_SR_FUNC_AOTRIG \fP\fP
+.TP
+\fB\fIQ32C_SR_FUNC_DOCLK \fP\fP
+.TP
+\fB\fIQ32C_SR_FUNC_DOTRIG \fP\fP
+
+.SH "Variable Documentation"
+.PP 
+.SS "struct \fBLLC200_INIT\fP \fBpacked\fP"
+.PP
+\fBLLC200_INIT\fP acq216 host side buffer for host side initialisation. 
+.PP
+we use a struct else it's just too tedious, but enforce a u32 alignment between fields
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for llcontrol from the source code.

@@ -1,0 +1,15 @@
+# default-resources - default resource file for dt100rc
+# $File:$
+#streamPanel INHIBIT
+#signalconditioningPanel INHIBIT
+#dvmPanel INHIBIT
+#sampleTaggingSelect INHIBIT
+
+#onStopBatchJob.setJobPath("onstop.bat");
+#onStoredBatchJob.setJobPath("onstore.bat");
+#onPlotBatchJob.setJobPath("onplot.bat");
+
+dt100.setDataFetchConnectionMode(1);
+
+#MainFrame.setNoLogo( true );
+#MainFrame.setTitle("dt100rc - dt100 remote control. www.d-tacq.com");

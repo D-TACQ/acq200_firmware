@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="StreamingControlPanel">
+  <grid id="cd15e" binding="panel" row-count="11" column-count="3" hgap="-1" vgap="-1">
+    <margin top="5" left="5" bottom="5" right="5"/>
+    <constraints>
+      <xy x="79" y="105" width="576" height="447"/>
+      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3"/>
+    </constraints>
+    <properties/>
+    <border type="etched" title="Control Live Data Streaming"/>
+    <children>
+      <component id="8d13c" class="javax.swing.JComboBox" binding="streamMaxChannels">
+        <constraints>
+          <xy x="11" y="66" width="50" height="24"/>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="0">
+            <preferred-size width="50" height="-1"/>
+          </grid>
+        </constraints>
+        <properties>
+          <enabled value="true"/>
+        </properties>
+      </component>
+      <component id="e5abc" class="javax.swing.JComboBox" binding="streamSubrate">
+        <constraints>
+          <xy x="280" y="66" width="50" height="24"/>
+          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="0">
+            <minimum-size width="50" height="-1"/>
+          </grid>
+        </constraints>
+        <properties>
+          <enabled value="true"/>
+        </properties>
+      </component>
+      <component id="7bdb1" class="javax.swing.JLabel">
+        <constraints>
+          <xy x="11" y="33" width="80" height="15"/>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+        </constraints>
+        <properties>
+          <text value="Max Channels"/>
+        </properties>
+      </component>
+      <component id="d9fe0" class="javax.swing.JLabel">
+        <constraints>
+          <xy x="280" y="33" width="44" height="15"/>
+          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+        </constraints>
+        <properties>
+          <text value="Subrate"/>
+        </properties>
+      </component>
+      <component id="ec63e" class="javax.swing.JCheckBox" binding="mfCheckbox">
+        <constraints>
+          <xy x="11" y="105" width="88" height="23"/>
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0"/>
+        </constraints>
+        <properties>
+          <enabled value="true"/>
+          <text value="MultiFrame"/>
+        </properties>
+      </component>
+      <component id="13d0c" class="javax.swing.JCheckBox" binding="saveRootCheckBox">
+        <constraints>
+          <xy x="11" y="143" width="81" height="23"/>
+          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0"/>
+        </constraints>
+        <properties>
+          <enabled value="true"/>
+          <text value="Save Root"/>
+        </properties>
+      </component>
+      <component id="b5ddc" class="javax.swing.JTextField" binding="rootDirectory">
+        <constraints>
+          <xy x="11" y="182" width="451" height="22"/>
+          <grid row="4" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1">
+            <preferred-size width="400" height="-1"/>
+          </grid>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="96fbe" class="javax.swing.JButton" binding="setRootButton">
+        <constraints>
+          <xy x="472" y="181" width="93" height="25"/>
+          <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0"/>
+        </constraints>
+        <properties>
+          <text value="Set Root..."/>
+        </properties>
+      </component>
+      <component id="1d6d" class="javax.swing.JCheckBox" binding="onSecondCheckbox">
+        <constraints>
+          <xy x="11" y="221" width="151" height="23"/>
+          <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0"/>
+        </constraints>
+        <properties>
+          <text value="On Second Processing"/>
+        </properties>
+      </component>
+      <component id="34a0d" class="javax.swing.JLabel">
+        <constraints>
+          <xy x="11" y="261" width="26" height="15"/>
+          <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+        </constraints>
+        <properties>
+          <text value="Host"/>
+        </properties>
+      </component>
+      <component id="a7b97" class="javax.swing.JTextField" binding="oneSecondHost">
+        <constraints>
+          <xy x="11" y="295" width="259" height="22"/>
+          <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1">
+            <preferred-size width="150" height="-1"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text value="localhost"/>
+        </properties>
+      </component>
+      <component id="8d7d3" class="javax.swing.JTextField" binding="oneSecondPort">
+        <constraints>
+          <xy x="280" y="295" width="182" height="22"/>
+          <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1">
+            <preferred-size width="75" height="-1"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text value="53506"/>
+        </properties>
+      </component>
+      <component id="353e6" class="javax.swing.JButton" binding="connectOneSecondServer">
+        <constraints>
+          <xy x="478" y="294" width="80" height="25"/>
+          <grid row="7" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0"/>
+        </constraints>
+        <properties>
+          <text value="Connect"/>
+        </properties>
+      </component>
+      <component id="de6b1" class="javax.swing.JLabel">
+        <constraints>
+          <xy x="11" y="336" width="19" height="15"/>
+          <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+        </constraints>
+        <properties>
+          <text value="Job"/>
+        </properties>
+      </component>
+      <component id="8b220" class="javax.swing.JLabel">
+        <constraints>
+          <xy x="280" y="261" width="23" height="15"/>
+          <grid row="6" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+        </constraints>
+        <properties>
+          <text value="Port"/>
+        </properties>
+      </component>
+      <component id="eb5e4" class="javax.swing.JButton" binding="runStop">
+        <constraints>
+          <xy x="488" y="406" width="60" height="25"/>
+          <grid row="10" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0"/>
+        </constraints>
+        <properties>
+          <enabled value="true"/>
+          <text value="Start"/>
+        </properties>
+      </component>
+      <component id="43d72" class="javax.swing.JTextField" binding="jobDef">
+        <constraints>
+          <xy x="11" y="369" width="259" height="22"/>
+          <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1">
+            <preferred-size width="150" height="-1"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text value="job"/>
+        </properties>
+      </component>
+    </children>
+  </grid>
+</form>

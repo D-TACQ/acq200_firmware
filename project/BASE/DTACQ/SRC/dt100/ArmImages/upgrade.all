@@ -1,0 +1,262 @@
+#!/usr/bin/perl
+# upgrade.all - for all boards - 
+#  stash serial#, cal info
+#  zap the flash
+#  program boot66, lca-loader, caldata
+
+
+$CAUTIOUS=1;
+
+$REVID='upgrade.all $Revision: 1.14.4.1 $';
+print( $REVID."\n" );
+
+use lib "../modules";
+use getBoards;
+
+$PROCFILE='/proc';
+#$SLOTBASED='slotbased';    # uncomment this line if slot based
+$SLOTBASED='';
+$JOBROOT ='/tmp/upgrade.all';
+$JOBFILE1=$JOBROOT.'/getcal';
+$JOBFILE2=$JOBROOT.'/flashops';
+$JOBFILE3=$JOBROOT.'/verify';
+
+
+sub systemCheck {
+    open TESTFILE, ">$JOBROOT.test" or die \
+	"ERROR: sorry, but to run this program you need write access to /tmp";
+    close TESTFILE;
+    if ( ! -d $JOBROOT ){
+        if ( ! -f $JOBROOT ){
+            system( "mkdir $JOBROOT" );
+        }else{
+            die "ERROR: $JOBROOT exists and it is not a directory!".
+		"- please delete";
+	}
+    }
+    open TESTFILE, ">$JOBROOT/test" or die \
+	"ERROR, we are unable to write to $JOBROOT/test\n";
+}
+
+
+
+
+sub makeCalFileName {
+    my ( $bn, $calname ) = @_;
+
+    $calname =~ s/\//_/g;   # file name uses _ as a delimiter
+    my $save_cal = $calname.'.cal.'.$bn.'.axf';
+
+    return $JOBROOT.'/'.$save_cal;
+}
+
+sub makeEnvFileName {
+    my ( $bn, $envname ) = @_;
+
+    $envname =~ s/\//_/g;   # file name uses _ as a delimiter
+    my $save_env = $envname.'.env.'.$bn.'.axf';
+
+    return $JOBROOT.'/'.$save_env;
+}
+
+sub makeCalInfo {
+    my ( $refb ) = @_;
+
+    return 
+	$refb->{serial_num}   . '/' .
+	$refb->{num_channels} . '/' .
+	$refb->{cal_date};
+}
+
+sub getEnvModule {
+    my ( $refb ) = @_;
+    my $envmodule;
+    my $modlin;
+    
+    open PFMU, "pfmu -b $refb->{lognum} list|" 
+	or die "FAILED ot run pfmu on board $refb->{lognum}\n";
+
+    while ( $modlin = <PFMU> ){
+	if ( ( $envmodule ) = $modlin =~ /Image 3 \"(\S+)\s*\"/ ){
+	    $refb->{envmodule} = $envmodule;
+	    return 1;
+	}
+    }
+    close PFMU;
+    return 0;
+}
+
+sub getBoardInfo {
+    open JOBFILE1, ">$JOBFILE1" or die "ERROR: failed to open $JOBFILE1";
+
+    printf JOBFILE1 ( "#!/bin/bash\n" );
+    printf JOBFILE1 ( "# file:$JOBFILE1 created by $REVID\n" );
+
+    foreach $refb ( @DEVRECS ) {
+
+	if ( $refb->{model} =~ /BLANK/ ){
+	    printf JOBFILE1 ( "# board $bn is BLANK, ignoring\n" );
+	    next;
+	}
+
+        my $bn = $refb->{lognum};
+	my $cal_info = makeCalInfo( $refb );
+	my $boot_code = $refb->{arm_fw};
+
+	printf JOBFILE1 ( "pfmu -b %d 'read 2 %s' <yesyes\n", 
+			      $bn, makeCalFileName( $bn, $cal_info ) );
+
+	if ( getEnvModule( $refb ) ){
+	    print "got Env Module $refb->{envmodule}\n";
+	    printf JOBFILE1 ( "pfmu -b %d 'read 3 %s' <yesyes\n",
+			      $bn, 
+			      makeEnvFileName( $bn, $refb->{envmodule} ) );
+	}
+
+	if ( $envmodule ){
+
+	    printf JOBFILE
+	}
+    }
+
+    close( JOBFILE1 );
+    close( PROCFILE );
+}
+
+sub scriptProgramBoards 
+{
+    open JOBFILE2, ">$JOBFILE2" or die "ERROR: failed to open $JOBFILE2";
+
+    printf JOBFILE2 ( "#!/bin/bash\n" );
+    printf JOBFILE2 ( "# file:$JOBFILE2 created by $REVID\n" );
+
+    my $iboard;
+
+    foreach $refb ( @DEVRECS ){
+        my $bn = $refb->{lognum};
+
+	printf JOBFILE2 ( "pfmu -b $bn deleteall <yesyes &\n" );
+    }
+
+    foreach $refb ( @DEVRECS ) {
+	printf JOBFILE2 ( "wait\n" );
+    }
+
+    foreach $refb ( @DEVRECS ) {
+
+	if ( $refb->{model} =~ /BLANK/ ){
+	    next;
+	}
+        my $bn = $refb->{lognum};
+	my $bootcode = $refb->{arm_fw};
+	my $bootfile = $bootcode . '.axf';
+	my $lca_name = $refb->{lca_fw};
+	my $lca_file = $lca_name . '-loader.axf';
+
+
+	printf JOBFILE2 ( 
+	    "pfmu -b $bn \'program 0 $bootcode $bootfile 0\'\n" );
+
+	printf JOBFILE2 (
+            "pfmu -b $bn \'program 1 $lca_name $lca_file 14\'\n" );
+
+        my $cal_info = makeCalInfo( $refb );
+
+        printf JOBFILE2 ( "pfmu -b %d 'program 2 %s %s 18'\n", 
+			  $bn, $cal_info, makeCalFileName( $bn, $cal_info ) );
+
+	if ( $refb->{envmodule} ){
+	    printf JOBFILE2 ( "pfmu -b %d 'program 3 %s %s 17'\n",
+			      $bn,
+			      $refb->{envmodule},  
+			      makeEnvFileName( $bn, $refb->{envmodule} ) );
+	}
+    }
+
+    close JOBFILE2;
+}
+
+sub scriptVerify {
+    open JOBFILE3, ">$JOBFILE3" or die "ERROR: failed to open $JOBFILE3";
+
+    printf JOBFILE3 ( "#!/bin/bash\n" );
+    printf JOBFILE3 ( "# file:$JOBFILE3 created by $REVID\n" );
+
+    my $iboard;
+
+    foreach $refb ( @DEVRECS ) {
+
+	if ( $refb->{model} =~ /BLANK/ ){
+	    next;
+	}
+        my $bn = $refb->{lognum};
+	my $bootcode = $refb->{arm_fw};
+	my $bootfile = $bootcode . '.axf';
+	my $lca_name = $refb->{lca_fw};
+	my $lca_file = $lca_name . '-loader.axf';
+
+
+	printf JOBFILE3 ( "rm -f  $JOBROOT/verify.$bn.$bootfile\n" );
+	printf JOBFILE3 ( "rm -f  $JOBROOT/verify.$bn.$lca_file\n" );
+
+	printf JOBFILE3 ( 
+	    "pfmu -b $bn \'read 0 $JOBROOT/verify.$bn.$bootfile\' \>/dev/null\n");
+
+	printf JOBFILE3 (
+            "pfmu -b $bn \'read 1 $JOBROOT/verify.$bn.$lca_file\' \>/dev/null\n" );
+
+	printf JOBFILE3 (
+			 "echo;echo " . '-'x80 . ";echo; echo Verify:\n" );
+	printf JOBFILE3 (
+			 "cmp $JOBROOT/verify.$bn.$bootfile $bootfile && ".
+                         "echo BOARD $bn $bootfile compares OK\n" );
+	printf JOBFILE3 (
+			 "cmp $JOBROOT/verify.$bn.$lca_file $lca_file && ".
+                         "echo BOARD $bn $lca_file compares OK\n" );
+    }
+
+    close JOBFILE3;
+}
+sub flashProg {
+    print( "execute $JOBFILE1\n" );
+    system( "$JOBFILE1" );
+    print( "execute $JOBFILE2\n" );
+    system( "$JOBFILE2" );
+}
+
+sub verify {
+    print( "execute $JOBFILE3\n" );
+    system( "$JOBFILE3" );
+}
+sub flashPromptInput {
+    print( '-'x80 . "\n" );
+    print( "[1] cat $JOBFILE1\n" );
+    print( "[2] cat $JOBFILE2\n" );
+    print( "[3] proceed with upgrade\n" );
+    print( "[4] verify\n" );
+    print( "[99] abort\n" );
+    return <>;
+}
+# main()
+
+systemCheck();
+getBoards( $PROCFILE, $SLOTBASED, 'acq32', "" );
+getBoardInfo();
+scriptProgramBoards();
+scriptVerify();
+system( "chmod u+rx $JOBFILE1 $JOBFILE2 $JOBFILE3" );
+
+
+if ( $CAUTIOUS ){
+    GETKEY: while ( $_ = flashPromptInput ) {
+	if ( /^1/ ) { system( "more $JOBFILE1\n" ); next GETKEY; }
+	if ( /^2/ ) { system( "more $JOBFILE2\n" ); next GETKEY; }
+	if ( /^3/ ) { flashProg; verify; last GETKEY; }
+	if ( /^4/ ) { verify; next GETKEY; }
+	if ( /^99/ ){ exit; }
+	print "sorry, not \"$_\" please try again\n";	
+    }
+}else{
+    flashProg;
+}
+

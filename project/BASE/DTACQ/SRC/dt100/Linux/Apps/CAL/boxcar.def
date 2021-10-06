@@ -1,0 +1,3 @@
+InvertedInputs=0
+Acq16Offset=1
+PostProcessCommand=BoxCar,32

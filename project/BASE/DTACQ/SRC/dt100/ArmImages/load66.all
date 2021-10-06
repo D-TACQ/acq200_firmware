@@ -1,0 +1,117 @@
+#!/bin/sh
+# load all ... load all flash funcs
+###############################################################################
+# 
+#  File: load66.all
+# 
+#  $RCSfile: load66.all,v $
+#  
+#  Copyright (C) 2001 D-TACQ Solutions Ltd
+#  not to be used without owner's permission
+# 
+#  Description:
+#  program is intended to be run via softlinks setup by make links
+#
+# load-acq32.all - loads acq32 LCA images
+# load-acq16.all - loads acq16 LCA images
+# usage load-acqxx.all {b1=sn1} [b2=sn2] ...
+# a default data set is loaded if no args are used.
+# 
+# 
+#  $Id: load66.all,v 1.4 2002/03/24 11:31:42 pgm Exp $
+#  $Log: load66.all,v $
+#  Revision 1.4  2002/03/24 11:31:42  pgm
+#  handles mixed acq16/32 systems
+#
+#  Revision 1.3  2001/08/03 14:57:47  pgm
+#  documented
+#
+#  Revision 1.3  2000/12/28 11:04:33  pgm
+#  header.sh
+#
+#
+###############################################################################
+
+case $0 in 
+"./load-acq32.all")
+    echo Loading acq32
+    armfw="boot66c3"
+    defchan=32
+    lca="acq32-lca";;
+"./load-acq16.all")
+    echo Loading acq16
+    armfw="boot66c2"
+    defchan=16
+    lca="acq16-lca";;
+*)
+    echo Please use load-acq32.all or load-acq16.all
+    echo usage load-acqxx.all {b1=sn1} [b2=sn2] ...
+    exit 1;;
+esac
+
+datecode=`date +%y%m%d`;
+
+function program {
+    bn=$1
+    sn=$2
+    nch=$3
+    cal=$4
+    
+    pfmu -b $1 <yesyes \
+     "deleteall" \
+     "program 0 $armfw $armfw.axf 0" \
+     "program 1 $lca $lca-loader.axf 14" \
+     "program 2 $sn/$nch/$datecode $cal 18" \
+     "list"    
+}
+
+if [ "$#" = 0 ]; then
+	echo "$0 programming default sn D20000, def-cal"
+	program 1 D20000 def-cal.axf
+else
+    while [ "$1" != "" ]; do
+
+	case $1 in 
+	-h | -help | help)
+		echo responding to $1
+		echo "help $0 {b1=serial1} [b2=serial2] ..."
+		exit 1;;
+	test)
+	    test="test";;
+	*)
+	    boardnum=${1%=*}
+	    if [ "$1" = "$boardnum" ]; then
+		echo 'please use parameters b=serial b: \{ 1..9 \}, sn Dxxxx'
+		exit 1
+	    fi
+
+	    boardp=${1#[1-9]=}
+	    serialnum=${boardp%%/*}
+	    nchan=${boardp#$serialnum/}
+
+	    if [ "$nchan" = "$serialnum" ]; then
+		nchan=$defchan;
+	    fi
+
+	    if [ -f $serialnum.axf ];then
+		calfile=$serialnum.axf
+	    else
+		calfile=def-cal.axf
+	    fi
+
+	    echo $0 b $boardnum s $serialnum n $nchan c $calfile
+
+	    program $boardnum $serialnum $nchan $calfile
+	esac
+	shift
+    done
+fi
+
+
+
+
+
+
+
+
+

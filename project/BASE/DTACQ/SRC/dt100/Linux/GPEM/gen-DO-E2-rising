@@ -1,0 +1,11 @@
+#!/bin/bash
+#gen-DO-E2-rising
+
+DF=${2:-~dt100/AO/doramp.dat}
+
+P2="LENGTH"
+E1="EV_TRUE"
+E2="EV_TRIGGER_RISING DI2"
+E3="EV_TRUE"
+
+. ./genbody $1 $DF

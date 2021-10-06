@@ -1,0 +1,14 @@
+#!/bin/bash
+# generic top level shot control for llcontrol for acq216
+PRAMS=${PRAMS:-PRAMS/M5-vranges.bin}
+NSAM=${NSAM:-512}
+SHOTS=${SHOTS:-1000}
+NCHAN=${NCHAN:-16}
+BD=${BD:-2}
+OUTFILE=/tmp/`basename $PRAMS`-$SHOTS-$NCHAN-$NSAM
+TAIL=${TAIL:-tail -n 3}
+export ACQ216HS=1
+./llcontrol -M ffff -b $BD -t --hbpoll --bigbuf \
+	-n $SHOTS -c $NCHAN --samples $NSAM --prams $PRAMS -O -W -o $OUTFILE \
+	 SCM 2>/dev/null | ${TAIL}
+echo output `ls -l ${OUTFILE}*userbuf`

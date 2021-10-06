@@ -1,0 +1,106 @@
+.TH "LLC200_INIT" 3 "1 Dec 2005" "llcontrol" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+LLC200_INIT \- LLC200_INIT acq216 host side buffer for host side initialisation.  
+
+.PP
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <acq32busprot.h>\fP
+.PP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "unsigned \fBmarker\fP"
+.br
+.ti -1c
+.RI "unsigned \fBmask\fP"
+.br
+.RI "\fILLC200_INIT_MAGIC_MARKER. \fP"
+.ti -1c
+.RI "unsigned char \fBdds_ftw\fP [8]"
+.br
+.RI "\fIindicates the fields to change. \fP"
+.ti -1c
+.RI "union {"
+.br
+.ti -1c
+.RI "   unsigned long long \fBull\fP"
+.br
+.ti -1c
+.RI "   unsigned \fBshort\fP \fBw\fP [4]"
+.br
+.ti -1c
+.RI "} \fBvranges\fP"
+.br
+.RI "\fI6 byte ftw, 2 byte QDAC \fP"
+.ti -1c
+.RI "unsigned \fBshort\fP \fBoffsets\fP [16]"
+.br
+.ti -1c
+.RI "unsigned \fBtrig\fP"
+.br
+.RI "\fIchannels 1. \fP"
+.ti -1c
+.RI "unsigned \fBchannel_mask\fP"
+.br
+.RI "\fItrigger definition \fP"
+.ti -1c
+.RI "unsigned \fBint_clk\fP"
+.br
+.RI "\fI0xf,0xff,0xfff,0xffff {4m,8,12,16} \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+LLC200_INIT acq216 host side buffer for host side initialisation. 
+
+we use a struct else it's just too tedious, but enforce a u32 alignment between fields
+.PP
+.SH "Field Documentation"
+.PP 
+.SS "unsigned \fBLLC200_INIT::channel_mask\fP"
+.PP
+trigger definition 
+.PP
+\fBTodo\fP
+.RS 4
+.RE
+.PP
+
+.SS "unsigned char \fBLLC200_INIT::dds_ftw\fP[8]"
+.PP
+indicates the fields to change. 
+.PP
+.SS "unsigned \fBLLC200_INIT::int_clk\fP"
+.PP
+0xf,0xff,0xfff,0xffff {4m,8,12,16} 
+.PP
+.SS "unsigned \fBLLC200_INIT::marker\fP"
+.PP
+.SS "unsigned \fBLLC200_INIT::mask\fP"
+.PP
+LLC200_INIT_MAGIC_MARKER. 
+.PP
+.SS "unsigned \fBshort\fP \fBLLC200_INIT::offsets\fP[16]"
+.PP
+.SS "unsigned \fBLLC200_INIT::trig\fP"
+.PP
+channels 1. 
+.PP
+.16. 
+.SS "unsigned long long \fBLLC200_INIT::ull\fP"
+.PP
+.SS "union { ... }   \fBLLC200_INIT::vranges\fP"
+.PP
+6 byte ftw, 2 byte QDAC 
+.PP
+.SS "unsigned \fBshort\fP \fBLLC200_INIT::w\fP[4]"
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for llcontrol from the source code.

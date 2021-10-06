@@ -1,0 +1,685 @@
+acq200_bigbuf_alloc.c:108:	struct IoMapping *bb = &device->bigbuf.bb;
+acq200_bigbuf_alloc.c:124:		sprintf( buf->name, "buf %d.%d", device->major, ibuf );
+acq200_bigbuf_alloc.c:128:	device->bigbuf.pool = pool;
+acq200_bigbuf_alloc.c:132:	if ( device->bigbuf.pool ){
+acq200_bigbuf_alloc.c:133:		KFREE(device->bigbuf.pool);
+acq200_bigbuf_alloc.c:134:		device->bigbuf.pool = 0;
+acq200_bigbuf_alloc.c:148:	struct BigBufPool *pool = device->bigbuf.pool;
+acq200_bigbuf_alloc.c:168:	struct BigBufPool *pool = device->bigbuf.pool;
+acq200.c:162:	rch->command_id = MAKE_ID_DTACQ(path->device->m_dpd.i2o_last_id_out+1);
+acq200.c:182:		if ( device->bridge_dev.major == major ||
+acq200.c:183:		     device->wave_dev.major   == major    ){
+acq200.c:283:		rchAppend(device->m_dpd.first_rch, rch);	
+acq200.c:491:	rchAppend(device->m_dpd.first_rch, rch);
+acq200.c:610:		rchAppend(device->m_dpd.first_rch, rch);
+acq200.c:686:	rchAppend(device->m_dpd.first_rch, rch);
+acq200.c:820:	     device->p_pci->vendor,
+acq200.c:821:	     device->p_pci->device,
+acq200.c:822:	     device->p_pci->subsystem_vendor,
+acq200.c:823:	     device->p_pci->subsystem_vendor);
+acq200.c:825:	switch(device->p_pci->vendor){
+acq200.c:830:		switch(device->p_pci->device){
+acq200.c:849:/* do NOT call directly, always use device->set_mailbox() */
+acq200.c:873:	return (void*)((unsigned)device->dmabuf.va+(mfa&ACQ200_PCIWINMSK));
+acq200.c:905:		dbg(1, "irq %d M:%d %s",irq,device->major,"message");
+acq200.c:911:		    irq, device->major, "doorbell", doorbell);
+acq200.c:917:		dbg(1, "irq %d M:%d %s",irq,device->major,"bad");
+acq200.c:937:/* do NOT call directly, always use device->get_mailbox() */
+acq200.c:961:	struct IoMapping* pim = &device->csr;
+acq200.c:968:	pim->pa = pci_resource_start(device->p_pci, bar)&BA_MASK;
+acq200.c:993:    device->rom.va  = device->ram.va = (void*)0xdeadbeef;
+acq200.c:996:    PDEBUGL(2)(" %4s p 0x%08lx v %p\n", "csr",device->csr.pa,device->csr.va);
+acq200.c:1008:		rc = acq200_bb_alloc( &device->bigbuf.bb, BBLEN, 
+acq200.c:1009:				      device->devname );
+acq200.c:1020:	device->ram.va = device->bigbuf.bb.va;
+acq200.c:1025:	device->dmabuf.va = device->bigbuf.bb.va;	
+acq200.c:1026:	device->dmabuf.pa = device->bigbuf.bb.pa;
+acq200.c:1027:	device->dmabuf.len = device->bigbuf.bb.len;
+acq200.c:1052:        unsigned* pmask = &device->m_dpd.channel_mask;
+acq200.c:1058:              ichannel_board != device->m_dpd.nchannels; 
+acq200.c:1083:        if ( device->m_dpd.channel_mask&imask ){
+acq200.c:1104:            device->m_dpd.channel_mask = mask;
+acq200.c:1120:		acq_device->dev_type = DEV_TYPE_ACQ196;
+acq200.c:1122:		acq_device->p_md->SetChannelMask = acq196_SetChannelMaskAll;
+acq200.c:1123:		acq_device->p_md->GetNumChannels = acq196_GetNumChannelsAll;
+acq200.c:1125:		acq_device->m_dpd.nchannels           = 96;
+acq200.c:1126:		acq_device->m_dpd.channel_mask = 0x7;
+acq200.c:1128:		acq_device->dev_type = DEV_TYPE_ACQ216;
+acq200.c:1131:		acq_device->m_dpd.nchannels           = 16;
+acq200.c:1132:		acq_device->m_dpd.channel_mask = 0xffff;
+acq200.c:1147:	acq_device->getImagesDef = acq200_getImagesDef;
+acq200.c:1148:	acq_device->set_mailbox = _acq200_set_mailbox;
+acq200.c:1149:	acq_device->get_mailbox = _acq200_get_mailbox;
+acq200.c:1150:	acq_device->isr = acq200_isr;
+acq200.c:1151:	acq_device->coreDevInit = acq200_coreDevInit;
+acq200.c:1152:	acq_device->i2o_return_mfa = acq200_dev_i2o_return_mfa;
+acq200.c:1153:	acq_device->i2o_mfa2va = acq200_dev_i2o_mfa2va;
+acq200.c:1155:	acq_device->fetchDataToLocalBuffer = acq200_fetchDataToLocalBuffer;
+acq200.c.~1.1.4.34.~:162:	rch->command_id = MAKE_ID_DTACQ(path->device->m_dpd.i2o_last_id_out+1);
+acq200.c.~1.1.4.34.~:182:		if ( device->bridge_dev.major == major ||
+acq200.c.~1.1.4.34.~:183:		     device->wave_dev.major   == major    ){
+acq200.c.~1.1.4.34.~:283:		rchAppend(device->m_dpd.first_rch, rch);	
+acq200.c.~1.1.4.34.~:493:	rchAppend(device->m_dpd.first_rch, rch);
+acq200.c.~1.1.4.34.~:612:		rchAppend(device->m_dpd.first_rch, rch);
+acq200.c.~1.1.4.34.~:688:	rchAppend(device->m_dpd.first_rch, rch);
+acq200.c.~1.1.4.34.~:822:	     device->p_pci->vendor,
+acq200.c.~1.1.4.34.~:823:	     device->p_pci->device,
+acq200.c.~1.1.4.34.~:824:	     device->p_pci->subsystem_vendor,
+acq200.c.~1.1.4.34.~:825:	     device->p_pci->subsystem_vendor);
+acq200.c.~1.1.4.34.~:827:	switch(device->p_pci->vendor){
+acq200.c.~1.1.4.34.~:832:		switch(device->p_pci->device){
+acq200.c.~1.1.4.34.~:851:/* do NOT call directly, always use device->set_mailbox() */
+acq200.c.~1.1.4.34.~:875:	return (void*)((unsigned)device->dmabuf.va+(mfa&ACQ200_PCIWINMSK));
+acq200.c.~1.1.4.34.~:907:		dbg(1, "irq %d M:%d %s",irq,device->major,"message");
+acq200.c.~1.1.4.34.~:913:		    irq, device->major, "doorbell", doorbell);
+acq200.c.~1.1.4.34.~:919:		dbg(1, "irq %d M:%d %s",irq,device->major,"bad");
+acq200.c.~1.1.4.34.~:939:/* do NOT call directly, always use device->get_mailbox() */
+acq200.c.~1.1.4.34.~:963:	struct IoMapping* pim = &device->csr;
+acq200.c.~1.1.4.34.~:970:	pim->pa = pci_resource_start(device->p_pci, bar)&BA_MASK;
+acq200.c.~1.1.4.34.~:995:    device->rom.va  = device->ram.va = (void*)0xdeadbeef;
+acq200.c.~1.1.4.34.~:998:    PDEBUGL(2)(" %4s p 0x%08lx v %p\n", "csr",device->csr.pa,device->csr.va);
+acq200.c.~1.1.4.34.~:1010:		rc = acq200_bb_alloc( &device->bigbuf.bb, BBLEN, 
+acq200.c.~1.1.4.34.~:1011:				      device->devname );
+acq200.c.~1.1.4.34.~:1022:	device->ram.va = device->bigbuf.bb.va;
+acq200.c.~1.1.4.34.~:1027:	device->dmabuf.va = device->bigbuf.bb.va;	
+acq200.c.~1.1.4.34.~:1028:	device->dmabuf.pa = device->bigbuf.bb.pa;
+acq200.c.~1.1.4.34.~:1029:	device->dmabuf.len = device->bigbuf.bb.len;
+acq200.c.~1.1.4.34.~:1054:        unsigned* pmask = &device->m_dpd.channel_mask;
+acq200.c.~1.1.4.34.~:1060:              ichannel_board != device->m_dpd.nchannels; 
+acq200.c.~1.1.4.34.~:1085:        if ( device->m_dpd.channel_mask&imask ){
+acq200.c.~1.1.4.34.~:1106:            device->m_dpd.channel_mask = mask;
+acq200.c.~1.1.4.34.~:1122:		acq_device->dev_type = DEV_TYPE_ACQ196;
+acq200.c.~1.1.4.34.~:1124:		acq_device->p_md->SetChannelMask = acq196_SetChannelMaskAll;
+acq200.c.~1.1.4.34.~:1125:		acq_device->p_md->GetNumChannels = acq196_GetNumChannelsAll;
+acq200.c.~1.1.4.34.~:1127:		acq_device->m_dpd.nchannels           = 96;
+acq200.c.~1.1.4.34.~:1128:		acq_device->m_dpd.channel_mask = 0x7;
+acq200.c.~1.1.4.34.~:1130:		acq_device->dev_type = DEV_TYPE_ACQ216;
+acq200.c.~1.1.4.34.~:1133:		acq_device->m_dpd.nchannels           = 16;
+acq200.c.~1.1.4.34.~:1134:		acq_device->m_dpd.channel_mask = 0xffff;
+acq200.c.~1.1.4.34.~:1149:	acq_device->getImagesDef = acq200_getImagesDef;
+acq200.c.~1.1.4.34.~:1150:	acq_device->set_mailbox = _acq200_set_mailbox;
+acq200.c.~1.1.4.34.~:1151:	acq_device->get_mailbox = _acq200_get_mailbox;
+acq200.c.~1.1.4.34.~:1152:	acq_device->isr = acq200_isr;
+acq200.c.~1.1.4.34.~:1153:	acq_device->coreDevInit = acq200_coreDevInit;
+acq200.c.~1.1.4.34.~:1154:	acq_device->i2o_return_mfa = acq200_dev_i2o_return_mfa;
+acq200.c.~1.1.4.34.~:1155:	acq_device->i2o_mfa2va = acq200_dev_i2o_mfa2va;
+acq200.c.~1.1.4.34.~:1157:	acq_device->fetchDataToLocalBuffer = acq200_fetchDataToLocalBuffer;
+Binary file acq200-drv.o matches
+#acq32.c#:618:    device->dmabuf.va = 
+#acq32.c#:623:    ASSERT( device->dmabuf.va );
+#acq32.c#:625:    device->dmabuf.len = DMABUF_SIZE;
+#acq32.c#:627:    PDEBUGL(2)( "dmabuf vaddr %p\n", device->dmabuf.va );
+#acq32.c#:628:    device->dmabuf.pa = virt_to_phys( device->dmabuf.va );
+#acq32.c#:629:    PDEBUGL(2)( "dmabuf paddr 0x%08x\n", device->dmabuf.pa);
+#acq32.c#:635:            device->dmabuf.va[ii] = 0xdeadbeef;
+#acq32.c#:642:    if ( device->dmabuf.len ){
+#acq32.c#:643:        free_pages( (unsigned long)device->dmabuf.len, PAGE_ORDER );
+#acq32.c#:644:        device->dmabuf.va = (void*)0;
+#acq32.c#:645:        device->dmabuf.len = 0;
+#acq32.c#:668:        if ( device->major == major ){
+#acq32.c#:688:        if ( device->major == major ){
+#acq32.c#:740:    if ( device->instrument_buf.cur-device->instrument_buf.buf < 
+#acq32.c#:742:        device->instrument_buf.cur->id = id;
+#acq32.c#:744:        vsprintf( device->instrument_buf.cur->ids, fmt, ap );
+#acq32.c#:745:        ASSERT( strlen( device->instrument_buf.cur->ids ) < 
+#acq32.c#:746:                sizeof( device->instrument_buf.cur->ids )   );
+#acq32.c#:749:        device->instrument_buf.cur->tv = tv;
+#acq32.c#:750:        device->instrument_buf.cur++;
+#acq32.c#:844:    memcpy( path->info, &device->cfi, sizeof(Acq32ChannelFileInfo) );
+#acq32.c#:913:    clearIoMapping( &device->csr, 0 );
+#acq32.c#:914:    clearIoMapping( &device->ram, 0 );
+#acq32.c#:915:    clearIoMapping( &device->rom, 1 );
+#acq32.c#:926:	unsigned long physical  = (long)device->csr.pa;
+#acq32.c#:1016:	if ( device->getImagesDef( device, &id ) == 0 ){
+#acq32.c#:1076:            unsigned irq    = device->p_pci->irq;               
+#acq32.c#:1080:			   device->p_pci->bus->number, 
+#acq32.c#:1081:			   device->p_pci->devfn );
+#acq32.c#:1084:                           device->csr.pa, 
+#acq32.c#:1085:                           device->ram.pa, 
+#acq32.c#:1086:                           device->rom.pa );
+#acq32.c#:1131:        len += PRINTF( "%30s:" fmt "\n", #field, device->m_dpd.field )
+#acq32.c#:1133:        len += PRINTF( "%30s:" fmt "\n", #field, device->m_dpd.field op )
+#acq32.c#:1176:        len += PRINTF( "%30s:" fmt "\n", #field, device->field )
+#acq32.c#:1194:                       streamNumEntries( &device->streambuf ) );
+#acq32.c#:1293:            for ( ib = device->instrument_buf.buf; 
+#acq32.c#:1294:                  ib != device->instrument_buf.cur; ++ib ){
+#acq32.c#:1314:            device->instrument_buf.cur = device->instrument_buf.buf;
+#acq32.c#:1536:	if (strlen(device->devname) == 0){
+#acq32.c#:1541:				sprintf( device->devname, 
+#acq32.c#:1543:				return device->devname;
+#acq32.c#:1547:		strcpy( device->devname, PROCFILENAME ".X" );
+#acq32.c#:1549:	return device->devname;
+#acq32.c#:1565:    ASSERT( device->nclients >= 0 );    
+#acq32.c#:1567:    PDEBUGL(3)( "acq32_request_irq() nclients %d\n", device->nclients );
+#acq32.c#:1569:    down( &device->m_dpd.irq_req_mutex );
+#acq32.c#:1571:    if ( ++device->nclients == 1 ){
+#acq32.c#:1576:        if ( acq32_use_interrupts != 0 && device->p_pci->irq != 0 ){
+#acq32.c#:1579:                device->p_pci->irq, 
+#acq32.c#:1580:                device->isr, 
+#acq32.c#:1586:            device->use_interrupts = result==0;
+#acq32.c#:1589:        rv = device->p_md->OnOpen && device->p_md->OnOpen( path );
+#acq32.c#:1592:    up( &device->m_dpd.irq_req_mutex );
+#acq32.c#:1611:    PDEBUGL(3)( "acq32_free_irq() nclients %d\n", device->nclients );
+#acq32.c#:1613:    down( &device->m_dpd.irq_req_mutex );
+#acq32.c#:1615:    if ( --device->nclients == 0 ){
+#acq32.c#:1616:        int used_interrupts = device->use_interrupts != 0;
+#acq32.c#:1617:        rv = device->p_md->OnRelease && device->p_md->OnRelease( path ); 
+#acq32.c#:1620:            free_irq( device->p_pci->irq, device );
+#acq32.c#:1621:            device->use_interrupts = 0;
+#acq32.c#:1625:    up( &device->m_dpd.irq_req_mutex );
+#acq32.c#:1627:    ASSERT( device->nclients >= 0 );
+#acq32.c#:1773:        if ( device->nclients >= 1 ){
+#acq32.c#:1776:                device->in_exclusive_use = 1;
+#acq32.c#:1889:        newpos = device->m_dpd.nsamples_actual.post - off;
+#acq32.c#:1892:        newpos = device->m_dpd.itrigger + off;
+#acq32.c#:2162:    while ( !statbufIsEmpty( &device->statusbuf ) ){
+#acq32.c#:2163:	u32 status = statbufGet( &device->statusbuf );
+#acq32.c#:2168:			ifilp, device->m_dpd.cos.files[ifilp] );
+#acq32.c#:2170:	    if ( (filp = device->m_dpd.cos.files[ifilp] ) ){
+#acq32.c#:2171:		acq32_doGetStateWork( filp, status, device->m_dpd.last_status);
+#acq32.c#:2174:	device->m_dpd.last_status = status;
+#acq32.c#:2178:	if ( (filp = device->m_dpd.cos.files[ifilp] ) ){
+#acq32.c#:2185:    if ( !device->m_dpd.cos.task_has_been_created ){
+#acq32.c#:2186:	INIT_TQUEUE( &device->m_dpd.cos.task, cos_task, device );
+#acq32.c#:2187:	device->m_dpd.cos.task_has_been_created = 1;
+#acq32.c#:2217:	info("register_chrdev %s\n", device->devname);
+#acq32.c#:2219:	device->major = register_chrdev( 
+#acq32.c#:2220:	    device->major = 0, device->devname, &acq32_fops );
+#acq32.c#:2222:	if ( device->major < 0) {
+#acq32.c#:2223:	    printk(KERN_WARNING "acq32: can't get major %d\n", device->major );
+#acq32.c#:2227:	device->nclients = 0;
+#acq32.c#:2229:	device->cfi.mode = CM_BINARY;
+#acq32.c#:2231:	device->p_pci = p_dev;
+#acq32.c#:2232:	memcpy( &device->pci_stash, p_dev, sizeof(struct pci_dev));
+#acq32.c#:2234:	device->p_md = acq32_simulate?
+#acq32.c#:2237:	device->m_dpd.rom_is_enabled = FALSE;
+#acq32.c#:2243:	device->m_dpd.nchannels           = ACQ32_MAX_CHANNELS;   
+#acq32.c#:2244:	device->m_dpd.total_sample_length = DEF_SAMPLE_TOTAL;
+#acq32.c#:2245:	device->m_dpd.state               = ST_STOP;
+#acq32.c#:2246:	device->m_dpd.channel_mask        = DEF_CHANNEL_MASK;
+#acq32.c#:2247:	device->m_dpd.mode                = M_GATED_TRANSIENT;
+#acq32.c#:2249:	device->m_dpd.nsamples_requested.pre  =
+#acq32.c#:2250:	    device->m_dpd.nsamples_requested.post =
+#acq32.c#:2251:	    device->m_dpd.nsamples_actual.pre =
+#acq32.c#:2252:	    device->m_dpd.nsamples_actual.post= 0;
+#acq32.c#:2253:	memset( &device->m_dpd.work_task, 0, sizeof(device->m_dpd.work_task) );
+#acq32.c#:2255:	init_waitqueue_head( &device->m_dpd.waitq );
+#acq32.c#:2256:	init_waitqueue_head( &device->m_dpd.aux_waitq );
+#acq32.c#:2258:	init_MUTEX( &device->m_dpd.mbox_mutex );
+#acq32.c#:2259:	init_MUTEX( &device->m_dpd.irq_req_mutex );
+#acq32.c#:2260:	init_MUTEX( &device->m_dpd.ioread_fetch_mutex );
+#acq32.c#:2262:	appbufInit( &device->appbuf );
+#acq32.c#:2263:	streamBufInit( &device->streambuf );
+#acq32.c#:2264:	streamBufInit( &device->downstreambuf );
+#acq32.c#:2265:	statBufInit( &device->statusbuf );
+#acq32.c#:2268:		device->instrument_buf.cur =
+#acq32.c#:2269:			device->instrument_buf.buf = 
+#acq32.c#:2274:		device->instrument_buf.cur = 
+#acq32.c#:2275:			device->instrument_buf.buf = NULL;
+#acq32.c#:2280:	info("99 device %s major %d", device->devname, device->major);
+#acq32.c#:2342:	device->coreDevInit( device );
+#acq32.c#:2446:        unregister_chrdev( device->major, getDevName(device));
+#acq32.c#:2449:	acq200_bb_free(&device->bigbuf.bb);
+#acq32.c#:2452:        if ( !acq32_simulate && device->p_pci ){
+#acq32.c#:2455:        if ( device->instrument_buf.buf ){
+#acq32.c#:2456:            KFREE( device->instrument_buf.buf );
+#acq32.c#:2462:	KFREE(device->p_md);
+acq32.c:618:    device->dmabuf.va = 
+acq32.c:623:    ASSERT( device->dmabuf.va );
+acq32.c:625:    device->dmabuf.len = DMABUF_SIZE;
+acq32.c:627:    PDEBUGL(2)( "dmabuf vaddr %p\n", device->dmabuf.va );
+acq32.c:628:    device->dmabuf.pa = virt_to_phys( device->dmabuf.va );
+acq32.c:629:    PDEBUGL(2)( "dmabuf paddr 0x%08x\n", device->dmabuf.pa);
+acq32.c:635:            device->dmabuf.va[ii] = 0xdeadbeef;
+acq32.c:642:    if ( device->dmabuf.len ){
+acq32.c:643:        free_pages( (unsigned long)device->dmabuf.len, PAGE_ORDER );
+acq32.c:644:        device->dmabuf.va = (void*)0;
+acq32.c:645:        device->dmabuf.len = 0;
+acq32.c:668:        if ( device->major == major ){
+acq32.c:688:        if ( device->major == major ){
+acq32.c:740:    if ( device->instrument_buf.cur-device->instrument_buf.buf < 
+acq32.c:742:        device->instrument_buf.cur->id = id;
+acq32.c:744:        vsprintf( device->instrument_buf.cur->ids, fmt, ap );
+acq32.c:745:        ASSERT( strlen( device->instrument_buf.cur->ids ) < 
+acq32.c:746:                sizeof( device->instrument_buf.cur->ids )   );
+acq32.c:749:        device->instrument_buf.cur->tv = tv;
+acq32.c:750:        device->instrument_buf.cur++;
+acq32.c:844:    memcpy( path->info, &device->cfi, sizeof(Acq32ChannelFileInfo) );
+acq32.c:913:    clearIoMapping( &device->csr, 0 );
+acq32.c:914:    clearIoMapping( &device->ram, 0 );
+acq32.c:915:    clearIoMapping( &device->rom, 1 );
+acq32.c:926:	unsigned long physical  = (long)device->csr.pa;
+acq32.c:1016:	if ( device->getImagesDef( device, &id ) == 0 ){
+acq32.c:1076:            unsigned irq    = device->p_pci->irq;               
+acq32.c:1080:			   device->p_pci->bus->number, 
+acq32.c:1081:			   device->p_pci->devfn );
+acq32.c:1084:                           device->csr.pa, 
+acq32.c:1085:                           device->ram.pa, 
+acq32.c:1086:                           device->rom.pa );
+acq32.c:1131:        len += PRINTF( "%30s:" fmt "\n", #field, device->m_dpd.field )
+acq32.c:1133:        len += PRINTF( "%30s:" fmt "\n", #field, device->m_dpd.field op )
+acq32.c:1176:        len += PRINTF( "%30s:" fmt "\n", #field, device->field )
+acq32.c:1194:                       streamNumEntries( &device->streambuf ) );
+acq32.c:1293:            for ( ib = device->instrument_buf.buf; 
+acq32.c:1294:                  ib != device->instrument_buf.cur; ++ib ){
+acq32.c:1314:            device->instrument_buf.cur = device->instrument_buf.buf;
+acq32.c:1536:	if (strlen(device->devname) == 0){
+acq32.c:1541:				sprintf( device->devname, 
+acq32.c:1543:				return device->devname;
+acq32.c:1547:		strcpy( device->devname, PROCFILENAME ".X" );
+acq32.c:1549:	return device->devname;
+acq32.c:1565:    ASSERT( device->nclients >= 0 );    
+acq32.c:1567:    PDEBUGL(3)( "acq32_request_irq() nclients %d\n", device->nclients );
+acq32.c:1569:    down( &device->m_dpd.irq_req_mutex );
+acq32.c:1571:    if ( ++device->nclients == 1 ){
+acq32.c:1576:        if ( acq32_use_interrupts != 0 && device->p_pci->irq != 0 ){
+acq32.c:1579:                device->p_pci->irq, 
+acq32.c:1580:                device->isr, 
+acq32.c:1586:            device->use_interrupts = result==0;
+acq32.c:1589:        rv = device->p_md->OnOpen && device->p_md->OnOpen( path );
+acq32.c:1592:    up( &device->m_dpd.irq_req_mutex );
+acq32.c:1611:    PDEBUGL(3)( "acq32_free_irq() nclients %d\n", device->nclients );
+acq32.c:1613:    down( &device->m_dpd.irq_req_mutex );
+acq32.c:1615:    if ( --device->nclients == 0 ){
+acq32.c:1616:        int used_interrupts = device->use_interrupts != 0;
+acq32.c:1617:        rv = device->p_md->OnRelease && device->p_md->OnRelease( path ); 
+acq32.c:1620:            free_irq( device->p_pci->irq, device );
+acq32.c:1621:            device->use_interrupts = 0;
+acq32.c:1625:    up( &device->m_dpd.irq_req_mutex );
+acq32.c:1627:    ASSERT( device->nclients >= 0 );
+acq32.c:1773:        if ( device->nclients >= 1 ){
+acq32.c:1776:                device->in_exclusive_use = 1;
+acq32.c:1889:        newpos = device->m_dpd.nsamples_actual.post - off;
+acq32.c:1892:        newpos = device->m_dpd.itrigger + off;
+acq32.c:2162:    while ( !statbufIsEmpty( &device->statusbuf ) ){
+acq32.c:2163:	u32 status = statbufGet( &device->statusbuf );
+acq32.c:2168:			ifilp, device->m_dpd.cos.files[ifilp] );
+acq32.c:2170:	    if ( (filp = device->m_dpd.cos.files[ifilp] ) ){
+acq32.c:2171:		acq32_doGetStateWork( filp, status, device->m_dpd.last_status);
+acq32.c:2174:	device->m_dpd.last_status = status;
+acq32.c:2178:	if ( (filp = device->m_dpd.cos.files[ifilp] ) ){
+acq32.c:2185:    if ( !device->m_dpd.cos.task_has_been_created ){
+acq32.c:2186:	INIT_TQUEUE( &device->m_dpd.cos.task, cos_task, device );
+acq32.c:2187:	device->m_dpd.cos.task_has_been_created = 1;
+acq32.c:2217:	info("register_chrdev %s\n", device->devname);
+acq32.c:2219:	device->major = register_chrdev( 
+acq32.c:2220:	    device->major = 0, device->devname, &acq32_fops );
+acq32.c:2222:	if ( device->major < 0) {
+acq32.c:2223:	    printk(KERN_WARNING "acq32: can't get major %d\n", device->major );
+acq32.c:2227:	device->nclients = 0;
+acq32.c:2229:	device->cfi.mode = CM_BINARY;
+acq32.c:2231:	device->p_pci = p_dev;
+acq32.c:2232:	memcpy( &device->pci_stash, p_dev, sizeof(struct pci_dev));
+acq32.c:2234:	device->p_md = acq32_simulate?
+acq32.c:2237:	device->m_dpd.rom_is_enabled = FALSE;
+acq32.c:2243:	device->m_dpd.nchannels           = ACQ32_MAX_CHANNELS;   
+acq32.c:2244:	device->m_dpd.total_sample_length = DEF_SAMPLE_TOTAL;
+acq32.c:2245:	device->m_dpd.state               = ST_STOP;
+acq32.c:2246:	device->m_dpd.channel_mask        = DEF_CHANNEL_MASK;
+acq32.c:2247:	device->m_dpd.mode                = M_GATED_TRANSIENT;
+acq32.c:2249:	device->m_dpd.nsamples_requested.pre  =
+acq32.c:2250:	    device->m_dpd.nsamples_requested.post =
+acq32.c:2251:	    device->m_dpd.nsamples_actual.pre =
+acq32.c:2252:	    device->m_dpd.nsamples_actual.post= 0;
+acq32.c:2253:	memset( &device->m_dpd.work_task, 0, sizeof(device->m_dpd.work_task) );
+acq32.c:2255:	init_waitqueue_head( &device->m_dpd.waitq );
+acq32.c:2256:	init_waitqueue_head( &device->m_dpd.aux_waitq );
+acq32.c:2258:	init_MUTEX( &device->m_dpd.mbox_mutex );
+acq32.c:2259:	init_MUTEX( &device->m_dpd.irq_req_mutex );
+acq32.c:2260:	init_MUTEX( &device->m_dpd.ioread_fetch_mutex );
+acq32.c:2262:	appbufInit( &device->appbuf );
+acq32.c:2263:	streamBufInit( &device->streambuf );
+acq32.c:2264:	streamBufInit( &device->downstreambuf );
+acq32.c:2265:	statBufInit( &device->statusbuf );
+acq32.c:2268:		device->instrument_buf.cur =
+acq32.c:2269:			device->instrument_buf.buf = 
+acq32.c:2274:		device->instrument_buf.cur = 
+acq32.c:2275:			device->instrument_buf.buf = NULL;
+acq32.c:2280:	info("99 device %s major %d", device->devname, device->major);
+acq32.c:2342:	device->coreDevInit( device );
+acq32.c:2446:        unregister_chrdev( device->major, getDevName(device));
+acq32.c:2449:	acq200_bb_free(&device->bigbuf.bb);
+acq32.c:2452:        if ( !acq32_simulate && device->p_pci ){
+acq32.c:2455:        if ( device->instrument_buf.buf ){
+acq32.c:2456:            KFREE( device->instrument_buf.buf );
+acq32.c:2462:	KFREE(device->p_md);
+acq32_command.c:841:	enum STATE state = PD(filp)->device->p_md->GetState( PD(filp) );
+acq32_command.c:857:        enum MODE mode = PD(filp)->device->m_dpd.mode;
+acq32_command.c:885:        int ierrno = PD(filp)->device->p_md->DoBigdump( PD(filp) );
+acq32_command.c:922:        int ierrno = PD(filp)->device->p_md->GetInfo( PD(filp), selector );
+acq32_command.c:1294:	    int n_pretrigger = device->m_dpd.nsamples_actual.pre;
+acq32_command.c:1295:	    int n_total      = device->m_dpd.nsamples_actual.post+n_pretrigger;
+acq32_command.c:1709:	    device->m_dpd.dio_dir &= ~imask;
+acq32_command.c:1710:	    device->m_dpd.dio_outputs &= ~imask; // for tidyness
+acq32_command.c:1713:	    device->m_dpd.dio_dir |= imask;
+acq32_command.c:1714:	    device->m_dpd.dio_outputs |= imask;
+acq32_command.c:1717:	    device->m_dpd.dio_dir |= imask;
+acq32_command.c:1718:	    device->m_dpd.dio_outputs &= ~imask;
+acq32_command.c:1781:#define INPUT( bit )   ((device->m_dpd.dio_inputs&1<<(bit)) != 0)
+acq32_command.c:1782:#define OUTPUT( bit )  ((device->m_dpd.dio_outputs&1<<(bit)) != 0)
+acq32_command.c:1783:#define OUTSEL( bit )  ((device->m_dpd.dio_dir&1<<(bit)) != 0)
+acq32_command.c:2815:		device->input_channels.vmin10*NORMAL/10, 
+acq32_command.c:2816:		device->input_channels.vmax10*NORMAL/10 );
+acq32_core.c:570:	struct ReturnCommandHandler *rch = &device->m_dpd.__first_handler;
+acq32_core.c:574:	rch->lock = &device->m_dpd.__rch_lock;
+acq32_core.c:576:	device->m_dpd.first_rch = rch;
+acq32_core.c:690:        if ( device->m_dpd.channel_mask&imask ){
+acq32_core.c:723:        device->get_mailbox( device, BP_MB_COMMAND, &ucommand );
+acq32_core.c:741:        &device->m_dpd.waitq, timeout   ) == 0L? -ETIMEDOUT: 0;
+acq32_core.c:748:    if ( device->m_dpd.aux_mfa != 0 ){
+acq32_core.c:754:        device->m_dpd.aux_task_waiting = 1;
+acq32_core.c:757:            &device->m_dpd.aux_waitq, timeout   ) == 0L? -ETIMEDOUT: 0;
+acq32_core.c:759:        device->m_dpd.aux_task_waiting = 0;
+acq32_core.c:786:    MUTEX_DOWN( &device->m_dpd.mbox_mutex );
+acq32_core.c:792:        device->set_mailbox( device, BP_MB_A4, *a4 );
+acq32_core.c:796:        device->set_mailbox( device, BP_MB_A3, *a3 );
+acq32_core.c:799:    PDEBUGL(2)(  "device->use_interrupts %d\n", device->use_interrupts );
+acq32_core.c:801:    if ( device->use_interrupts ){
+acq32_core.c:803:        device->set_mailbox( device, BP_MB_COMMAND, command );
+acq32_core.c:807:        device->set_mailbox( device, BP_MB_COMMAND, command );
+acq32_core.c:812:    MUTEX_UP( &device->m_dpd.mbox_mutex );
+acq32_core.c:817:	sprintf( dbs, " M:%3d p:%p ", device->major, device->p_pci );
+acq32_core.c:848:    device->set_mailbox( device, BP_MB_COMMAND, command );
+acq32_core.c:851:    interruptible_sleep_on_timeout( &device->m_dpd.waitq, 20 );
+acq32_core.c:919:    MUTEX_DOWN( &device->m_dpd.mbox_mutex );
+acq32_core.c:921:    if ( device->use_interrupts ){
+acq32_core.c:923:        device->set_mailbox( device, BP_MB_COMMAND, command|BP_CI_QUERY );
+acq32_core.c:926:        device->set_mailbox( device, BP_MB_COMMAND, command|BP_CI_QUERY );
+acq32_core.c:933:            device->get_mailbox( device, BP_MB_COMMAND, &response );
+acq32_core.c:937:        if ( a3 ) device->get_mailbox( device, BP_MB_A3, a3 );
+acq32_core.c:938:        if ( a4 ) device->get_mailbox( device, BP_MB_A4, a4 );
+acq32_core.c:941:    MUTEX_UP( &device->m_dpd.mbox_mutex );
+acq32_core.c:956:    if ( !device->use_interrupts ){
+acq32_core.c:960:    MUTEX_DOWN( &device->m_dpd.mbox_mutex );
+acq32_core.c:963:    device->set_mailbox( device, BP_MB_COMMAND, command|BP_CI_QUERY );
+acq32_core.c:966:    MUTEX_UP( &device->m_dpd.mbox_mutex );
+acq32_core.c:978:    device->get_mailbox( device, BP_MB_STATUS, &status );
+acq32_core.c:984:    device->m_dpd.mode = (enum MODE)BP_GET_MODE(status);
+acq32_core.c:985:    device->m_dpd.cycle = BP_GET_CYCLE(status);
+acq32_core.c:986:    device->m_dpd.error = BP_GET_ERROR(status);
+acq32_core.c:987:    return device->m_dpd.state = (enum STATE)BP_GET_STATE( status );
+acq32_core.c:1025:        device->m_dpd.channel_mask = actual_mask;
+acq32_core.c:1034:    unsigned mean = device->m_dpd.streaming&0x80000000? 1: 0;
+acq32_core.c:1035:    unsigned stride = device->m_dpd.streaming&0xffffU;
+acq32_core.c:1043:        device->m_dpd.streaming_enabled = device->m_dpd.streaming != 0;
+acq32_core.c:1096:        device->get_mailbox( device, BP_MB_A3, &target_offset );
+acq32_core.c:1097:        device->get_mailbox( device, BP_MB_A4, &maxsamples );
+acq32_core.c:1100:                    device->ram.va, target_offset, maxsamples );
+acq32_core.c:1105:        memcpy_fromio( buffer, (char*)device->ram.va+target_offset, nbytes );
+acq32_core.c:1132:    int prelen = path->device->m_dpd.nsamples_actual.pre;
+acq32_core.c:1133:    int postlen= path->device->m_dpd.nsamples_actual.post; 
+acq32_core.c:1228:    int totlen = device->m_dpd.nsamples_actual.pre +
+acq32_core.c:1229:        device->m_dpd.nsamples_actual.post;
+acq32_core.c:1264:                ((char*)device->bigbuf.bb.va)[sample_size*start_sample];
+acq32_core.c:1278:                &((u16*)device->bigbuf.bb.va)[sample_offset+chan_offset];
+acq32_core.c:1312:    if ( path->device->bigbuf.bb.len != 0 &&
+acq32_core.c:1313:         path->device->bigbuf.contains_valid_data == 1 ){
+acq32_core.c:1352:    if ( path->device->use_interrupts ){
+acq32_core.c:1353:        return path->device->m_dpd.state;
+acq32_core.c:1416:        char* pdst = (char*)device->ram.va + (mfa&=MFA_MASK);
+acq32_core.c:1419:                path->device->m_dpd.i2o_last_id_out+1, mfa );
+acq32_core.c:1421:        message->header.id = MAKE_ID_DTACQ( ++device->m_dpd.i2o_last_id_out );
+acq32_core.c:1434:        device->m_dpd.i2o_packets_outgoing++;
+acq32_core.c:1502:        device->m_dpd.mode = mode;
+acq32_core.c:1503:        device->m_dpd.nsamples_requested.post = samples;
+acq32_core.c:1504:        device->m_dpd.nsamples_requested.pre = presamples;
+acq32_core.c:1552:    struct DriverPrivate* dp = &device->m_dpd;
+acq32_core.c:1563:    struct DriverPrivate* dp = &device->m_dpd;
+acq32_core.c:1580:	device->i2o_return_mfa(device, mfa);
+acq32_core.c:1581:	device->m_dpd.i2o_packets_returned++;       
+acq32_core.c:1600:    struct ReturnCommandHandler* rch = device->m_dpd.first_rch;
+acq32_core.c:1617:    while( rch != device->m_dpd.first_rch );
+acq32_core.c:1622:    device->m_dpd.i2o_packets_discarded++;
+acq32_core.c:1639:	while ( (mfa = streamGet( &device->streambuf )) != 
+acq32_core.c:1641:		Message *message = (Message*)device->i2o_mfa2va(device, mfa);
+acq32_core.c:1656:			if ( device->m_dpd.streaming_enabled ){
+acq32_core.c:1658:				streamPut( &device->downstreambuf, mfa );
+acq32_core.c:1660:				wake_up_interruptible( &device->m_dpd.waitq ); 
+acq32_core.c:1674:			if ( device->m_dpd.aux_task_waiting ){
+acq32_core.c:1675:				device->m_dpd.aux_mfa = mfa;
+acq32_core.c:1676:				device->m_dpd.aux_task_waiting = 0;    
+acq32_core.c:1678:				wake_up_interruptible(&device->m_dpd.aux_waitq);
+acq32_core.c:1681:				device->m_dpd.i2o_packets_discarded++;
+acq32_core.c:1694:        device->m_dpd.i2o_packets_incoming++;
+acq32_core.c:1699:	}else if ( streamPut( &device->streambuf, mfa ) < 0 ){
+acq32_core.c:1701:		device->m_dpd.i2o_packets_discarded++;
+acq32_core.c:1706:		device->m_dpd.i2o_last_in = (void*)mfa;
+acq32_core.c:1708:		device->m_dpd.streaming_message_delta_usecs =
+acq32_core.c:1710:				&device->m_dpd.tv_last_streaming_message,
+acq32_core.c:1711:				&device->m_dpd.tv_last_streaming_message  );
+acq32_core.c:1716:		queue_task( &device->m_dpd.isr_bh, &tq_immediate );
+acq32_core.c:1720:			    device->m_dpd.isr_bh.routine==
+acq32_core.c:1733:		    &device->m_dpd.waitq );
+acq32_core.c:1735:	wake_up_interruptible( &device->m_dpd.waitq );
+acq32_core.c:1738:	 device->m_dpd.cos.enable && !device->m_dpd.cos.inhibit ){
+acq32_core.c:1741:				       device->m_dpd.error, 
+acq32_core.c:1742:				       device->m_dpd.state );
+acq32_core.c:1744:		    &device->m_dpd.cos.task );
+acq32_core.c:1746:	statbufPut( &device->statusbuf, status );
+acq32_core.c:1750:	schedule_task( &device->m_dpd.cos.task );
+acq32_core.c:1764:	device->m_dpd.nsamples_actual.post = set_valid;
+acq32_core.c:1766:    device->bigbuf.contains_valid_data = set_valid!=0;
+acq32_core.c:1827:    return device->m_dpd.cycle;
+acq32_core.c:1842:    struct ArmWdtStruct* wdt = &device->m_dpd.set_arm;
+acq32_core.c:1848:	if ( device->m_dpd.error ){
+acq32_core.c:1872:    struct ArmWdtStruct* wdt = &device->m_dpd.set_arm;
+acq32_core.c:1885:    int major = device->major;
+acq32_core.c:1892:    if ( device->m_dpd.set_arm.busy ){
+acq32_core.c:1895:	device->m_dpd.set_arm.busy = 1;
+acq32_core.c:1901:	device->m_dpd.cos.inhibit = 1;
+acq32_core.c:1925:	device->m_dpd.cos.inhibit = 0;
+acq32_core.c:1946:    device->m_dpd.cos.inhibit = 0;
+acq32_core.c:1951:	device->m_dpd.set_arm.busy = 0;
+acq32_core.c:1970:        &path->device->m_dpd.nsamples_actual.post,
+acq32_core.c:1971:        &path->device->m_dpd.nsamples_actual.pre
+acq32_core.c:1974:    path->device->m_dpd.itrigger = path->device->m_dpd.nsamples_actual.pre;
+acq32_core.c:1975:    return path->device->m_dpd.nsamples_actual.post+
+acq32_core.c:1976:        path->device->m_dpd.nsamples_actual.pre;
+acq32_core.c:1992:        unsigned* pmask = &device->m_dpd.channel_mask;
+acq32_core.c:1998:              ichannel_board != device->m_dpd.nchannels; 
+acq32_core.c:2030:            device->m_dpd.channel_mask = mask;
+acq32_core.c:2044:	PDEBUGL(2)( "acq32_OnOpen() %d\n", device->use_interrupts );
+acq32_core.c:2046:	if (device->use_interrupts){
+acq32_core.c:2069:			(unsigned*)&device->dmabuf.pa,
+acq32_core.c:2070:			(unsigned*)&device->dmabuf.len );
+acq32_core.c:2076:		if (device->input_channels.nchannels == 0 &&
+acq32_core.c:2077:		    device->output_channels.nchannels == 0   ){
+acq32_core.c:2092:    PDEBUGL(2)( "acq32_OnRelease() %d\n", path->device->use_interrupts );
+acq32_core.c:2094:    if ( device->m_dpd.streaming_enabled ){
+acq32_core.c:2095:        device->m_dpd.streaming = 0;
+acq32_core.c:2098:    if ( device->use_interrupts ){
+acq32_core.c:2099:        device->use_interrupts = 0;     // answer will be polled!
+acq32_core.c:2113:    unsigned freq = path->device->m_dpd.clock.internal;
+acq32_core.c:2114:    u8 doX = path->device->m_dpd.clock.doX;
+acq32_core.c:2131:            &device->m_dpd.clock.internal,
+acq32_core.c:2146:    unsigned divisor = path->device->m_dpd.clock.divisor;
+acq32_core.c:2147:    u8 diX = path->device->m_dpd.clock.diX;
+acq32_core.c:2148:    u8 doX = path->device->m_dpd.clock.doX;
+acq32_core.c:2174:            BP_SET_A1(path->device->m_dpd.sample_tagging) 
+acq32_core.c:2192:        &path->device->m_dpd.dio_dir,
+acq32_core.c:2193:        &path->device->m_dpd.dio_outputs 
+acq32_core.c:2207:		&path->device->m_dpd.dio_inputs,
+acq32_core.c:2219:		&device->input_channels.nchannels, 
+acq32_core.c:2220:		&device->output_channels.nchannels,
+acq32_core.c:2281:    code2v10( &device->input_channels,  vin_code ); 
+acq32_core.c:2282:    code2v10( &device->output_channels, vout_code );
+acq32_core.c:2336:    unsigned mfa     = device->m_dpd.aux_mfa;
+acq32_core.c:2337:    Message* message = (Message*)device->i2o_mfa2va(device, mfa);
+acq32_core.c:2347:    device->m_dpd.aux_mfa = 0;
+acq32_core.c:2396:            (unsigned*)&path->device->bigbuf.bb.pa,
+acq32_core.c:2397:            (unsigned*)&path->device->bigbuf.bb.len  );
+acq32_core.c:2406:                if ( path->device->bigbuf.bb.len != 0 ){
+acq32_core.c:2870:                long adj_pos = f_pos - path->device->m_dpd.nsamples_actual.pre;
+acq32_core.c:2933:    if ( device->appbuf.count_max <= 0 || device->appbuf.count_actual != 0 ){
+acq32_core.c:2944:        while ( (mfa = streamGet( &device->downstreambuf )) == 
+acq32_core.c:2948:		 device->m_dpd.streaming_message_delta_usecs > SLOW_ACQ ){
+acq32_core.c:2963:        }  //    while ( (mfa = streamGet( &device->streambuf )) ...
+acq32_core.c:2986:            }else if ( ibuf+mylen > device->appbuf.count_max ){
+acq32_core.c:2993:                streamPutBack( &device->downstreambuf );
+acq32_core.c:3020:                                device->appbuf.buf+ibuf, psrc+1, clenb  );
+acq32_core.c:3022:                    copy_to_user( device->appbuf.buf+ibuf, psrc+1, clenb );
+acq32_core.c:3035:        device->appbuf.count_actual = ibuf;
+acq32_core.c:3059:        int nq = streamNumEntries( &device->streambuf );
+acq32_core.c:3061:        if ( nq > device->streambuf.def.hitide ){
+acq32_core.c:3062:            device->streambuf.def.hitide = nq;
+acq32_core.c:3074:    device->appbuf.buf = buf;
+acq32_core.c:3075:    device->appbuf.count_max = count;
+acq32_core.c:3076:    device->appbuf.count_actual = 0;
+acq32_core.c:3087:    return_count = device->appbuf.count_actual;
+acq32_core.c:3088:    device->appbuf.buf = (char*)0;
+acq32_core.c:3089:    device->appbuf.count_max = 
+acq32_core.c:3090:        device->appbuf.count_actual = 0;
+acq32_core.c:3098:                    return_count, count, streamNumEntries( &device->streambuf ) );
+acq32_core.c:3167:                long adj_pos = f_pos - path->device->m_dpd.nsamples_actual.pre;
+acq32_core.c:3225:    device->get_mailbox( device, BP_MB_STATUS, &cycle );
+acq32_core.c:3232:    device->get_mailbox( device, BP_MB_STATUS,  &v );
+acq32_core.c:3254:            return device->heartbeat_detected = v2 - v1;
+acq32_core.c:3265:            return device->heartbeat_detected = v1 - v2;
+acq32_core.c:3270:        device->get_mailbox( device, 0, &m1 );
+acq32_core.c:3271:        device->get_mailbox( device, 1, &m2 );
+acq32_core.c:3272:        device->get_mailbox( device, 2, &m3 );
+acq32_core.c:3273:        device->get_mailbox( device, 3, &m4 );
+acq32_core.c:3277:        return device->heartbeat_detected = 0;
+acq32_core.c:3293:        INIT_TQUEUE( &device->m_dpd.isr_bh, acq32_streaming_isr_bh, device ); 
+acq32_core.c:3296:                    device->m_dpd.isr_bh.routine==acq32_streaming_isr_bh?
+acq32_core.c:3523:    rch->command_id = MAKE_ID_DTACQ(path->device->m_dpd.i2o_last_id_out + 1);
+acq32_core.c:3531:    MUTEX_DOWN( &path->device->m_dpd.ioread_fetch_mutex );
+acq32_core.c:3533:	MUTEX_UP( &path->device->m_dpd.ioread_fetch_mutex );
+acq32_core.c:3538:    rchInsert( path->device->m_dpd.first_rch, rch );
+acq32_core.c:3561:	path->device->coreDevInit(path->device);
+acq32_core.c:3568:    MUTEX_UP( &path->device->m_dpd.ioread_fetch_mutex );
+Binary file acq32_core.o matches
+Binary file acq32-drv.o matches
+#acq32.h#:1531:    PDEBUGL(3)( FN " mbox_mutex count:%d\n", (int)device->m_dpd.mbox_mutex.count );\
+acq32.h:1531:    PDEBUGL(3)( FN " mbox_mutex count:%d\n", (int)device->m_dpd.mbox_mutex.count );\
+acq32_mmap.c:197:    device->vmas++;
+acq32_mmap.c:262:    device->vmas--;
+acq32_simul.c:206:    int iline = device->m_dpd.subframe_id;
+acq32_simul.c:212:	device->m_dpd.subframe_sample_id = device->m_dpd.global_sample_id;
+acq32_simul.c:225:	unsigned nX = (device->m_dpd.subframe_sample_id >> iline)&0x1;
+acq32_simul.c:232:    device->m_dpd.subframe_id = (++device->m_dpd.subframe_id)&SUBFRAME_MASK;
+acq32_simul.c:545:    path->device->m_dpd.itrigger = 
+acq32_simul.c:546:	path->device->m_dpd.nsamples_actual.post = 
+acq32_simul.c:547:	path->device->m_dpd.nsamples_actual.pre  = 0;
+acq32_simul.c:549:    path->device->m_dpd.global_sample_id = 0ULL;
+acq32_simul.c:550:    path->device->m_dpd.subframe_id = 0;
+acq32_simul.c:555:    return path->device->m_dpd.state;
+acq32_simul.c:565:    path->device->m_dpd.mode = mode;
+acq32_simul.c:566:    path->device->m_dpd.nsamples_requested.post = samples;
+acq32_simul.c:567:    path->device->m_dpd.nsamples_requested.pre = pre;
+acq32_simul.c:625:    struct DriverPrivate* dp = &device->m_dpd;
+acq32_simul.c:655:    struct DriverPrivate* dp = &device->m_dpd;
+acq32_simul.c:699:    struct DriverPrivate* dp = &device->m_dpd;
+acq32_simul.c:770:    struct DriverPrivate* dp = &device->m_dpd;
+acq32_simul.c:816:        unsigned* pmask = &device->m_dpd.channel_mask;
+acq32_simul.c:822:              ichannel_board != device->m_dpd.nchannels; 
+acq32_simul.c:831:	device->m_dpd.channel_mask = *pmask;
+acq32_simul.c:844:    struct DriverPrivate* dp = &path->device->m_dpd;
+acq32_simul.c:900:    path->device->m_dpd.state = ST_STOP;
+acq32_simul.c:906:    return path->device->m_dpd.nsamples_actual.pre + 
+acq32_simul.c:907:	path->device->m_dpd.nsamples_actual.pre;
+acq32_simul.c:927:    path->device->input_channels.vmax10 = V10( 10 );
+acq32_simul.c:928:    path->device->output_channels.vmin10 = V10( -10 );
+acq32_simul.c:933:    path->device->input_channels.nchannels = 32;
+acq32_simul.c:934:    path->device->output_channels.nchannels = 2;
+#acq32_specific.c#:79:    struct IoMapping* pim = bar==PCI_BA_CSR? &device->csr: &device->ram;
+#acq32_specific.c#:86:    pim->pa = pci_resource_start(device->p_pci, bar)&PCI_BASE_ADDRESS_MEM_MASK;
+#acq32_specific.c#:158:            return (unsigned long)device->rom.va + offset;
+#acq32_specific.c#:160:            return (unsigned long)device->ram.va + offset;
+#acq32_specific.c#:274:    device->p_pci->resource[PCI_ROM_RESOURCE].start = 
+#acq32_specific.c#:276:        device->p_pci->rom_address =   
+#acq32_specific.c#:278:        device->ram.pa;
+#acq32_specific.c#:279:    device->rom.va  = device->ram.va;
+#acq32_specific.c#:282:    PDEBUGL(2)(" %4s p 0x%08lx v %p\n", "csr",device->csr.pa,device->csr.va);
+#acq32_specific.c#:283:    PDEBUGL(2)(" %4s p 0x%08lx v %p\n", "ram",device->ram.pa,device->ram.va);
+#acq32_specific.c#:284:    PDEBUGL(2)(" %4s p 0x%08lx v %p\n", "rom",device->rom.pa,device->rom.va);
+#acq32_specific.c#:297:    unsigned long physical = pci_resource_start( device->p_pci, resource );
+#acq32_specific.c#:302:                                      device->p_pci->base_address[PCI_BA_CSR]&PCI_BASE_ADDRESS_IO_MASK:
+#acq32_specific.c#:303:                                      device->p_pci->rom_address&PCI_ROM_ADDRESS_MASK
+#acq32_specific.c#:314:    PDEBUGL(3)( "device->p_pci->rom_address 0x%08lx\n", physical );
+#acq32_specific.c#:348:        (vsize <= 0x1000? device->csr.pa: device->ram.pa);
+#acq32_specific.c#:426:	if ( (mfa_va&~(device->dmabuf.nbytes-1)) != (u32)device->dmabuf.buf ){
+#acq32_specific.c#:463:	    device->get_mailbox( device, 2, &mfa2 );
+#acq32_specific.c#:546:/* do NOT call directly, always use device->get_mailbox() */
+#acq32_specific.c#:561:/* do NOT call directly, always use device->set_mailbox() */
+#acq32_specific.c#:590:    unsigned long rom_addr = device->p_pci->resource[PCI_ROM_RESOURCE].start;
+#acq32_specific.c#:592:    unsigned long rom_addr = device->p_pci->rom_address;
+#acq32_specific.c#:596:    if ( (device->m_dpd.rom_is_enabled = enable) ){
+#acq32_specific.c#:602:        ram_addr = device->pci_stash.resource[PCI_BA_SDRAM].start;
+#acq32_specific.c#:604:        ram_addr = device->pci_stash.base_address[PCI_BA_SDRAM];
+#acq32_specific.c#:615:        device->p_pci->bus->number,
+#acq32_specific.c#:616:        device->p_pci->devfn,
+#acq32_specific.c#:621:        device->p_pci->bus->number,
+#acq32_specific.c#:622:        device->p_pci->devfn,
+#acq32_specific.c#:672:	char* rom_bytes = (char*)device->rom.va;
+#acq32_specific.c#:679:	int rom_was_enabled = device->m_dpd.rom_is_enabled;
+#acq32_specific.c#:692:	p_header = (struct image_header*)device->p_rom;
+#acq32_specific.c#:707:    char* rom_bytes = (char*)device->rom.va;
+#acq32_specific.c#:713:    int rom_was_enabled = device->m_dpd.rom_is_enabled;
+#acq32_specific.c#:742:    char* rom_bytes = (char*)device->rom.va;
+#acq32_specific.c#:748:    int rom_was_enabled = device->m_dpd.rom_is_enabled;
+#acq32_specific.c#:782:		char* rom_bytes = (char*)device->rom.va;
+#acq32_specific.c#:783:		int rom_was_enabled = device->m_dpd.rom_is_enabled;
+#acq32_specific.c#:853:	return (void*)((unsigned)device->dmabuf.va+(mfa&ACQ200_PCIWINMSK));
+#acq32_specific.c#:866:	device->dev_type = DEV_TYPE_ACQ32;
+#acq32_specific.c#:867:	device->getImagesDef = acq32_getImagesDef;
+#acq32_specific.c#:868:	device->set_mailbox = _acq32_set_mailbox;
+#acq32_specific.c#:869:	device->get_mailbox = _acq32_get_mailbox;
+#acq32_specific.c#:870:	device->coreDevInit = acq32_coreDevInit;
+#acq32_specific.c#:871:	device->i2o_return_mfa = acq32_dev_i2o_return_mfa;
+#acq32_specific.c#:872:	device->i2o_mfa2va  = acq32_dev_i2o_mfa2va;
+#acq32_specific.c#:873:	device->isr = acq32_isr;
+#acq32_specific.c#:874:	device->fetchDataToLocalBuffer = acq32_fetchDataToLocalBuffer;
+acq32_specific.c:79:    struct IoMapping* pim = bar==PCI_BA_CSR? &device->csr: &device->ram;
+acq32_specific.c:86:    pim->pa = pci_resource_start(device->p_pci, bar)&PCI_BASE_ADDRESS_MEM_MASK;
+acq32_specific.c:158:            return (unsigned long)device->rom.va + offset;
+acq32_specific.c:160:            return (unsigned long)device->ram.va + offset;
+acq32_specific.c:274:    device->p_pci->resource[PCI_ROM_RESOURCE].start = 
+acq32_specific.c:276:        device->p_pci->rom_address =   
+acq32_specific.c:278:        device->ram.pa;
+acq32_specific.c:279:    device->rom.va  = device->ram.va;
+acq32_specific.c:282:    PDEBUGL(2)(" %4s p 0x%08lx v %p\n", "csr",device->csr.pa,device->csr.va);
+acq32_specific.c:283:    PDEBUGL(2)(" %4s p 0x%08lx v %p\n", "ram",device->ram.pa,device->ram.va);
+acq32_specific.c:284:    PDEBUGL(2)(" %4s p 0x%08lx v %p\n", "rom",device->rom.pa,device->rom.va);
+acq32_specific.c:297:    unsigned long physical = pci_resource_start( device->p_pci, resource );
+acq32_specific.c:302:                                      device->p_pci->base_address[PCI_BA_CSR]&PCI_BASE_ADDRESS_IO_MASK:
+acq32_specific.c:303:                                      device->p_pci->rom_address&PCI_ROM_ADDRESS_MASK
+acq32_specific.c:314:    PDEBUGL(3)( "device->p_pci->rom_address 0x%08lx\n", physical );
+acq32_specific.c:348:        (vsize <= 0x1000? device->csr.pa: device->ram.pa);
+acq32_specific.c:426:	if ( (mfa_va&~(device->dmabuf.nbytes-1)) != (u32)device->dmabuf.buf ){
+acq32_specific.c:463:	    device->get_mailbox( device, 2, &mfa2 );
+acq32_specific.c:546:/* do NOT call directly, always use device->get_mailbox() */
+acq32_specific.c:561:/* do NOT call directly, always use device->set_mailbox() */
+acq32_specific.c:590:    unsigned long rom_addr = device->p_pci->resource[PCI_ROM_RESOURCE].start;
+acq32_specific.c:592:    unsigned long rom_addr = device->p_pci->rom_address;
+acq32_specific.c:596:    if ( (device->m_dpd.rom_is_enabled = enable) ){
+acq32_specific.c:602:        ram_addr = device->pci_stash.resource[PCI_BA_SDRAM].start;
+acq32_specific.c:604:        ram_addr = device->pci_stash.base_address[PCI_BA_SDRAM];
+acq32_specific.c:615:        device->p_pci->bus->number,
+acq32_specific.c:616:        device->p_pci->devfn,
+acq32_specific.c:621:        device->p_pci->bus->number,
+acq32_specific.c:622:        device->p_pci->devfn,
+acq32_specific.c:672:	char* rom_bytes = (char*)device->rom.va;
+acq32_specific.c:679:	int rom_was_enabled = device->m_dpd.rom_is_enabled;
+acq32_specific.c:692:	p_header = (struct image_header*)device->p_rom;
+acq32_specific.c:707:    char* rom_bytes = (char*)device->rom.va;
+acq32_specific.c:713:    int rom_was_enabled = device->m_dpd.rom_is_enabled;
+acq32_specific.c:742:    char* rom_bytes = (char*)device->rom.va;
+acq32_specific.c:748:    int rom_was_enabled = device->m_dpd.rom_is_enabled;
+acq32_specific.c:782:		char* rom_bytes = (char*)device->rom.va;
+acq32_specific.c:783:		int rom_was_enabled = device->m_dpd.rom_is_enabled;
+acq32_specific.c:853:	return (void*)((unsigned)device->dmabuf.va+(mfa&ACQ200_PCIWINMSK));
+acq32_specific.c:866:	device->dev_type = DEV_TYPE_ACQ32;
+acq32_specific.c:867:	device->getImagesDef = acq32_getImagesDef;
+acq32_specific.c:868:	device->set_mailbox = _acq32_set_mailbox;
+acq32_specific.c:869:	device->get_mailbox = _acq32_get_mailbox;
+acq32_specific.c:870:	device->coreDevInit = acq32_coreDevInit;
+acq32_specific.c:871:	device->i2o_return_mfa = acq32_dev_i2o_return_mfa;
+acq32_specific.c:872:	device->i2o_mfa2va  = acq32_dev_i2o_mfa2va;
+acq32_specific.c:873:	device->isr = acq32_isr;
+acq32_specific.c:874:	device->fetchDataToLocalBuffer = acq32_fetchDataToLocalBuffer;
+Binary file acq32_specific.o matches
+#acq32_utils.c#:184:	if ( IS_FULL( &path->device->mrb ) ){
+#acq32_utils.c#:187:	    PUT( &path->device->mrb, achar );
+acq32_utils.c:184:	if ( IS_FULL( &path->device->mrb ) ){
+acq32_utils.c:187:	    PUT( &path->device->mrb, achar );

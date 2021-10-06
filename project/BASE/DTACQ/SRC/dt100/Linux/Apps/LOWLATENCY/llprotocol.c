@@ -1,0 +1,366 @@
+/*****************************************************************************
+ *
+ * File:
+ *
+ * $RCSfile: llprotocol.c,v $
+ * 
+ * Copyright (C) 2001 D-TACQ Solutions Ltd
+ * not to be used without owner's permission
+ *
+ * Description: implementation of app side bus protocol
+ *
+ * $Id: llprotocol.c,v 1.7.4.14 2010/08/26 16:25:52 pgm Exp $
+ * $Log: llprotocol.c,v $
+ * Revision 1.7.4.14  2010/08/26 16:25:52  pgm
+ * more switchable instrumentation
+ *
+ * Revision 1.7.4.13  2009/04/02 13:19:01  pgm
+ * docs away
+ *
+ * Revision 1.7.4.12  2006/02/24 17:32:37  pgm
+ * seed V2 correctly
+ *
+ * Revision 1.7.4.11  2006/02/23 21:56:40  pgm
+ * remove unwanted statics
+ *
+ * Revision 1.7.4.10  2006/01/15 14:30:17  pgm
+ * *** empty log message ***
+ *
+ * Revision 1.7.4.9  2006/01/15 11:18:18  pgm
+ * SYNC_2V
+ *
+ * Revision 1.7.4.8  2005/11/04 17:26:18  pgm
+ * *** empty log message ***
+ *
+ * Revision 1.7.4.7  2005/09/25 20:32:34  pgm
+ * LLCV2 initial poll corrected
+ *
+ * Revision 1.7.4.6  2005/08/11 10:02:24  pgm
+ * SYNC_ECM - init host side slave memory areas
+ *
+ * Revision 1.7.4.5  2005/08/01 11:10:24  pgm
+ * V2 part 1 running - local status, no hbpoll - ECM 100 acheived
+ *
+ * Revision 1.7.4.4  2004/09/25 08:31:37  pgm
+ * *** empty log message ***
+ *
+ * Revision 1.7.4.3  2004/08/10 07:35:46  pgm
+ * works with ACQ196
+ *
+ * Revision 1.7.4.2  2004/07/27 20:49:06  pgm
+ * llcontrol 2G with AO - in debug
+ *
+ * Revision 1.7.4.1  2004/07/25 20:39:38  pgm
+ * hbpolling, 96 channels
+ *
+ * Revision 1.7  2002/09/02 11:01:18  pgm
+ * revised debug levels
+ *
+ * Revision 1.6  2002/04/02 10:15:38  pgm
+ * emacs indent, untabify
+ *
+ * Revision 1.5  2002/03/12 15:37:52  pgm
+ * emacs format rools OK
+ *
+ * Revision 1.4  2001/08/17 07:25:38  pgm
+ * ll, aync update, has race
+ *
+ * Revision 1.3  2001/05/25 12:05:15  pgm
+ * its a runner - shippit quick
+ *
+ * Revision 1.2  2001/05/23 19:16:21  pgm
+ * doc
+ *
+ * Revision 1.1  2001/05/21 17:42:38  pgm
+ * reformed
+ *
+ * Revision 1.5  2001/05/20 21:24:10  pgm
+ * ll WIP - almost works
+ *
+ * Revision 1.4  2001/05/19 19:46:15  pgm
+ * enters LL mode with good bufs, mboxes
+ *
+ * Revision 1.3  2001/05/19 07:03:40  pgm
+ * LL done for SOFT CLOCK, compiles
+ *
+ * Revision 1.2  2001/05/18 20:21:13  pgm
+ * compiles. needs algorithms
+ *
+ * Revision 1.1  2001/05/18 07:09:37  pgm
+ * first cut - wont compile :-(
+ *
+ * Revision 1.2  2000/12/28 11:03:00  pgm
+ * *** empty log message ***
+ *
+ * Revision 1.1  1999/10/22 16:26:49  pgm
+ * first entry to cvs
+ *
+ *
+\*****************************************************************************/
+
+/** @file llprotocol.c implementation of bus level protocol. */
+
+
+#include "local.h"
+
+
+#include <assert.h>
+#include "llif.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <errno.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <sys/ioctl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <stdio.h>
+#include <unistd.h>
+
+
+#include "acq32busprot.h"
+//#include "platform.h"
+
+#include "llprotocol.h"
+
+sigjmp_buf G_env;
+
+int pollAck( struct MU* m )
+// polls regular ack from acq32
+{
+	int ipoll = 0;
+    
+	while( (getMbox( m, BP_MB_COMMAND )&MASK(BP_CI_ACK_BIT) ) == 0  ){
+		if ( (++ipoll&0xfffff) == 0 ){
+			fprintf(  stderr, "pollAck %6d looking for 0x%08x got 0x%08x\n",
+				  ipoll, MASK(BP_CI_ACK_BIT), getMbox(m,BP_MB_COMMAND) );
+		}
+	}
+        
+	PRINTF(4)( "pollAck() done 0x%08x\n", getMbox(m,BP_MB_COMMAND) );
+        
+	return 0;
+}
+
+
+static int enterLLC( 
+	struct MU* m, 
+	unsigned mode, 
+	unsigned a3,
+	int clkpos, 
+	int trpos
+	)
+{
+	u32 command = MASK(BP_CI_DONE_BIT)+
+		MASK(BP_CI_COMMAND_BIT)+
+		BP_SET_FUNCODE(BP_FC_SET_MODE_LLC)+
+		mode;
+                  
+	if ( clkpos ){
+		command |= BP_SET_A1(BP_FC_SET_MODE_LLC_CLKPOL_POS);
+	}
+	if ( trpos ) {
+		command |= BP_SET_A1(BP_FC_SET_MODE_LLC_TRPOL_POS);
+	}
+
+	PRINTF(1)("enterLLC()\n");
+
+	setMbox( m, BP_MB_A3, a3 );
+	setMbox( m, BP_MB_COMMAND, command );
+	pollAck( m );
+	pollMboxBits( m, BP_MB_COMMAND, LLC_CSR_READY, LLC_CSR_READY );
+	return 0;
+}
+
+int enterLLCSoftClock( 
+	struct MU* m, int clkpos, int trpos, int internal_loopback,
+	u32 command_mods)
+{
+	u32 command = BP_FC_SET_MODE_LLC_SOFTCLOCK;
+
+	command |= command_mods;
+    
+	if ( internal_loopback ){
+		command += BP_FC_SET_MODE_LLC_INTSOFT_CLK;
+	}
+	return enterLLC( 
+		m, 
+		BP_SET_A1(command),
+		0,
+		clkpos,
+		trpos
+		);
+}
+
+int enterLLCExtClock( 
+	struct MU* m, int clkpos, int trpos, 
+	unsigned short divisor,
+	int internal_loopback,
+	u32 command_mods
+	)
+{
+	unsigned command = BP_FC_SET_MODE_LLC_EXTCLOCK;
+    
+	command |= command_mods;
+
+	if ( internal_loopback ){
+		command += BP_FC_SET_MODE_LLC_INTDIV_CLK;
+	}
+	return enterLLC( 
+		m,
+		BP_SET_A1(command),
+		divisor,
+		clkpos,
+		trpos
+		);
+}
+
+int enterLLC_SYNC_ECM(
+	struct MU* m, int clkpos, int trpos, 
+	unsigned short divisor,
+	int internal_loopback,
+	u32 command_mods,
+	u32 init_buf_baddr
+	)
+{
+	setMbox( m, BP_MB_A4, init_buf_baddr);
+	return enterLLCExtClock(m, clkpos, trpos,
+				divisor, internal_loopback,
+				command_mods|BP_FC_SET_LLCV2_INIT);
+}
+
+int leaveLLC( struct MU* m )
+{
+	llSetCmd( m,LLC_CSR_M_ESC );
+	fprintf( stderr, "leave LLC\n" ); 
+	return 0;
+}
+
+
+u32 llWaitDmaDone(struct MU* m)
+/** polls until DMA has completed. 
+ *Returns tlatch 
+ * guaranteed DMA done when tlatch updated
+ */
+{
+	u32 old_tlatch = getMboxShadow(m, BP_MB_LLC_TADC);
+	u32 tlatch;
+	int ipoll = 0;
+    
+	do {
+		tlatch = llGetTlatch( m );
+		++ipoll;
+	}
+	while (tlatch == old_tlatch);
+    
+	setMboxPollcount(m, ipoll);
+	return tlatch;
+}
+
+/*
+ * WARNING: SERVICE_ macros snipped from llc.ko
+ * duplicate assignment statement adds a conditional bitop, but loses
+ * an expensive str/ldr. Way to go!
+ */
+
+#define ACQ196_TCR_MASK 0xfff
+
+#define SERVICE_ROLLOVER(tim, reg, mask, temp)				\
+	temp = (reg) & (mask);						\
+	if (((tim) & (mask)) > (temp)){					\
+		(tim) = (((tim) & ~(mask)) | (temp)) + ((mask)+1);	\
+	}else{								\
+		(tim) = (((tim) & ~(mask)) | (temp));			\
+	}							   
+
+  
+  
+u32 llv2_extend32(u32 old32, u32 new12)
+/** return 32 bit count as function of old32, new12. */
+{
+	u32 y = old32;
+	u32 t;
+
+	SERVICE_ROLLOVER(y, new12, ACQ196_TCR_MASK, t);
+	return y;
+}
+
+#define LLCV2_POISON 0xf0000001
+
+u32 llv2WaitDmaDone(struct MU *m, volatile u32* hstats)
+/** polls until DMA has completed. 
+ * Returns tlatch 
+ * guaranteed DMA done when tlatch updated
+ * V2 method does NOT poll PCI
+ */
+{
+	unsigned pollcat = 0;
+	unsigned mask = 0xffffff;
+
+	while (hstats[LLCV2_STATUS_BDR] == LLCV2_POISON){
+		if ((++pollcat&mask) == 0){
+			fprintf(stderr, 
+				"polling[%08x] %p current 0x%08x wait poison\n",
+				pollcat, 
+				&hstats[LLCV2_STATUS_BDR],
+				hstats[LLCV2_STATUS_BDR]);
+			mask = (mask << 1) | 1;
+		}		
+	}
+	while (hstats[LLCV2_STATUS_BDR] != 0xdeadbeef){
+		if ((++pollcat&mask) == 0){
+			fprintf(stderr, "polling[%08x] %p current 0x%08x\n",
+				pollcat, 
+				&hstats[LLCV2_STATUS_BDR],
+				hstats[LLCV2_STATUS_BDR]);
+			mask = (mask << 1) | 1;
+		}
+	}
+	hstats[LLCV2_STATUS_BDR] = LLCV2_POISON;
+
+	setMboxPollcount(m, pollcat);
+/** @todo old, new looks wrong! */
+	return llv2_extend32(hstats[BP_MB_LLC_TADC], 
+			     hstats[LLCV2_STATUS_TLATCH]);
+}
+
+
+u32 llv2WaitDmaDone_2v(struct MU *m, volatile u32* hstats, unsigned tlatch)
+/** polls until DMA has completed. 
+ * Returns tlatch 
+ * guaranteed DMA done when tlatch updated
+ * V2 method does NOT poll PCI
+ */
+{
+	unsigned pollcat = 0;
+	unsigned mask = tlatch==0? 0x3fffffff: 0xffffff;
+
+	while (hstats[LLC_SYNC2V_IN_LAST] == LLCV2_POISON){
+		if ((++pollcat&mask) == 0){
+			fprintf(stderr, 
+				"polling[%08x] %p current 0x%08x\n",
+				pollcat, 
+				&hstats[LLC_SYNC2V_IN_LAST],
+				hstats[LLC_SYNC2V_IN_LAST]);
+			mask = (mask << 1) | 1;
+		}		
+		if (tlatch != 0 && pollcat > 0x7fffffff){
+			fprintf(stderr, "ERROR: timeout\n");
+			kill(getpid(), 1);
+			return 0;
+		}
+	}
+	hstats[LLC_SYNC2V_IN_LAST] = LLCV2_POISON;
+
+	setMboxPollcount(m, pollcat);
+	return llv2_extend32(tlatch, hstats[LLCV2_STATUS_TLATCH]);
+}
+
+
+void llv2InitDmaDone(volatile u32* hstats) {
+	hstats[LLCV2_STATUS_BDR] = LLCV2_POISON;
+	hstats[LLC_SYNC2V_IN_LAST] = LLCV2_POISON;
+}

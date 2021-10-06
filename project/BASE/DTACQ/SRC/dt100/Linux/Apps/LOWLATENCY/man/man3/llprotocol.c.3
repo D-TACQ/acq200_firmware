@@ -1,0 +1,164 @@
+.TH "llprotocol.c" 3 "1 Dec 2005" "llcontrol" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+llprotocol.c \- implementation of bus level protocol. 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'local.h'\fP
+.br
+\fC#include <assert.h>\fP
+.br
+\fC#include 'llif.h'\fP
+.br
+\fC#include <stdio.h>\fP
+.br
+\fC#include <stdlib.h>\fP
+.br
+\fC#include <errno.h>\fP
+.br
+\fC#include <fcntl.h>\fP
+.br
+\fC#include <sys/ioctl.h>\fP
+.br
+\fC#include <sys/mman.h>\fP
+.br
+\fC#include <sys/stat.h>\fP
+.br
+\fC#include <sys/types.h>\fP
+.br
+\fC#include <unistd.h>\fP
+.br
+\fC#include 'acq32busprot.h'\fP
+.br
+\fC#include 'llprotocol.h'\fP
+.br
+
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBACQ196_TCR_MASK\fP   0xfff"
+.br
+.ti -1c
+.RI "#define \fBSERVICE_ROLLOVER\fP(tim, reg, mask, temp)"
+.br
+.ti -1c
+.RI "#define \fBLLCV2_POISON\fP   0xf0000001"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "int \fBpollAck\fP (struct \fBMU\fP *m)"
+.br
+.RI "\fIpolls regular ack from acq32. \fP"
+.ti -1c
+.RI "static int \fBenterLLC\fP (struct \fBMU\fP *m, unsigned mode, unsigned a3, int clkpos, int trpos)"
+.br
+.ti -1c
+.RI "int \fBenterLLCSoftClock\fP (struct \fBMU\fP *m, int clkpos, int trpos, int internal_loopback, \fBu32\fP command_mods)"
+.br
+.ti -1c
+.RI "int \fBenterLLCExtClock\fP (struct \fBMU\fP *m, int clkpos, int trpos, unsigned \fBshort\fP divisor, int internal_loopback, \fBu32\fP command_mods)"
+.br
+.ti -1c
+.RI "int \fBenterLLC_SYNC_ECM\fP (struct \fBMU\fP *m, int clkpos, int trpos, unsigned \fBshort\fP divisor, int internal_loopback, \fBu32\fP command_mods, \fBu32\fP init_buf_baddr)"
+.br
+.RI "\fIEnter LowLatency Mode for EXTERNAL CLOCK capture. \fP"
+.ti -1c
+.RI "int \fBleaveLLC\fP (struct \fBMU\fP *m)"
+.br
+.ti -1c
+.RI "\fBu32\fP \fBllWaitDmaDone\fP (struct \fBMU\fP *m)"
+.br
+.RI "\fIpolls until DMA has completed. \fP"
+.ti -1c
+.RI "\fBu32\fP \fBllv2_extend32\fP (\fBu32\fP old32, \fBu32\fP new12)"
+.br
+.RI "\fIreturn 32 bit count as function of old32, new12. \fP"
+.ti -1c
+.RI "\fBu32\fP \fBllv2WaitDmaDone\fP (struct \fBMU\fP *m, volatile \fBu32\fP *hstats)"
+.br
+.RI "\fIpolls until DMA has completed. \fP"
+.ti -1c
+.RI "void \fBllv2InitDmaDone\fP (volatile \fBu32\fP *hstats)"
+.br
+.RI "\fIpolls until DMA has completed. \fP"
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "sigjmp_buf \fBG_env\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+implementation of bus level protocol. 
+
+
+.SH "Define Documentation"
+.PP 
+.SS "#define ACQ196_TCR_MASK   0xfff"
+.PP
+.SS "#define LLCV2_POISON   0xf0000001"
+.PP
+.SS "#define SERVICE_ROLLOVER(tim, reg, mask, temp)"
+.PP
+\fBValue:\fP
+.PP
+.nf
+temp = (reg) & (mask);                                     \
+                if (((tim) & (mask)) > (temp)){                            \
+                        (tim) = (((tim) & ~(mask)) | (temp)) + ((mask)+1); \
+                }else{                                                     \
+                        (tim) = (((tim) & ~(mask)) | (temp));              \
+                }
+.fi
+.SH "Function Documentation"
+.PP 
+.SS "static int enterLLC (struct \fBMU\fP * m, unsigned mode, unsigned a3, int clkpos, int trpos)\fC [static]\fP"
+.PP
+.SS "int enterLLC_SYNC_ECM (struct \fBMU\fP * m, int clkpos, int trpos, unsigned \fBshort\fP divisor, int internal_loopback, \fBu32\fP command_mods, \fBu32\fP init_buf_baddr)"
+.PP
+Enter LowLatency Mode for EXTERNAL CLOCK capture. 
+.PP
+.SS "int enterLLCExtClock (struct \fBMU\fP * m, int clkpos, int trpos, unsigned \fBshort\fP divisor, int internal_loopback, \fBu32\fP command_mods)"
+.PP
+.SS "int enterLLCSoftClock (struct \fBMU\fP * m, int clkpos, int trpos, int internal_loopback, \fBu32\fP command_mods)"
+.PP
+.SS "int leaveLLC (struct \fBMU\fP * m)"
+.PP
+.SS "\fBu32\fP llv2_extend32 (\fBu32\fP old32, \fBu32\fP new12)"
+.PP
+return 32 bit count as function of old32, new12. 
+.PP
+.SS "void llv2InitDmaDone (volatile \fBu32\fP * hstats)"
+.PP
+polls until DMA has completed. 
+.PP
+Returns tlatch guaranteed DMA done when tlatch updated V2 method does NOT poll PCI
+.SS "\fBu32\fP llv2WaitDmaDone (struct \fBMU\fP * m, volatile \fBu32\fP * hstats)"
+.PP
+polls until DMA has completed. 
+.PP
+Returns tlatch guaranteed DMA done when tlatch updated V2 method does NOT poll PCI
+.SS "\fBu32\fP llWaitDmaDone (struct \fBMU\fP * m)"
+.PP
+polls until DMA has completed. 
+.PP
+Returns tlatch guaranteed DMA done when tlatch updated
+.SS "int pollAck (struct \fBMU\fP * m)"
+.PP
+polls regular ack from acq32. 
+.PP
+.SH "Variable Documentation"
+.PP 
+.SS "sigjmp_buf \fBG_env\fP"
+.PP
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for llcontrol from the source code.

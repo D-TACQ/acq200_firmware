@@ -1,0 +1,6 @@
+#!/bin/bash
+mkdir -p /dev/acq32
+mknod /dev/acq32/acq32.1.flash c 254 128 ;# Board 1 Flash
+mknod /dev/acq32/acq32.2.flash c 253 128 ;# Board 1 Flash
+mknod /dev/acq32/acq32.3.flash c 252 128 ;# Board 1 Flash
+mknod /dev/acq32/acq32.4.flash c 251 128 ;# Board 1 Flash

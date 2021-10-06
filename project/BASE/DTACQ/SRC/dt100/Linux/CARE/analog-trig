@@ -1,0 +1,5 @@
+#!/bin/bash
+# analog-trig - demonstrate analog trigger
+
+export TRIGGER=analog
+./testbody $*

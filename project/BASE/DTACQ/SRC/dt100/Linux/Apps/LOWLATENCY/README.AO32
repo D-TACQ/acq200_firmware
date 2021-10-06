@@ -1,0 +1,147 @@
+/* ------------------------------------------------------------------------- */
+/* README for LLCONTROL  AO32CPCI                                            */
+/* ------------------------------------------------------------------------- */
+/*   Copyright (C) 2009 Peter Milne, D-TACQ Solutions Ltd
+ *                      <Peter dot Milne at D hyphen TACQ dot com>
+                                                                               
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of Version 2 of the GNU Lesser Public License
+    as published by the Free Software Foundation;
+                                                                               
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+                                                                               
+    You should have received a copy of the GNU Lesser Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
+/* ------------------------------------------------------------------------- */
+
+AO32CPCI has 32 AO channels, 64 DO bits.
+
+AO32CPCI can be incorporated in a Low Latency Control system as a slave device on the CPCI backplane.
+
+The channels are designed for efficient DMA update.
+
+The example software makes use of the ACQ196 DMA engine to update one or more
+slave devices.
+
+
+Test Setup
+----------
+
+MB: "Master Board" :: Slot number of ACQ196
+S1: "Slave 1" :: Slot number of AO32 #1
+S2: "Slave 2" :: Slot number of AO32 #2 ...
+CB: "Clock Board" :: slot number of Clock ACQ196
+
+The CB is included for the purposes of testing only,
+in a real system, this function will be external.
+
+eg:
+MB=3
+S1=5
+S2=7
+CB=4
+
+Connect AO32 S1 AO0132 connector to ACQ196 MB AI0132 input
+Connect AO32 S1 DO0132 connector to ACQ196 MB AI3364 input
+Connect AO32 S1 DO3364 connector to ACQ196 MB AI6596 input
+
+
+Device Drivers
+--------------
+
+Host-side ACQ200 and AO32 drivers must be loaded.
+
+
+Validate driver load:
+--------------------
+
+acqcmd -s MB hostname
+
+set.ao32 $S1 AO_MODE M_AWGI
+get.ao32 $S1 AO_MODE
+
+... returns M_AWGI
+
+repeat for other slaves..
+
+
+
+Build LLC Software
+------------------
+
+cd LOWLATENCY; make
+
+
+
+Run LLC Test routine
+-------------------
+
+# now configure the cards
+
+./setup.ao32 $MB $S1 $S2 ....
+source ./setup.clocks2 $MB 0 96 $CB
+
+init_clocks
+
+run_llc_once -n 1000 -o /tmp/sync2VAO32 -W --dacs aoramps SYNC_2VAO32 20 $S1 $S2
+
+
+# -n 1000 : capture one shot, 1000 samples
+# -o /tmp/sync2VAO32 : store captured data here (128 "channels" wide)
+# -W write data
+# --dacs aoramps : source AO data from this binary file
+# SYNC_2VAO32 : new mode supports AO32
+# 20 : ECM 20 (ie 20us cycle)
+# $S1 $S2 : AO32CPCI slave cards
+
+cut -c-80 /tmp/llcontrol.tstats | tail
+990, -1, 14865, -14866, 15, 0, 4999, 0, 1475
+991, -1, 14880, -14881, 15, 0, 4994, 0, 1476
+992, -1, 14895, -14896, 15, 0, 3103, 0, 1478
+993, -1, 14910, -14911, 15, 0, 5018, 0, 1479
+994, -1, 14925, -14926, 15, 0, 4825, 0, 1481
+995, -1, 14940, -14941, 15, 0, 4971, 0, 1482
+996, -1, 14955, -14956, 15, 0, 4988, 0, 1484
+997, -1, 14970, -14971, 15, 0, 4974, 0, 1485
+998, -1, 14985, -14986, 15, 0, 4951, 0, 1487
+999, -1, 15000, -15001, 15, 0, 5361, 0, 1488
+
+(example was at ecm 15).
+
+# Data plot example - we use the free Gnu Octave tool
+# vector length is 128 (includes DI, STATUS entries).
+
+# The AO data is a series of ramps at discrete offsets
+# The DO data is "walking bit test"
+
+# if necessary copy the data to a computer with a screen
+
+scp dt100@localhost:/tmp/sync2VAO32.3.userbuf .
+
+
+octave
+fp=fopen("sync2VAO32.3.userbuf","r");
+chx=fread(fp,Inf,"short");
+fclose(fp);
+
+
+chx=reshape(chx,128,length(chx)/128);
+chy=transpose(chx);
+
+# analog data
+plot(chy(:,1:32))
+
+# digital data
+plot(chy(:,33:96))
+
+# The pictures look like this:
+<a href="html/ao-ramps.png">ao-ramps.png</a>
+<a href="html/walking-bit.png">walking-bit.png</a>
+
+
+
+

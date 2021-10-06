@@ -1,0 +1,11 @@
+#!/bin/bash
+BOARD=${1:-1}
+
+cd /tmp
+
+acqcmd -b $BOARD <<EOF
+setDIO -----
+setDIO --0--
+setDIO --1--
+setDIO -----
+EOF

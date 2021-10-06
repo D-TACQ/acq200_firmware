@@ -1,0 +1,84 @@
+# function processes llcontrol shotfile
+# usage
+# this is a script file
+
+1;
+
+function v = calibrate(raw, V)
+# straightline calibrate
+	whos V
+	v = V(1) + (raw + 32768)(V(2) - V(1))/65535;
+endfunction
+
+function shot = process_shot(raw, samples, channels, cal)
+# raw: short [samples][channels]
+	if (channels != 4)
+		usage("sorry, input channels MUST be 4");
+	endif
+
+	outchan = channels/2;
+	outsam  = samples*2;
+
+        shot = 1:samples*channels;
+        shot = reshape(shot, outchan, outsam);
+        
+	for ch = 1:outchan
+		for xx = 1:samples
+			rch = (ch-1) * 2 + 1;
+			shot(ch,xx*2) = calibrate(raw(rch, xx), cal(:,rch));
+			rch += 1;
+			shot(ch,xx*2+1) = calibrate(raw(rch, xx), cal(:,rch));
+		endfor
+	endfor
+endfunction
+
+
+function cooked = \
+  interleave(file, shots, samples, channels, calvin)
+
+	if (nargin != 5)
+		usage("interleave(yy, shots, samples, channels, calvin)");
+	endif
+        if (channels != 4)
+	   usage("channels must be 4 (2+2 bonded)");
+        endif
+
+	settings = rows(calvin);
+
+	yy = read_llc_output(file, channels, samples, shots);
+# yy [ch][samples][shots]
+
+# cooked data: 2channels, all shots, double # samples
+
+	printf("shots %d samples %d\n", shots, samples);
+
+	cooked = 1:2*shots*samples*2;
+	cooked = reshape(cooked, shots, 2, samples*2);
+
+	for shot = 1:shots
+		rawx = yy(1:4,:,shot);
+		reshape(rawx, 1, samples*4);
+		calix = shot % settings + 1;
+
+		
+		process_shot(rawx, samples, 4, 
+			reshape(calvin(calix,:,:),2,16));
+	endfor;
+endfunction
+
+function calvin = load_calvin(calvin_file)
+# load predefined octave file with cal consts
+# input [shots][channels*2]
+# output calvin[shots][2][channels]
+
+	load(calvin_file);
+	whos calvin
+	calvin = reshape(calvin, rows(calvin), 2, columns(calvin)/2);
+endfunction
+
+printf "functions load_calvin(), interleave(), process_shot() defined\n";
+
+
+# load_calvin vin.octave
+# cooked = interleave(file, shots, samples, channels, calvin);
+

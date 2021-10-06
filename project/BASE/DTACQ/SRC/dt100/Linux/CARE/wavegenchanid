@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+
+if ( $#ARGV >= 0 ){
+        $track = $ARGV[0];
+}else{
+        $track = 0;
+}
+if ( $#ARGV >= 1 ){
+        $channel = $ARGV[1];
+}else{
+        $channel = 1;
+}
+if ( $#ARGV >= 2 ){
+        $nsamples = $ARGV[2];
+}else{
+        $nsamples = 1000;
+}
+
+$LUT='0123456789abcdefghijklmnopqrstuvwxyz';
+
+$channel = substr $LUT, $channel, 1;
+
+
+
+for ($ii = 0; $ii != $nsamples; ++$ii){
+        print( "$track$channel" );
+}
+
+

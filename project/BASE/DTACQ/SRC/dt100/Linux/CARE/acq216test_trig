@@ -1,0 +1,77 @@
+#!/bin/bash
+
+date
+
+CLK=${1:-10000000}
+#PRE=${2:-0}
+#PST=${3:-524288}
+PST=${3:-8388608}
+maxcount=${4:-100}
+verbose=1
+read=1
+CMASK=${CMASK:-11111111111111110000000000000000}
+	
+TRIGBOARD=${TRIGBOARD:-8}
+SLAVE=${SLAVE:-8}
+BOARDS=${BOARDS:-$SLAVE}
+
+. acqcmd_all
+
+acqcmd_all setChannelMask $CMASK
+acqcmd_all setInternalClock $CLK
+acqcmd_all setModeTriggeredContinuous 0 $PST
+let "count=0"
+
+set -e
+
+while [ $count -ne $maxcount ]
+do
+if [ $verbose -ne 0 ]; then
+	echo 
+	echo
+	echo "`date` forxv $* iteration $count"
+	echo
+fi
+
+
+acqcmd -b $TRIGBOARD -- setDIO ---1----
+
+acqcmd_all setArm
+time acqcmd_all --until ST_RUN
+
+acqcmd -b $TRIGBOARD -- setDIO ---0----
+
+echo -n Capture Time
+time acqcmd_all --while ST_RUN
+echo -n PostProcess
+time acqcmd_all --until ST_STOP
+
+stats="stats $count "
+echo $stats
+
+for BRD in $BOARDS
+do
+        stats=`acqcmd -b $BRD getCaptureStats | \
+	    grep 'status\|shot\|samp\|usec' |
+	    perl -np -e 's/\n//;s/ACQ32:/ACQ32:\n/;'`
+	 echo $BRD $stats
+done  
+
+
+acqcmd_all getCaptureStats
+
+report=`acqcmd_all getNumSamples | matchup pre=$PRE post=$PST`
+
+if [ $read -ne 0 ]; then
+    for BRD in $BOARDS
+    do
+      time echo Read Board $BRD \
+	  `dd if=/dev/acq32/acq32.$BRD.01 bs=1000000 | wc -c` bytes
+      
+    done
+fi
+
+echo OK $count
+let "count=$count+1"
+done
+

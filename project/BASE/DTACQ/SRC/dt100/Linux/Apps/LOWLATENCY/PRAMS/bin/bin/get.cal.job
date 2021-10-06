@@ -1,0 +1,21 @@
+#!/bin/bash
+# retrieves calibrated input voltages (calvin)
+PRAMS=${PRAMS:-PRAMS/M5-vranges.bin}
+BB=${1:-3}                               # we used slot 5
+
+export ACQ216=1
+let NN="`./dump.prams $PRAMS | wc -l`"
+echo NN $NN BOARD $BB
+let nn=0
+rm -f vin.log
+touch vin.log
+
+while [ $nn -lt $NN ]
+do
+./llcontrol -M ffff -b $BB -t --hbpoll --bigbuf -n $nn -c 16 --samples 512 --prams $PRAMS -O -W SCM 2>/dev/null | tail -n 1
+acqcmd -s $BB get.vin >>/tmp/vin.log
+let nn="$nn+1"
+done
+
+echo created vin.log
+

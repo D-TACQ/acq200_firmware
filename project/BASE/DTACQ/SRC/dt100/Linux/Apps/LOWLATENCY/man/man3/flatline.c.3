@@ -1,0 +1,100 @@
+.TH "flatline.c" 3 "1 Dec 2005" "llcontrol" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+flatline.c \- ad-hoc test file looking for an error condition. 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <stdio.h>\fP
+.br
+\fC#include <errno.h>\fP
+.br
+\fC#include <fcntl.h>\fP
+.br
+\fC#include <stdlib.h>\fP
+.br
+\fC#include <unistd.h>\fP
+.br
+
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBNFLATS\fP   32"
+.br
+.ti -1c
+.RI "#define \fBMAXBUF\fP   0x10000"
+.br
+.ti -1c
+.RI "#define \fBFLATFMT\fP   'FLATLINE %s %5d 0x%04x %6s at %d\\n'"
+.br
+.ti -1c
+.RI "#define \fBHEXIBLE\fP(v)   ((v)&0x0000ffff)"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBfind_flatline\fP (int fd)"
+.br
+.ti -1c
+.RI "int \fBmain\fP (int argc, const char *argv[])"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "unsigned \fBshort\fP \fBlast_value\fP"
+.br
+.ti -1c
+.RI "int \fBrepeat_count\fP"
+.br
+.ti -1c
+.RI "int \fBerror_count\fP"
+.br
+.ti -1c
+.RI "\fBshort\fP * \fBbuffer\fP"
+.br
+.ti -1c
+.RI "const char * \fBfname\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+ad-hoc test file looking for an error condition. 
+
+test files for flatline condition input files are channelized shorts
+.SH "Define Documentation"
+.PP 
+.SS "#define FLATFMT   'FLATLINE %s %5d 0x%04x %6s at %d\\n'"
+.PP
+.SS "#define HEXIBLE(v)   ((v)&0x0000ffff)"
+.PP
+.SS "#define MAXBUF   0x10000"
+.PP
+.SS "#define NFLATS   32"
+.PP
+.SH "Function Documentation"
+.PP 
+.SS "void find_flatline (int fd)"
+.PP
+.SS "int main (int argc, const char * argv[])"
+.PP
+.SH "Variable Documentation"
+.PP 
+.SS "\fBshort\fP* \fBbuffer\fP"
+.PP
+.SS "int \fBerror_count\fP"
+.PP
+.SS "const char* \fBfname\fP"
+.PP
+.SS "unsigned \fBshort\fP \fBlast_value\fP"
+.PP
+.SS "int \fBrepeat_count\fP"
+.PP
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for llcontrol from the source code.

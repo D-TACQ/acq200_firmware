@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+
+# diotest - exercise the DIO's.
+# the program generates the script
+
+
+sub make_dio_command {
+	my ($dx) = @_;
+	my $rs = '';
+
+	if ($dx >= 1){
+		$rs = '0' x $dx;
+	}
+	$rs .= '1';
+	
+	if ($dx < 15){
+		$rs .= '0' x (15-$dx);
+	}
+	return $rs;
+}
+
+
+printf( "#!/bin/bash\n" );
+printf( "#exercise dio\n" );
+
+for ($dx = 0; $dx <= 15; ++$dx){
+	printf( "acqcmd -- setDIO %s\n", make_dio_command($dx) );
+	printf( "acqcmd -- getDIO\n" );
+}
+
+printf( "acqcmd -- setDIO %s\n", '-' x 16 );
+

@@ -1,0 +1,132 @@
+README for RFM
+
+Recap on SYNC2V:
+
+LLC firmware on ACQ196 operates a 2 element DMA chain:
+ADC -> FPGA -> DMA "VI" -> HOST
+DAC <- FPGA <- DMA "VO" <- HOST
+
+Where VI is the single "Input Vector" with AI, DI and status
+and VO is the single "Output Vector" with AI and DO 
+
+SYNC2V now supports and "Alternate Target", so that VI is transferred to an additional destination as well as HOST memory. This "Alternate Target" is some slave memory on the CPCI backplane, typically "Reflective Memory".
+
+LLC firmware on ACQ196 now operates a 4 element DMA chain:
+ADC-> FPGA -> DMA "VI" -> ACQ196 DDRAM.
+ACQ196 DDRAM -> DMA "VI" -> HOST
+DAC <- FPGA <- DMA "VO" <- HOST
+ACQ196 DDRAM -> DMA "VI" -> ALTERNATE
+
+D-TACQ has tested data transfers where ACQ196 masters a block transfer to 
+GE-Fanuc (GEF) RFM2G module on PMC. **
+** Please note, the standard RFM firmware as of 2009/01 was shows a fault 
+in this mode. GEF were kind enough to fix this fault for us, and provided a 
+firmware update "fwB21290.rbf" - 
+cards fitted with this firmware (or presumably later), should word correctly.
+
+To operate alternate mode:
+
+1. First confirm that regular SYNC2V mode works on your system.
+
+2. Compute bus address of ALTERNATE TARGET. 
+In testing we used an AO32CPCI card, here is an example of obtaining the bus address:
+
+/sbin/lspci -v :
+09:0c.0 Signal processing controller: PLX Technology, Inc. PCI9030
+
+cat /sys/bus/pci/devices/0000:09:0c.0/resource
+0x00000000d8304000 0x00000000d830407f 0x0000000000000200
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+0x00000000d8303000 0x00000000d8303fff 0x0000000000000200
+
+On AO32CPCI, we know there is memory in BAR2, so we pick the base address
+0x00000000d8303000. ACQ196 is expecting a 32 bit number, so reformulate as:
+0xd8303000
+
+With RFM, identify the base address of the memory (easy, it's the large resource .. 128MB+), then you will almost certainly want to add some site-specific offset to that..
+
+
+Set the target address on ACQ196:
+
+acqcmd -s SLOT set.sys /dev/llc/alt_VI_target 0xd8303000
+
+3. Run LLC in SYNC2V mode again.
+From the HOST, it's exactly the same, but VI is also copied to RFM.
+
+TIMING:
+On our system, SYNC2V maxed out at a 14 usec cycle in regular mode, and
+with alt_VI_target enabled, it maxed out at a 15 usec cycle. So the overhead is not high.
+
+Example running SYNC2V mode with D-TACQ application program:
+
+ACQ196 UUT "Master Board" MB : slot 3, 96 channels
+No "Slave Board" SB (optional second ACQ196)
+
+ACQ196 "Clock Board" CB : slot 7 
+(CB provides clock and trigger under host program control).
+
+Regular:
+
+./set.sync_2v 3
+. ./setup.clocks2 3 0 96 7
+init_clocks
+run_llc_once -n 100 -W --dacs aoramps SYNC_2V 20;cut -c-80 /tmp/llcontrol.tstats | tail
+
+ALTERNATE TARGET MODE:
+
+acqcmd -s 3 set.sys /dev/llc/alt_VI_target 0xd8303000
+
+run_llc_once -n 100 -W --dacs aoramps SYNC_2V 20;cut -c-80 /tmp/llcontrol.tstats | tail
+
+
+
+
+
+FIRMWARE UPDATE NOTES:
+
+NB: This operation is at your own risk. D-TACQ does not accept any liability.
+
+Note:  This command should not be used unless advised to do so by
+GE Fanuc Intelligent Platforms, Inc. support personnel.
+
+Are you sure you want to continue? (y/n) : y
+d-tacq: RFM2gMapDeviceMemory() offset:-4096 before:0x6001c000 after:0x6001c000
+d-tacq: pFA 0x6001c1f4 pEndianCheck 0x6001c1f4 pEndianCheck[0] ff
+
+ERROR:  Could not determine the endianess of the CPU
+UTIL0 > Connection to localhost closed by remote host.
+Connection to localhost closed.
+
+
+BTW: the procedure is (from the word doc):
+
+Below are the programming instructions. 
+  
+  1.)  The network/ring must be idle or RX disconnected.
+
+  2.)  Copy the firmware file to a FTP based directory, which should be
+the same FTP server that you booting from. 
+
+** D-TACQ says: save firmware file in current directory.
+
+  3.)  Execute "rfm2g_util"
+  4.)  Enter the "Flash" command.
+  5.)  Respond "y" to the question.
+  6.)  Select the device to be programmed by entering "S 1".
+  7.)  Copy the current file by entering "C path/filename".
+
+** D-TACQ says: this makes a backup recommend:
+C rfm-backup.rbf
+
+  8.)  Program the card using the command "p <firmware.rbf>" with
+<firmware.rbf> specifying the full or relative directory path.
+** D-TACQ says: use file in same directory:
+
+p fwB21290.rbf
+
+  9.)  The command will first erase several banks of the flash.  It will
+then program and verify 741,069 bytes in the flash.
+  10.)  Enter "x" to exit the flash command.
+  11.)  Enter "exit" to exit the rfm2g_util.
+  12.)  Turn the power off before using the new firmware.
+

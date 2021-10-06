@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+# makeboard map - make physical to logical (slot) mapping for dt100d
+
+use lib "../modules";
+use getBoards;
+
+
+$REVID = 'make-boardmap $Revision: 1.1.2.3 $';
+
+$ROOT='/dev/acq32';
+$PROCROOT='/proc';
+$MAPNAME="$ROOT/boardmap";
+
+
+sub isSlotbased {
+    open SLOB, "../modules/cmdline_lookup acq32.load_order |" 
+	or die "failed to test for SLOTBASED\n";
+    return <SLOB>;
+}
+
+
+$acq200_phys_offset = getBoards( $PROCROOT, isSlotbased(), 'acq32', "" );
+getBoards( $PROCROOT, isSlotbased(), 'acq200', "" );
+
+open MAPFILE, ">$MAPNAME" or die "ERROR: failed to create $MAPNAME\n";
+
+print MAPFILE "# mapfile created by make-boardmap\n";
+
+foreach $refb ( @DEVRECS ){
+	my $physb = $refb->{devnum};
+
+	if ( ! ($refb->{model} =~ /ACQ32/) ){
+		$physb += $acq200_phys_offset;
+	}		
+	print MAPFILE 	"physical=$physb ".
+			"logical=$refb->{lognum} ".
+			"model=$refb->{model}\n";
+}
+
+close MAPFILE;

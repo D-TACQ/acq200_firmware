@@ -1,0 +1,19 @@
+#!/bin/bash
+# machine-specific setup example for AO32 control 
+
+MB=${1:-3}
+shift
+AO32=${*:-5}
+
+echo setup.ao32 ACQ196 $MB AO32 $AO32
+
+acqcmd -s $MB load.llc
+./set.sync_2v $MB
+
+for SLOT in $AO32
+do
+	set.ao32 $SLOT AO_MODE M_LLI
+	set.ao32 $SLOT DO_MODE M_LLI
+	set.ao32 $SLOT LLC_ENABLE 1
+done
+

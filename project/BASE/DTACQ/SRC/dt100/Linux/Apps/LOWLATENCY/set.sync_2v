@@ -1,0 +1,21 @@
+#!/bin/bash
+# set.sync_2v - enable sync_2v mode
+
+SLOTS=${*:-2}
+LVL=${2:-4}
+
+set_sync2v() {
+MODULE=/sys/module/acq100_llc
+acqcmd -s $1 load.llc
+acqcmd -s $1 "echo $LVL >$MODULE/parameters/acq100_llc_sync2V"
+acqcmd -s $1 "cat $MODULE/parameters/acq100_llc_sync2V"
+acqcmd -s $1 set.llc adc_clkdly 74
+acqcmd -s $1 set.llc imask 0xffffffff
+}
+
+for s in $SLOTS
+do
+	set_sync2v $s
+done
+
+

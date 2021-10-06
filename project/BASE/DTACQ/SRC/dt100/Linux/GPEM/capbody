@@ -1,0 +1,26 @@
+#!/bin/bash
+# capbody [board] [P1] [P2] [verb]
+
+BN=${1:-1}
+P1=${2:-1024}
+P2=${3:-1024}
+VB=${4:-1}
+
+# function is AI of course
+
+E1=${E1:-EV_NONE}
+E2=${E2:-EV_NONE}
+E3=${E3:-EV_NONE}
+
+# send the commands
+
+./reset
+
+acqcmd -b $BN -v $VB << EOF
+setPhase AI P1 $P1
+setPhase AI P2 $P2
+setEvent AI E1 $E1
+setEvent AI E2 $E2
+setEvent AI E3 $E3
+EOF
+

@@ -1,0 +1,3 @@
+# run the remote client app
+java -jar jars/dt100rc.jar
+

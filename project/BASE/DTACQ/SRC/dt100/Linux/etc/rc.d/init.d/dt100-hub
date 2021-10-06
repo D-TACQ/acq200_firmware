@@ -1,0 +1,37 @@
+#!/bin/sh
+#
+# chkconfig: 
+# description: Starts and stops the D-TACQ dt100 server
+
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+HUB=/home/milne/dt100-hub
+BIN=/home/milne/bin
+HUBLOG=/var/log/dt100-hub.log
+
+echo "dt100-hub $1" >>$HUBLOG
+chown 1000.1001 $HUBLOG
+
+# See how we were called.
+case "$1" in
+  start)
+	echo -n "Start dt100-hub:"
+	/sbin/insmod $HUB/dt100-hub-drv.o
+	cd $HUB;daemon $BIN/dt100d ./start.proxy $HUBLOG
+	echo;;
+  stop)
+        echo -n "Stop dt100:"
+	killproc  $BIN/dt100d
+	/sbin/rmmod dt100-hub-drv
+	echo;;
+  restart)
+        $0 stop
+	$0 start
+	;;
+  *)
+	echo "Usage: dt100-hub {start|stop|restart}"
+	exit 1
+esac
+

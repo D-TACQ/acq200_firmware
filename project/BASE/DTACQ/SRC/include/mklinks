@@ -1,0 +1,5 @@
+#!/bin/sh
+#mklinks ... makes top level include links
+
+ln -s ../ARM2.5/Angel/Source/acq32/*.h .
+

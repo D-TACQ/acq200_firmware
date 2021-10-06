@@ -1,0 +1,282 @@
+.TH "llcontrol.c" 3 "1 Dec 2005" "llcontrol" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+llcontrol.c \- .IP "\(bu" 2
+MAIN llcontrol top level and UI. 
+.PP
+
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'local.h'\fP
+.br
+\fC#include <assert.h>\fP
+.br
+\fC#include <stdio.h>\fP
+.br
+\fC#include <stdlib.h>\fP
+.br
+\fC#include <errno.h>\fP
+.br
+\fC#include <fcntl.h>\fP
+.br
+\fC#include <sys/ioctl.h>\fP
+.br
+\fC#include <sys/mman.h>\fP
+.br
+\fC#include <sys/stat.h>\fP
+.br
+\fC#include <sys/time.h>\fP
+.br
+\fC#include <sys/types.h>\fP
+.br
+\fC#include <unistd.h>\fP
+.br
+\fC#include <popt.h>\fP
+.br
+\fC#include 'acq32ioctl.h'\fP
+.br
+\fC#include 'acq32busprot.h'\fP
+.br
+\fC#include 'llif.h'\fP
+.br
+\fC#include 'llprotocol.h'\fP
+.br
+\fC#include 'llcontrol.h'\fP
+.br
+
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBFLAVOR\fP   'ACQ32'"
+.br
+.ti -1c
+.RI "#define \fBVERID\fP   'llcontrol $Revision: 1.30.2.29 $ B1034 ' FLAVOR '\\n'"
+.br
+.ti -1c
+.RI "#define \fBHELP\fP"
+.br
+.ti -1c
+.RI "#define \fBCLIP\fP(t)   ((t) < 0? -1: (t) > \fBCLIP_LIMIT\fP? (-1): (t))"
+.br
+.RI "\fICLIP bogus times - not to try hide anything - big number spoils display. \fP"
+.ti -1c
+.RI "#define \fBHFMT\fP   '%8s, %10s, %10s, %8s, %8s, %6s, %4s, '"
+.br
+.ti -1c
+.RI "#define \fBDFMT\fP   '%8d, %10d, %10d, %8d, %8d, %6d, %4d, '"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "static void \fBsetDefaults\fP (struct \fBTestDescription\fP *td)"
+.br
+.ti -1c
+.RI "static void \fBloadPramfile\fP (struct \fBTestDescription\fP *td, const char *pram_file)"
+.br
+.RI "\fIACQ216 ONLY: pram_file contains binary array of struct \fBLLC200_INIT\fP. \fP"
+.ti -1c
+.RI "static \fBu32\fP \fBmakeChannelMask\fP (int channels)"
+.br
+.ti -1c
+.RI "static void \fBinitPrams\fP (struct \fBTestDescription\fP *td)"
+.br
+.RI "\fIforce channel mask if not already set in prams data. \fP"
+.ti -1c
+.RI "static int \fBmake_output_file\fP (struct \fBTestDescription\fP *td, int slot, const char *class)"
+.br
+.ti -1c
+.RI "void \fBupdateTimingStats\fP (struct \fBTimingStats\fP *\fBbuffer\fP, int iter, struct \fBTimingStats\fP *tstats)"
+.br
+.ti -1c
+.RI "static int \fBextractTprocess\fP (struct \fBTimingStats\fP *ts)"
+.br
+.RI "\fIif TP is available, USE IT, else calculate from tlatch, tinst this is valid because either it is accurate IOP calc, or worst case Host calc \fP"
+.ti -1c
+.RI "static void \fBdumpTimingStats\fP (struct \fBTestDescription\fP *td)"
+.br
+.ti -1c
+.RI "static void \fBdumpTimingStatsBin\fP (struct \fBTestDescription\fP *td, const char *bfile)"
+.br
+.ti -1c
+.RI "static void \fBtd_allocate_dac_data\fP (struct \fBTestDescription\fP *td, int nsamples)"
+.br
+.ti -1c
+.RI "static void \fBtd_load_dac_data_impulse\fP (struct \fBTestDescription\fP *td)"
+.br
+.ti -1c
+.RI "static int \fBget_file_size\fP (const char *\fBfname\fP)"
+.br
+.ti -1c
+.RI "static void \fBtd_load_dac_data_file\fP (struct \fBTestDescription\fP *td, const char *\fBfname\fP)"
+.br
+.ti -1c
+.RI "static void \fBtd_load_dac_data\fP (struct \fBTestDescription\fP *td)"
+.br
+.ti -1c
+.RI "static void \fBsetEdge\fP (int *flag, const char *arg)"
+.br
+.ti -1c
+.RI "static void \fBselectBoards\fP (struct \fBTestDescription\fP *td, const char *board_def)"
+.br
+.ti -1c
+.RI "static void \fBdoWorkBufDataOutput\fP (struct \fBTestDescription\fP *td)"
+.br
+.ti -1c
+.RI "static void \fBdoDmaBufDataOutput\fP (struct \fBTestDescription\fP *td)"
+.br
+.ti -1c
+.RI "static void \fBdoPostShotAnalysis\fP (struct \fBTestDescription\fP *td)"
+.br
+.ti -1c
+.RI "static void \fBinitWorkBuf\fP (struct \fBTestDescription\fP *td)"
+.br
+.ti -1c
+.RI "void \fBinitV2Stats\fP (struct \fBTestDescription\fP *td)"
+.br
+.ti -1c
+.RI "static void \fBinitV2\fP (struct \fBTestDescription\fP *td)"
+.br
+.RI "\fILLC V2 initialization - pick up prams from config file. \fP"
+.ti -1c
+.RI "int \fBmain\fP (int argc, const char *argv[])"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "const char * \fBcore_ident\fP"
+.br
+.ti -1c
+.RI "int \fBverbose\fP = 0"
+.br
+.ti -1c
+.RI "int \fBG_quit\fP"
+.br
+.ti -1c
+.RI "static int \fBCLIP_LIMIT\fP = 100000"
+.br
+.ti -1c
+.RI "static int \fBis_v2\fP = 0"
+.br
+.ti -1c
+.RI "unsigned \fBllcv2_hb_offset\fP = LLCV2_HB_OFFSET"
+.br
+.RI "\fIbut for future, simpler host side drivers, we'd like a single 4K buf, no offset. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+.IP "\(bu" 2
+MAIN llcontrol top level and UI. 
+.PP
+
+
+llcontrol -
+.IP "\(bu" 2
+mmapMboxes() - get app mapping for mailboxes
+.IP "\(bu" 2
+mmapBuffer() - get dmabuff and phys addresses
+.IP "\(bu" 2
+\fBrunSCM()\fP - capture using soft trigger
+.IP "\(bu" 2
+\fBrunECM()\fP - capture using external clock
+.PP
+
+.SH "Define Documentation"
+.PP 
+.SS "#define CLIP(t)   ((t) < 0? -1: (t) > \fBCLIP_LIMIT\fP? (-1): (t))"
+.PP
+CLIP bogus times - not to try hide anything - big number spoils display. 
+.PP
+.SS "#define DFMT   '%8d, %10d, %10d, %8d, %8d, %6d, %4d, '"
+.PP
+.SS "#define FLAVOR   'ACQ32'"
+.PP
+.SS "#define HELP"
+.PP
+.SS "#define HFMT   '%8s, %10s, %10s, %8s, %8s, %6s, %4s, '"
+.PP
+.SS "#define VERID   'llcontrol $Revision: 1.30.2.29 $ B1034 ' FLAVOR '\\n'"
+.PP
+.SH "Function Documentation"
+.PP 
+.SS "static void doDmaBufDataOutput (struct \fBTestDescription\fP * td)\fC [static]\fP"
+.PP
+.SS "static void doPostShotAnalysis (struct \fBTestDescription\fP * td)\fC [static]\fP"
+.PP
+.SS "static void doWorkBufDataOutput (struct \fBTestDescription\fP * td)\fC [static]\fP"
+.PP
+.SS "static void dumpTimingStats (struct \fBTestDescription\fP * td)\fC [static]\fP"
+.PP
+.SS "static void dumpTimingStatsBin (struct \fBTestDescription\fP * td, const char * bfile)\fC [static]\fP"
+.PP
+.SS "static int extractTprocess (struct \fBTimingStats\fP * ts)\fC [inline, static]\fP"
+.PP
+if TP is available, USE IT, else calculate from tlatch, tinst this is valid because either it is accurate IOP calc, or worst case Host calc 
+.PP
+.SS "static int get_file_size (const char * fname)\fC [static]\fP"
+.PP
+.SS "static void initPrams (struct \fBTestDescription\fP * td)\fC [static]\fP"
+.PP
+force channel mask if not already set in prams data. 
+.PP
+.SS "static void initV2 (struct \fBTestDescription\fP * td)\fC [static]\fP"
+.PP
+LLC V2 initialization - pick up prams from config file. 
+.PP
+WORKTODO V2 
+.SS "void initV2Stats (struct \fBTestDescription\fP * td)"
+.PP
+.SS "static void initWorkBuf (struct \fBTestDescription\fP * td)\fC [static]\fP"
+.PP
+.SS "static void loadPramfile (struct \fBTestDescription\fP * td, const char * pram_file)\fC [static]\fP"
+.PP
+ACQ216 ONLY: pram_file contains binary array of struct \fBLLC200_INIT\fP. 
+.PP
+.SS "int main (int argc, const char * argv[])"
+.PP
+.SS "static int make_output_file (struct \fBTestDescription\fP * td, int slot, const char * class)\fC [static]\fP"
+.PP
+.SS "static \fBu32\fP makeChannelMask (int channels)\fC [inline, static]\fP"
+.PP
+.SS "static void selectBoards (struct \fBTestDescription\fP * td, const char * board_def)\fC [static]\fP"
+.PP
+.SS "static void setDefaults (struct \fBTestDescription\fP * td)\fC [static]\fP"
+.PP
+.SS "static void setEdge (int * flag, const char * arg)\fC [static]\fP"
+.PP
+.SS "static void td_allocate_dac_data (struct \fBTestDescription\fP * td, int nsamples)\fC [static]\fP"
+.PP
+.SS "static void td_load_dac_data (struct \fBTestDescription\fP * td)\fC [static]\fP"
+.PP
+.SS "static void td_load_dac_data_file (struct \fBTestDescription\fP * td, const char * fname)\fC [static]\fP"
+.PP
+.SS "static void td_load_dac_data_impulse (struct \fBTestDescription\fP * td)\fC [static]\fP"
+.PP
+.SS "void updateTimingStats (struct \fBTimingStats\fP * buffer, int iter, struct \fBTimingStats\fP * tstats)"
+.PP
+.SH "Variable Documentation"
+.PP 
+.SS "int \fBCLIP_LIMIT\fP = 100000\fC [static]\fP"
+.PP
+.SS "const char* \fBcore_ident\fP"
+.PP
+.SS "int \fBG_quit\fP"
+.PP
+.SS "int \fBis_v2\fP = 0\fC [static]\fP"
+.PP
+.SS "unsigned \fBllcv2_hb_offset\fP = LLCV2_HB_OFFSET"
+.PP
+but for future, simpler host side drivers, we'd like a single 4K buf, no offset. 
+.PP
+=> use a variable and set as appropriate
+.SS "int \fBverbose\fP = 0"
+.PP
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for llcontrol from the source code.

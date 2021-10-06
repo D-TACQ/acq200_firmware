@@ -1,0 +1,209 @@
+#!/usr/bin/expectk
+# example host side control gui - run on an X desktop
+# edgetrig.gui <target> [opts]
+# expectsexample host side control gui - run on an X desktop
+# expect prompt of the form "[dt100@* "
+
+list buttons
+list boards
+
+set x 0
+
+set maxtrigchannels 1
+
+#exec xhost +
+set user ""
+
+set target [lindex $argv 0]
+
+if {[string compare $target ""] == 0} {
+	puts "Usage:edgetrig.gui <target> \[opts\]"
+	puts "opts -eg \"export ACQCMD_DEV=/dev/acq32/acq32.2.m2\""
+	exit
+}
+
+set prompt "\\\[dt100@* "
+
+proc addDt100Button { command } {
+	global buttons x 
+	button .button$x -text $command -command "dt100_send $command \"\""
+	lappend buttons .button$x
+	incr x
+}
+proc addDt100Button1 { command } {
+	global buttons x 
+	button .button$x -text $command -foreground red \
+	                   -command "dt100_send1 $command"
+	lappend buttons .button$x
+	incr x
+}
+
+proc addShellButton {txt command} {
+	global buttons x
+	button .button$x -text $txt -command "shell_cmd \"$command\""
+	lappend buttons .button$x
+	incr x
+}
+
+proc addHostProcButton {txt command} {
+	global buttons x
+	button .button$x -text $txt -command $command
+	lappend buttons .button$x
+	incr x
+}
+addDt100Button1 { "setInternalClock 2000000 DO3" }
+addDt100Button { "setExternalClock DI0" }
+addDt100Button { "setModeTriggeredContinuous 1024 1024 DI1" }
+addDt100Button { "setModeTriggeredContinuous 1024 1024 DI2" }
+
+
+for { set itrig 1 } { $itrig <= $maxtrigchannels } { incr itrig } {
+	addDt100Button "\"setChannelThreshold $itrig 0 8000\""
+	addDt100Button "\"setChannelThreshold $itrig 8000 0\""
+}
+
+addDt100Button { "clearThresholds" }
+addDt100Button { "selectThresholdDistributor FAST_MULTI" }
+addDt100Button { "setDistributor NORMAL" }
+addDt100Button { "setArm" }
+addDt100Button { "getState" }
+addDt100Button { "getFwrev" }
+addDt100Button { "getCaptureStats" }
+addDt100Button { "setAbort" }
+
+addShellButton history {history | cut -c 8- | grep ^acqcmd }
+
+addHostProcButton "Wire Test" wireTest
+addHostProcButton Quit doQuit
+
+
+
+# make a board selector frame
+
+frame .mf -relief groove -borderwidth 2 
+label .mtitle -text "Select Boards"
+
+foreach board {1 2 3 4 5 6 7 8} {
+	checkbutton .m$board -text $board -variable m$board
+	lappend boards m$board
+}
+
+pack .mtitle -in .mf
+foreach bb $boards {
+	pack .$bb -in .mf -side left -anchor n
+}
+
+pack .mf -fill x
+
+foreach btn $buttons {
+	pack $btn
+}
+
+set cmdn 0
+
+
+proc shell_cmd { command } {
+	global prompt
+	global target
+	global cmdn
+
+	exp_send "$command\r"
+	expect {
+		$prompt {
+			incr cmdn 
+			puts "$cmdn OK" 
+		}
+		timeout { puts "WARNING: timeout" }
+	}
+}	
+
+proc dt100_send1 { command } {
+	shell_cmd "acqcmd $command"
+}
+
+proc dt100_send { command callback } {
+
+	global boards
+
+	set done_specific_boards 0
+
+	set iboard 0
+	foreach board $boards {
+		global $board		
+	    	incr iboard
+		set ref_enable \$$board
+
+		if {[expr $ref_enable] == 1} {
+			shell_cmd "acqcmd -b $iboard $command"
+			set done_specific_boards 1
+
+			if {[string compare $callback ""] != 0 } {
+				eval $callback
+			}
+		}
+	}
+	
+# default - if no boards selected, just do a regual acqcmd
+	if {$done_specific_boards == 0} {
+		shell_cmd "acqcmd $command"
+	}
+}
+
+proc doQuit {} {
+	exit
+}
+
+
+# Wire test
+
+proc wtClearDIO {} {
+	dt100_send "-- setDIO -----------" ""
+}
+proc wtSetMaster { trg clk } {
+	dt100_send1 "-- setDIO $clk--$trg-----"
+}
+
+proc wtTestSlavesCallback {} {
+	global expect_out
+
+	puts "wtTestSlavesCallback was here expect_out(buffer)"
+	puts "$expect_out(1,string)"
+	puts "wtTestSlavesCallback99"
+}
+
+proc wtTestSlaves { trg clk } {
+	dt100_send "getDIO" wtTestSlavesCallback
+}
+
+proc wtTestCase { trg clk } {
+	wtSetMaster $trg $clk
+	wtTestSlaves $trg $clk
+}
+proc wireTest {} {
+	wtClearDIO
+	wtTestCase 0 0
+#	wtTestCase 0 1
+#	wtTestCase 1 0
+#	wtTestCase 1 1
+	wtClearDIO
+}
+
+spawn rlogin -l dt100 $target
+
+
+expect "Password:" 
+exp_send "dt100\r"
+
+expect $prompt
+
+exp_send "export DISPLAY=$env(HOSTNAME)$env(DISPLAY)\r"
+expect $prompt
+
+set argc 1
+while {[ string length [lindex $argv $argc]]} {
+	puts "exec [lindex $argv $argc]"
+	exp_send "[lindex $argv $argc]\r"
+	expect $prompt
+	incr argc
+}
+

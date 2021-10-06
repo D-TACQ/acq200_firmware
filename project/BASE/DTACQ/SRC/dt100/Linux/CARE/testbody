@@ -1,0 +1,103 @@
+#!/bin/bash
+# mode1 (and 2) - digital trigger
+
+#set -v
+
+function ss
+{
+    usleep 250000
+}
+
+REVISION='$Revision: 1.5 $'
+
+echo $0 $REVISION
+
+. get_boards
+. acqcmd_all
+
+echo NBOARDS $NBOARDS MCLKBOARD $MCLKBOARD MTRGBOARD $MTRGBOARD BOARDS $BOARDS
+
+CLK=${1:-2000000}
+PRE=${2:-10240}
+PST=${3:-20480}
+TRG=${4:-DI2}
+
+# if using clock distributor..
+#CLKO=DO3
+CLKO=DO0
+CLKI=DI0
+
+TRIGGER=${TRIGGER:-auto}
+export ACQCMD_DEV=/dev/acq32/acq32.$MCLKBOARD.m$MCLKBOARD
+
+#echo -n 8 >/dev/short0
+
+set -e
+
+
+if [ "$MCLKBOARD" != "$MTRGBOARD" ]; then
+    echo Using single master clock from board $MCLKBOARD
+    acqcmd -b $MCLKBOARD setInternalClock $CLK $CLK0
+    acqcmd_allx setExternalClock $CLKI
+else
+    echo Using regular internal clock
+    acqcmd_allx setInternalClock $CLK
+fi
+
+#acqcmd_allx clearThresholds
+#acqcmd_allx setDistributor NORMAL
+
+if [ "$TRIGGER" = "analog" ]; then
+    THRESH1=${THRESH1:-0}
+    THRESH2=${THRESH2:-8000}
+    echo analog trigger on channel 1 $THRESH1 $THRESH2
+    acqcmd setChannelThreshold 1 $THRESH1 $THRESH2
+    acqcmd selectThresholdDistributor FAST_MULTI
+fi
+
+acqcmd_allx setModeTriggeredContinuous $PRE $PST $TRG
+
+acqcmd_all setArm
+
+acqcmd_allx --until ST_RUN
+
+acqcmd_all getState | joinup $NBOARDS
+
+echo Boards running, trigger anytime
+sleep 2
+
+case $TRIGGER in
+auto)
+    echo "autotrigger - hardcoded to DI2 $MTRGBOARD"
+    echo "acqcmd -b $MTRGBOARD -- setDIO --0-----"
+    acqcmd -b $MTRGBOARD -- setDIO --0-----
+    ;;
+analog)
+    echo "analog trigger - rising edge now"
+#  74 = minimum pulse.
+#    echo -n 74 >/dev/short0
+#    echo -n 7774 >/dev/short0
+#    echo -n 7 >/dev/short0
+#    echo -n 4 >/dev/short0
+    ;;
+*)
+    ;;
+esac
+
+acqcmd_allx --until ST_STOP
+
+if [ "$TRIGGER" = "auto" ]; then
+    acqcmd getDIO
+    acqcmd -b $MTRGBOARD -- setDIO ----------
+fi
+
+acqcmd_all getState | joinup $NBOARDS
+acqcmd_all getNumSamples | matchup pre=$PRE post=$PST
+acqcmd_all getCaptureStats | grep nevents
+
+let total="$PRE+$PST"
+
+acq32fetch -S 33..40 $total
+
+#echo -n 0 >/dev/short0
+

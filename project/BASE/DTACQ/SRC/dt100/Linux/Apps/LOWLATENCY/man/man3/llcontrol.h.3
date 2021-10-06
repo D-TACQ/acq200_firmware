@@ -1,0 +1,180 @@
+.TH "llcontrol.h" 3 "1 Dec 2005" "llcontrol" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+llcontrol.h \- shared data structs for llcontrol. 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fBCard\fP"
+.br
+.ti -1c
+.RI "struct \fBTimingStats\fP"
+.br
+.ti -1c
+.RI "struct \fBTestDescription\fP"
+.br
+.in -1c
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBMAXTEST\fP   12"
+.br
+.ti -1c
+.RI "#define \fBACQ196_BIGBUF_AREA\fP   0x1000000"
+.br
+.ti -1c
+.RI "#define \fBMAXCARDS\fP   16"
+.br
+.ti -1c
+.RI "#define \fBLLC200_INIT_SZ\fP   sizeof(struct \fBLLC200_INIT\fP)"
+.br
+.ti -1c
+.RI "#define \fBV2_NOBUF\fP   1"
+.br
+.ti -1c
+.RI "#define \fBEACHCARD_INIT\fP   int icard"
+.br
+.ti -1c
+.RI "#define \fBEACHCARD\fP(td)   (&(td)->cards[icard])"
+.br
+.ti -1c
+.RI "#define \fBEACHMBX\fP(td)   ((td)->cards[icard].mbx)"
+.br
+.ti -1c
+.RI "#define \fBEACHBUF\fP(td)   ((td)->cards[icard].buf)"
+.br
+.ti -1c
+.RI "#define \fBEACHSLOT\fP(td)   ((td)->cards[icard].slot)"
+.br
+.ti -1c
+.RI "#define \fBFOREACHCARD\fP   for (icard = 0; icard != td->ncards; ++icard)"
+.br
+.ti -1c
+.RI "#define \fBFIRSTCARD\fP(td)   (&(td)->cards[0])"
+.br
+.ti -1c
+.RI "#define \fBFIRSTMBX\fP(td)   ((td)->cards[0].mbx)"
+.br
+.ti -1c
+.RI "#define \fBFIRSTBUF\fP(td)   ((td)->cards[0].buf)"
+.br
+.ti -1c
+.RI "#define \fBFIRSTSLOT\fP(td)   ((td)->cards[0].slot)"
+.br
+.ti -1c
+.RI "#define \fBTHIS_CARD\fP   icard"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "int \fBrunTest\fP (struct \fBTestDescription\fP *td)"
+.br
+.RI "\fIgeneric top level text exec. \fP"
+.ti -1c
+.RI "void \fBsetupAbortHandler\fP (struct \fBTestDescription\fP *td)"
+.br
+.ti -1c
+.RI "void \fBsetupMonitor\fP (int millisec)"
+.br
+.ti -1c
+.RI "void \fBinitCardResource\fP (struct \fBCard\fP *card)"
+.br
+.ti -1c
+.RI "static int \fBtd_sample_size\fP (struct \fBTestDescription\fP *td)"
+.br
+.ti -1c
+.RI "static int \fBtd_dss\fP (struct \fBTestDescription\fP *td)"
+.br
+.ti -1c
+.RI "static int \fBisAcq216\fP (void)"
+.br
+.ti -1c
+.RI "void \fBupdateTimingStats\fP (struct \fBTimingStats\fP *\fBbuffer\fP, int iter, struct \fBTimingStats\fP *stats)"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "int \fBverbose\fP"
+.br
+.ti -1c
+.RI "int \fBG_quit\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+shared data structs for llcontrol. 
+
+
+.SH "Define Documentation"
+.PP 
+.SS "#define ACQ196_BIGBUF_AREA   0x1000000"
+.PP
+.SS "#define EACHBUF(td)   ((td)->cards[icard].buf)"
+.PP
+.SS "#define EACHCARD(td)   (&(td)->cards[icard])"
+.PP
+.SS "#define EACHCARD_INIT   int icard"
+.PP
+.SS "#define EACHMBX(td)   ((td)->cards[icard].mbx)"
+.PP
+.SS "#define EACHSLOT(td)   ((td)->cards[icard].slot)"
+.PP
+.SS "#define FIRSTBUF(td)   ((td)->cards[0].buf)"
+.PP
+.SS "#define FIRSTCARD(td)   (&(td)->cards[0])"
+.PP
+.SS "#define FIRSTMBX(td)   ((td)->cards[0].mbx)"
+.PP
+.SS "#define FIRSTSLOT(td)   ((td)->cards[0].slot)"
+.PP
+.SS "#define FOREACHCARD   for (icard = 0; icard != td->ncards; ++icard)"
+.PP
+.SS "#define LLC200_INIT_SZ   sizeof(struct \fBLLC200_INIT\fP)"
+.PP
+.SS "#define MAXCARDS   16"
+.PP
+.SS "#define MAXTEST   12"
+.PP
+.SS "#define THIS_CARD   icard"
+.PP
+.SS "#define V2_NOBUF   1"
+.PP
+.SH "Function Documentation"
+.PP 
+.SS "void initCardResource (struct \fBCard\fP * card)"
+.PP
+.SS "static int isAcq216 (void)\fC [inline, static]\fP"
+.PP
+.SS "int runTest (struct \fBTestDescription\fP * td)"
+.PP
+generic top level text exec. 
+.PP
+.SS "void setupAbortHandler (struct \fBTestDescription\fP * td)"
+.PP
+.SS "void setupMonitor (int millisec)"
+.PP
+.SS "static int td_dss (struct \fBTestDescription\fP * td)\fC [inline, static]\fP"
+.PP
+.SS "static int td_sample_size (struct \fBTestDescription\fP * td)\fC [inline, static]\fP"
+.PP
+.SS "void updateTimingStats (struct \fBTimingStats\fP * buffer, int iter, struct \fBTimingStats\fP * stats)"
+.PP
+.SH "Variable Documentation"
+.PP 
+.SS "int \fBG_quit\fP"
+.PP
+.SS "int \fBverbose\fP"
+.PP
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for llcontrol from the source code.

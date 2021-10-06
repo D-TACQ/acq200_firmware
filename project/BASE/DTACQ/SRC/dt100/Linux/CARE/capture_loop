@@ -1,0 +1,71 @@
+#!/bin/bash
+
+BT=${BT:-4}  			 # Board under Test (default: slot 4)
+IC=${IC:-500000}		 # Internal Clock (default: 500kHz)
+PST=${PST:-100000}		 # PoST samples
+PRE=${PRE:-0}
+
+
+ACQCMD() {
+	acqcmd -b $BT $*
+}
+
+ACQ2SH() {
+	acqcmd -s $BT $*
+}
+
+capture() 
+{
+	ACQCMD setArm
+	ACQCMD getNumSamples
+# capture SM briefly transits to ST_STOP before running POSTPROCESS
+# for reliable data, we should wait until POSTPROCESS done
+#	ACQCMD --until ST_POSTPROCESS
+	ACQCMD --until ST_STOP
+}
+
+setup() {
+	ACQCMD setInternalClock $IC
+	ACQCMD setMode SOFT_TRANSIENT $PST
+}
+
+get_data() {
+	dd if=/dev/acq32/acq32.$1.$2 bs=1024000 2>/dev/null
+}
+count_data() {
+	wc 2>/dev/null | awk '{ print $3 }'
+}
+show_mean() {
+	~/bin/mean --nchannels 1 -n $PST 2>/dev/null | hexdump -e '1/4 "%08x"'
+}
+testdata() {
+	for ch in 01 02 03 04 05 06 07 08 
+# omit the rest for brevity
+# 09 10 11 12 13 14 15 16
+	do
+		count="`get_data $BT $ch | count_data`"
+		mean="`get_data $BT $ch | show_mean`"
+		echo $ch $count $mean
+	done
+}
+
+
+doitall()
+{
+	setup
+
+	let SHOTS=${1:-1}
+	let shot=0
+
+	while [ $shot -lt $SHOTS ]
+	do
+		echo SHOT $shot out of $SHOTS
+		capture
+		testdata
+		let shot="$shot+1"
+	done
+}
+
+
+# do whatever is on the command line
+$*

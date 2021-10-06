@@ -1,0 +1,504 @@
+.TH "llcontrol-core.c" 3 "1 Dec 2005" "llcontrol" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+llcontrol-core.c \- module implements the core of llcontrol loop. 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'local.h'\fP
+.br
+\fC#include <assert.h>\fP
+.br
+\fC#include <stdio.h>\fP
+.br
+\fC#include <stdlib.h>\fP
+.br
+\fC#include <errno.h>\fP
+.br
+\fC#include <fcntl.h>\fP
+.br
+\fC#include <sys/ioctl.h>\fP
+.br
+\fC#include <sys/mman.h>\fP
+.br
+\fC#include <sys/stat.h>\fP
+.br
+\fC#include <sys/time.h>\fP
+.br
+\fC#include <sys/types.h>\fP
+.br
+\fC#include <unistd.h>\fP
+.br
+\fC#include <popt.h>\fP
+.br
+\fC#include 'acq32ioctl.h'\fP
+.br
+\fC#include 'acq32busprot.h'\fP
+.br
+\fC#include 'llif.h'\fP
+.br
+\fC#include 'llprotocol.h'\fP
+.br
+\fC#include 'llcontrol.h'\fP
+.br
+\fC#include 'x86timer.h'\fP
+.br
+\fC#include <signal.h>\fP
+.br
+
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBFLAVOR\fP   'ACQ32'"
+.br
+.ti -1c
+.RI "#define \fBHOST_TIMING\fP   1"
+.br
+.ti -1c
+.RI "#define \fBPOLLALERT\fP(ipoll, message)   if ( (++ipoll&0xfffff) == 0 ) fprintf( stderr, message )"
+.br
+.ti -1c
+.RI "#define \fBINIT_TIMER\fP   get_elapsed_microseconds(1)"
+.br
+.ti -1c
+.RI "#define \fBMARK_TIME\fP(t, ident)"
+.br
+.ti -1c
+.RI "#define \fBFOREACHCARD_MARK_TIME\fP(t, ident)   FOREACHCARD{ MARK_TIME(t, ident); }"
+.br
+.ti -1c
+.RI "#define \fBTIMER_CHECK_OVERFLOW\fP   if (get_elapsed_microseconds(0) > 99000) INIT_TIMER"
+.br
+.ti -1c
+.RI "#define \fBEACHMFA\fP   (dac_buf[icard].mfa)"
+.br
+.ti -1c
+.RI "#define \fBEACHBBB\fP   (dac_buf[icard].bbb)"
+.br
+.ti -1c
+.RI "#define \fBEACHDAC_BASE\fP   (EACHBBB + EACHMFA)"
+.br
+.ti -1c
+.RI "#define \fBEACHDAC_BASE16\fP   ((\fBu16\fP*)EACHDAC_BASE)"
+.br
+.ti -1c
+.RI "#define \fBNMEASURE\fP   20"
+.br
+.ti -1c
+.RI "#define \fBEACHBBB\fP   (dac_buf[icard].bbb)"
+.br
+.ti -1c
+.RI "#define \fBEACHDAC_BASE\fP   (EACHBBB + LLCV2_AO_HSBS)"
+.br
+.ti -1c
+.RI "#define \fBEACHDAC_BASE16\fP   ((\fBu16\fP*)EACHDAC_BASE)"
+.br
+.ti -1c
+.RI "#define \fBV2SETDACS\fP(src, icard)   memcpy(EACHDAC_BASE, (src)+(icard)*32, DAC_SAMPLE_SIZE)"
+.br
+.ti -1c
+.RI "#define \fBOFFSET\fP   0"
+.br
+.ti -1c
+.RI "#define \fBPRAMS_OFFSET\fP   0x100000"
+.br
+.ti -1c
+.RI "#define \fBEACHBBB\fP   bbb[icard]"
+.br
+.ti -1c
+.RI "#define \fBPOLLOFF\fP(td)   (offset + (td->samples-1) * td_sample_size(td))"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "static void * \fBtd_get_next_dac_data\fP (struct \fBTestDescription\fP *td)"
+.br
+.ti -1c
+.RI "static void \fBappEnterLLC_SYNC_ECM\fP (int icard, struct \fBMU\fP *mu, struct \fBTestDescription\fP *td)"
+.br
+.RI "\fIset up LLCV2_INIT buffer and enter mode. \fP"
+.ti -1c
+.RI "static int \fBrunSYNC_ECM\fP (struct \fBTestDescription\fP *td, int soft_clock)"
+.br
+.RI "\fIruns the test SYNC_ECM mode. \fP"
+.ti -1c
+.RI "static void \fBmbox_updateTstats\fP (\fBu32\fP cmd, struct \fBCard\fP *card, struct \fBTimingStats\fP *tstats)"
+.br
+.ti -1c
+.RI "static void \fBv2_updateTstats\fP (\fBu32\fP cmd, struct \fBCard\fP *card, struct \fBTimingStats\fP *tstats)"
+.br
+.RI "\fIupdates timing stats from embedded host buffer data \fP"
+.ti -1c
+.RI "static void \fBupdateTargetAddr\fP (\fBu32\fP cmd, struct \fBCard\fP *card, unsigned offset)"
+.br
+.ti -1c
+.RI "static void \fBdoApplicationWork\fP (struct \fBTestDescription\fP *td, \fBu32\fP offset)"
+.br
+.ti -1c
+.RI "static \fBu32\fP \fBcard_v1_WaitDmaDone\fP (struct \fBCard\fP *card)"
+.br
+.ti -1c
+.RI "static \fBu32\fP \fBcard_v2_WaitDmaDone\fP (struct \fBCard\fP *card)"
+.br
+.ti -1c
+.RI "static int \fBdo_run\fP (struct \fBTestDescription\fP *td, int soft_clock)"
+.br
+.RI "\fIruns the test. \fP"
+.ti -1c
+.RI "static int \fBrunSCM\fP (struct \fBTestDescription\fP *td)"
+.br
+.ti -1c
+.RI "static int \fBrunSCM216\fP (struct \fBTestDescription\fP *td)"
+.br
+.ti -1c
+.RI "static int \fBrunECM\fP (struct \fBTestDescription\fP *td)"
+.br
+.ti -1c
+.RI "static \fBu32\fP \fBcommandModifiers\fP (struct \fBTestDescription\fP *td)"
+.br
+.ti -1c
+.RI "static int \fBmeasureBridge\fP (struct \fBMU\fP *mu)"
+.br
+.ti -1c
+.RI "static int \fBmeasureBridgeStats\fP (struct \fBTestDescription\fP *td, struct \fBMU\fP *mu)"
+.br
+.ti -1c
+.RI "int \fBrunTest\fP (struct \fBTestDescription\fP *td)"
+.br
+.RI "\fIgeneric top level text exec. \fP"
+.ti -1c
+.RI "static void \fBquit_handler\fP (int signum)"
+.br
+.ti -1c
+.RI "void \fBsetupAbortHandler\fP (struct \fBTestDescription\fP *td)"
+.br
+.ti -1c
+.RI "static void \fBmonitor_handler\fP (int signum)"
+.br
+.ti -1c
+.RI "void \fBsetupMonitor\fP (int millisec)"
+.br
+.ti -1c
+.RI "void \fBinitCardResource\fP (struct \fBCard\fP *card)"
+.br
+.ti -1c
+.RI "static void \fBdebug_prompt\fP (int icard, int ibuf, \fBu32\fP addr)"
+.br
+.RI "\fIpromnpt user to ensure pram set (temporary pre-update measure). \fP"
+.ti -1c
+.RI "void \fBinitV2Stats\fP (struct \fBTestDescription\fP *td)"
+.br
+.ti -1c
+.RI "static void \fBsetAcq216Parameters\fP (struct \fBTestDescription\fP *td, struct \fBLLC200_INIT\fP *\fBbuffer\fP, int card, int iter)"
+.br
+.RI "\fIconfigure card parameters for iteration iter \fP"
+.ti -1c
+.RI "static void \fBdoApplicationWork216\fP (struct \fBTestDescription\fP *td, \fBu32\fP offset)"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "const char * \fBcore_ident\fP = '$Revision: 1.1.4.19 $ B1102\\n'"
+.br
+.ti -1c
+.RI "static void(* \fBupdateTstats\fP )(\fBu32\fP cmd, struct \fBCard\fP *card, struct \fBTimingStats\fP *tstats)"
+.br
+.ti -1c
+.RI "static \fBu32\fP(* \fBwaitDmaDone\fP )(struct \fBCard\fP *c) = card_v1_WaitDmaDone"
+.br
+.ti -1c
+.RI "static struct \fBTestDescription\fP * \fBS_td\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+module implements the core of llcontrol loop. 
+
+.IP "\(bu" 2
+mmapMboxes() - get app mapping for mailboxes
+.PP
+.PP
+.IP "\(bu" 2
+mmapBuffer() - get dmabuff and phys addresses
+.PP
+.PP
+.IP "\(bu" 2
+\fBrunSCM()\fP - capture using soft trigger
+.PP
+.PP
+.IP "\(bu" 2
+\fBrunECM()\fP - capture using external clock
+.PP
+.PP
+Note on HOST MEMORY MAP: assumes bootcommand configured as follows, to allow a 16MB host area per card in at the top of memory. This host area will be slaved off the pci backplane
+.PP
+.IP "\(bu" 2
+mem=NNN restrict memory for Linux. Must allow Nx16MB + gap
+.IP "\(bu" 2
+acq32_big_buf_base=0xnnnn : informs driver of start of area
+.IP "\(bu" 2
+acq32_big_buf_len=0xxxxx : informs driver of length of area
+.PP
+.PP
+eg
+.PP
+[dt100 dt100]$ cat /proc/cmdline mem=320M acq32.load_order=slotbased
+.PP
+acq32_big_buf_base=0x18000000 acq32_big_buf_len=0x08000000
+.PP
+For the purpose of LLCONTROL, each 16MB card are is used as follows:
+.PP
+.IP "\(bu" 2
+0x000000 .. 0xefffff (15MB) - AI reception area (controlled by client app).
+.IP "\(bu" 2
+0xf00000 .. 0xffffff (1MB) - message buffers (owned by target).
+.PP
+.PP
+This means that if the llcontrol app is using an incrementing memory strategy in host buffer for AI, this is subject to max 15MB (80K samples at 96 channels).
+.PP
+The message buffers are used for DAC output. The application reserves a Mesage Frame Address (MFA) from the target before copying data to slave memory. The MFA is an index into the message buffer memory.
+.SH "Define Documentation"
+.PP 
+.SS "#define EACHBBB   bbb[icard]"
+.PP
+.SS "#define EACHBBB   (dac_buf[icard].bbb)"
+.PP
+.SS "#define EACHBBB   (dac_buf[icard].bbb)"
+.PP
+.SS "#define EACHDAC_BASE   (EACHBBB + LLCV2_AO_HSBS)"
+.PP
+.SS "#define EACHDAC_BASE   (EACHBBB + EACHMFA)"
+.PP
+.SS "#define EACHDAC_BASE16   ((\fBu16\fP*)EACHDAC_BASE)"
+.PP
+.SS "#define EACHDAC_BASE16   ((\fBu16\fP*)EACHDAC_BASE)"
+.PP
+.SS "#define EACHMFA   (dac_buf[icard].mfa)"
+.PP
+.SS "#define FLAVOR   'ACQ32'"
+.PP
+.SS "#define FOREACHCARD_MARK_TIME(t, ident)   FOREACHCARD{ MARK_TIME(t, ident); }"
+.PP
+.SS "#define HOST_TIMING   1"
+.PP
+.SS "#define INIT_TIMER   get_elapsed_microseconds(1)"
+.PP
+.SS "#define MARK_TIME(t, ident)"
+.PP
+\fBValue:\fP
+.PP
+.nf
+do { \
+        tstats[icard].test_points[t] = get_elapsed_microseconds(0);\
+        } while(0)
+.fi
+.SS "#define NMEASURE   20"
+.PP
+.SS "#define OFFSET   0"
+.PP
+.SS "#define POLLALERT(ipoll, message)   if ( (++ipoll&0xfffff) == 0 ) fprintf( stderr, message )"
+.PP
+.SS "#define POLLOFF(td)   (offset + (td->samples-1) * td_sample_size(td))"
+.PP
+.SS "#define PRAMS_OFFSET   0x100000"
+.PP
+.SS "#define TIMER_CHECK_OVERFLOW   if (get_elapsed_microseconds(0) > 99000) INIT_TIMER"
+.PP
+.SS "#define V2SETDACS(src, icard)   memcpy(EACHDAC_BASE, (src)+(icard)*32, DAC_SAMPLE_SIZE)"
+.PP
+.SH "Function Documentation"
+.PP 
+.SS "static void appEnterLLC_SYNC_ECM (int icard, struct \fBMU\fP * mu, struct \fBTestDescription\fP * td)\fC [static]\fP"
+.PP
+set up LLCV2_INIT buffer and enter mode. 
+.PP
+Buffer set up as 4K block at offset 0 
+.PP
+\fBTodo\fP
+.RS 4
+
+.IP "\(bu" 2
+this overwrites settings from \fBinitV2Stats()\fP, initV2Stats is therefore redundant.
+.PP
+.RE
+.PP
+set up for single 4K buffer
+.PP
+uses V2 synchronization 
+.SS "static \fBu32\fP card_v1_WaitDmaDone (struct \fBCard\fP * card)\fC [static]\fP"
+.PP
+.SS "static \fBu32\fP card_v2_WaitDmaDone (struct \fBCard\fP * card)\fC [static]\fP"
+.PP
+.SS "static \fBu32\fP commandModifiers (struct \fBTestDescription\fP * td)\fC [static]\fP"
+.PP
+.SS "static void debug_prompt (int icard, int ibuf, \fBu32\fP addr)\fC [static]\fP"
+.PP
+promnpt user to ensure pram set (temporary pre-update measure). 
+.PP
+.SS "static int do_run (struct \fBTestDescription\fP * td, int soft_clock)\fC [static]\fP"
+.PP
+runs the test. 
+.PP
+PSEUDO-CODE:
+.PP
+.IP "\(bu" 2
+(1) Clear the latch timer
+.IP "\(bu" 2
+(2) Set a local memory target address and arm the capture
+.IP "\(bu" 2
+(3) Poll for counter running (hardware counter starts on external gate)
+.IP "\(bu" 2
+(4) Iterate for required number of samples:
+.IP "\(bu" 2
+(5) [optionally send a soft clock command] trigger an acquisition
+.IP "\(bu" 2
+(6) Wait for DMA Done - at this point data is available in target mem. A 'real' control application is probably getting most of its calcs done here rather than simply polling
+.IP "\(bu" 2
+(7) [Get the latch (sample) and current uSec counters from the boards - only if interested]
+.IP "\(bu" 2
+(8) Check the process has not stopped (external gate high)
+.IP "\(bu" 2
+(9) [optionally update the target address - else it gets overwritten]
+.IP "\(bu" 2
+(a) using DACS - preallocate a MFA for dac data.
+.IP "\(bu" 2
+(b) write data to host side buffer(f(MFA)) and post MFA
+.IP "\(bu" 2
+(b.1) take the incoming value on feedback_channel and propagate to all DACS. default is to assume HAWG on DAC0 (so feedback_channel better be 0 !), but td->update_dacs makes a better test.
+.IP "\(bu" 2
+(b.15) special case where we are DRIVING the initial DAC signal from host side.
+.IP "\(bu" 2
+(b.2) simple feedforward case - just drive all DACS from AWG pattern.
+.PP
+.PP
+.IP "\(bu" 2
+(c) later, pick up another MFA
+.IP "\(bu" 2
+(d) finally, return final set of MFA's. might be a good idea to ensure data is zero at this point
+.PP
+.PP
+(b.2) 
+.SS "static void doApplicationWork (struct \fBTestDescription\fP * td, \fBu32\fP offset)\fC [static]\fP"
+.PP
+.SS "static void doApplicationWork216 (struct \fBTestDescription\fP * td, \fBu32\fP offset)\fC [static]\fP"
+.PP
+.SS "void initCardResource (struct \fBCard\fP * card)"
+.PP
+.SS "void initV2Stats (struct \fBTestDescription\fP * td)"
+.PP
+.SS "static void mbox_updateTstats (\fBu32\fP cmd, struct \fBCard\fP * card, struct \fBTimingStats\fP * tstats)\fC [static]\fP"
+.PP
+.SS "static int measureBridge (struct \fBMU\fP * mu)\fC [static]\fP"
+.PP
+.SS "static int measureBridgeStats (struct \fBTestDescription\fP * td, struct \fBMU\fP * mu)\fC [static]\fP"
+.PP
+.SS "static void monitor_handler (int signum)\fC [static]\fP"
+.PP
+.SS "static void quit_handler (int signum)\fC [static]\fP"
+.PP
+.SS "static int runECM (struct \fBTestDescription\fP * td)\fC [static]\fP"
+.PP
+.SS "static int runSCM (struct \fBTestDescription\fP * td)\fC [static]\fP"
+.PP
+.SS "static int runSCM216 (struct \fBTestDescription\fP * td)\fC [static]\fP"
+.PP
+runs the test SCM mode, ACQ216 only. PSEUDO-CODE:
+.PP
+.IP "\(bu" 2
+(1) Clear the latch timer
+.IP "\(bu" 2
+(2) Set a local memory target address and arm the capture
+.IP "\(bu" 2
+(3) Poll for counter running (hardware counter starts on external gate)
+.IP "\(bu" 2
+(4) Iterate for required number of samples:
+.IP "\(bu" 2
+(5) [optionally send a soft clock command] trigger an acquisition
+.IP "\(bu" 2
+(6) Wait for DMA Done - at this point data is available in target mem. A 'real' control application is probably getting most of its calcs done here rather than simply polling
+.IP "\(bu" 2
+(7) [Get the latch (sample) and current uSec counters from the boards - only if interested]
+.IP "\(bu" 2
+(8) Check the process has not stopped (external gate high)
+.IP "\(bu" 2
+(9) [optionally update the target address - else it gets overwritten]
+.PP
+
+.SS "static int runSYNC_ECM (struct \fBTestDescription\fP * td, int soft_clock)\fC [static]\fP"
+.PP
+runs the test SYNC_ECM mode. 
+.PP
+PSEUDO-CODE:
+.PP
+.IP "\(bu" 2
+(1) Clear the latch timer
+.IP "\(bu" 2
+(2) Set a local memory target address and arm the capture
+.IP "\(bu" 2
+(3) Poll for counter running (hardware counter starts on external gate)
+.IP "\(bu" 2
+(4) Iterate for required number of samples:
+.IP "\(bu" 2
+(5) [optionally send a soft clock command] trigger an acquisition
+.IP "\(bu" 2
+(6) Wait for DMA Done - at this point data is available in target mem. A 'real' control application is probably getting most of its calcs done here rather than simply polling
+.IP "\(bu" 2
+(7) [Get the latch (sample) and current uSec counters from the boards - only if interested]
+.IP "\(bu" 2
+(8) Check the process has not stopped (external gate high)
+.IP "\(bu" 2
+(b) write data to host side buffer(LLCV2_AO_HSBS)
+.IP "\(bu" 2
+(b.1) take the incoming value on feedback_channel and propagate to all DACS. default is to assume HAWG on DAC0 (so feedback_channel better be 0 !), but td->update_dacs makes a better test.
+.IP "\(bu" 2
+(b.15) special case where we are DRIVING the initial DAC signal from host side.
+.IP "\(bu" 2
+(b.2) simple feedforward case - just drive all DACS from AWG pattern.
+.PP
+.PP
+(b.2) 
+.SS "int runTest (struct \fBTestDescription\fP * td)"
+.PP
+generic top level text exec. 
+.PP
+.SS "static void setAcq216Parameters (struct \fBTestDescription\fP * td, struct \fBLLC200_INIT\fP * buffer, int card, int iter)\fC [static]\fP"
+.PP
+configure card parameters for iteration iter 
+.PP
+.SS "void setupAbortHandler (struct \fBTestDescription\fP * td)"
+.PP
+.SS "void setupMonitor (int millisec)"
+.PP
+.SS "static void* td_get_next_dac_data (struct \fBTestDescription\fP * td)\fC [inline, static]\fP"
+.PP
+.SS "static void updateTargetAddr (\fBu32\fP cmd, struct \fBCard\fP * card, unsigned offset)\fC [inline, static]\fP"
+.PP
+.SS "static void v2_updateTstats (\fBu32\fP cmd, struct \fBCard\fP * card, struct \fBTimingStats\fP * tstats)\fC [static]\fP"
+.PP
+updates timing stats from embedded host buffer data 
+.PP
+.SH "Variable Documentation"
+.PP 
+.SS "const char* \fBcore_ident\fP = '$Revision: 1.1.4.19 $ B1102\\n'"
+.PP
+.SS "struct \fBTestDescription\fP* \fBS_td\fP\fC [static]\fP"
+.PP
+.SS "void(* \fBupdateTstats\fP)(\fBu32\fP cmd, struct \fBCard\fP *card, struct \fBTimingStats\fP *tstats)\fC [static]\fP"
+.PP
+\fBInitial value:\fP
+.PP
+.nf
+ 
+mbox_updateTstats
+.fi
+.SS "\fBu32\fP(* \fBwaitDmaDone\fP)(struct \fBCard\fP *c) = card_v1_WaitDmaDone\fC [static]\fP"
+.PP
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for llcontrol from the source code.

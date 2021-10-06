@@ -1,0 +1,16 @@
+#!/bin/bash
+
+. ../bin/acq200_knobs
+
+
+function master {
+    acq200set $1 master d3
+}
+
+function slave {
+    acq200set $1 slave d3
+}
+
+function lemo_master {
+    acq200set $1 lemo_master d3
+}

@@ -1,0 +1,367 @@
+/* ------------------------------------------------------------------------- */
+/* README for LLCONTROL ACQ216                                               */
+/* ------------------------------------------------------------------------- */
+/*   Copyright (C) 2005 Peter Milne, D-TACQ Solutions Ltd
+ *                      <Peter dot Milne at D hyphen TACQ dot com>
+                                                                               
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of Version 2 of the GNU Lesser Public License
+    as published by the Free Software Foundation;
+                                                                               
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+                                                                               
+    You should have received a copy of the GNU Lesser Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
+/* ------------------------------------------------------------------------- */
+
+$Header: /home/cvsroot/BASE/DTACQ/SRC/dt100/Linux/Apps/LOWLATENCY/Attic/README.ACQ216,v 1.1.2.12 2005/12/07 12:11:05 pgm Exp $
+
+ACQ216 differs from ACQ196, in that the burst length > 1.
+
+Currently a burst up to 32768 bytes is supported,
+
+16 channel x 1024 samples.
+08 channel x 2048 samples
+04 channel x 4096 samples.
+
+On board setup:
+boot time configuration scripts can take care of ACQ216 initial setup.
+Please ask D-TACQ to configure appropriate /ffs files.
+
+
+
+Description of the LLCONTROL application.
+----------------------------------------
+The LLCONTROL application is the D-TACQ REFERENCE APPLICATION to demonstrate the low latency mode of operation.
+
+We ask customers to use LLCONTROL to verify that the system works.
+LLCONTROL is supplied as "working example" source code, for use as a base in custom applications.
+
+LLCONTROL is NOT an end-user application. It is targeted at user who need
+to produce their own custom control applications, using low level programming techniques. 
+
+The code is annotated for use with Doxygen http://www.doxygen.org/index.html
+To generate the documentation, run "make doc" and then view 
+./html/files.html.
+
+Typically we would expect that:
+
+llcontrol.c - the "User Interface" - this will be replaced entirely
+llcontrol-core.c - the "Engine" - customers should replicate core loop functionality. Pick the appropriate doRun() function and use it as a base.
+other *.[ch] - form a "library", implementing the communication protocol. Custom apps should link to these modules to obtains protocol services.
+
+Data analysis
+-------------
+
+LLCONTROL _does_ _not_ perform "real time control", but it has the capability of logging captured data to file. D-TACQ make extensive use of gnu-octave 
+http://www.octave.org/ for data analysis, and a number of octave scripts are provided for data analysis (described later in this README).
+
+Basic LLCONTROL
+---------------
+
+Always runs "SCM" - this means Software trigger.
+Please ensure ACQ216 environment variable is SET
+export ACQ216=1
+
+For ACQ216HS: substitute the following environment variable:
+export ACQ216HS=1
+***************
+
+All examples assume that $PWD=the LLCONTROL base directory
+
+Parameter setting with LLCONTROL
+--------------------------------
+
+Certain parameters may be set on each trigger.
+The parameter list is defined in acq32busprot.h
+Essentially, an LLC200_INIT structure should be overlaid on the host slave buffer before sending the soft trigger.
+
+The parameters are loaded at the start from a previously generated binary file, with one record per sample.
+
+./llcontrol --prams PRAMSFILE
+
+PRAMSFILE may be generated using the build_prams utility.
+
+Currently build_prams can build data sets with
+
+--dds_ftw : a set of FTW values, derived from an FTWTEXT file
+--intclk  : a set of INTCLK values, derived from an INTCLK file.
+--M5range : a set of M5 RANGE consts. 
+--M5offset: a set of M5 offset vectors
+--M2range : a set of M2 RANGE consts.
+--dds_qdac : a set of QDAC variables
+(used by D-TACQ to find optimum mark:space ratio in antiphase sampling. Not really for customer use).
+
+Loading from file is a convenience for the LLCONTROL application.
+Your application may choose to do this, or you may choose to build the record on the fly. Here we prefer the pre cooked file because it is efficient, and may be extended/modified without affecting the test application.
+.
+INTCLK file:  a set of clock values, integer decimal hz, ascii, one per line:
+
+FTWTEXT file: a set of FTW values, a 12 digit hexadecimal string, one per line.
+
+
+
+For example, I generated an FTWTEXT file using octave:
+
+octave
+octave:1> a=1000:2000;
+octave:2> a *= 1000
+octave:3> fd = fopen("ramp1m2m.txt","w");
+octave:4> for ix = 1:1000
+> fprintf(fd, "%d\n", a(ix));
+> endfor
+octave:5> fclose(fd)
+octave:6> exit
+[pgm@islay OCTAVE]$ more ramp1m2m.txt
+1000000
+1001000
+
+
+The dds utility can generate a series of FTW1 strings:
+
+./PRAMS/bin/dds <ramp1m2m.txt -o - >ramp1m2m.ftw1.txt
+
+[pgm@islay OCTAVE]$ more ramp1m2m.ftw1.txt
+00F83E0F83E1
+00F87D9C54A7
+00F8BD29256D
+
+
+
+## NB: dds is shipped as a binary, as it is difficult to build statndalone
+## The same binary is available on the target.
+
+Finally, use build_prams to generate binary parameter data for use with 
+LLCONTROL:
+
+
+./build_prams --dds_ftw PRAMS/ramp1m2m.ftw1.txt -o PRAMS/ftw.bin
+./build_prams --intclk  PRAMS/ramp1m2m.txt -o PRAMS/intclk.bin
+
+
+NB: for neatness, we use the convention of building prams files in the 
+PRAMS subdirectory.
+
+# Here is another actual example:
+
+[pgm@islay LOWLATENCY]$ ./PRAMS/bin/dds <PRAMS/rampfast60\:80 -o - >PRAMS/rampfast60:80.ftw
+[pgm@islay LOWLATENCY]$ ./build_prams --dds_ftw PRAMS/rampfast60:80.ftw -o PRAMS/rampfast60:80.bin
+[pgm@islay LOWLATENCY]$ ./PRAMS/bin/dump.prams PRAMS/rampfast60:80.bin | cut -c -80 | head
+marker,mask,dds_ftw[8],range[4],offsets[16],trig,channel_mask,int_clk
+200cafe0,00000001,3a2e8ba2e8bb0000,0000000000000000, {0000,0000,0000,0000,0000,0
+200cafe0,00000001,3b26c9b26c9c0000,0000000000000000, {0000,0000,0000,0000,0000,0
+200cafe0,00000001,3c1f07c1f07d0000,0000000000000000, {0000,0000,0000,0000,0000,0
+200cafe0,00000001,3d1745d1745e0000,0000000000000000, {0000,0000,0000,0000,0000,0
+
+
+
+
+M5range : one line per shot, aggregate of all M5 range consts on line
+	The constants are defined in CONSTS/M5-consts.h, use the symbols
+	see example in CONSTS/M5-consts.dat
+
+./build_prams --M5range CONSTS/M5-consts.dat -o PRAMS/M5-vranges.bin
+
+M2range : ditto M5range, but use symbols from CONSTS/M2-consts.h
+
+M5offset: 16 decimal values per line, range -2048 .. + 2047.
+	Example PRAMS/offsetramps, generated by PRAMS/make-offset-ramps.
+	
+
+./build-prams --M5offset PRAMS/offsetramps -o PRAMS/offsetramps.bin	
+
+
+
+A formatted dump utility is provided for viewing the data:
+
+pgm@islay LOWLATENCY]$ ./PRAMS/bin/dump.prams PRAMS/rampfast.ftw.bin \
+	 | cut -c -70
+marker,mask,dds_ftw[8],range[4],offsets[16],trig,channel_mask,int_clk
+200cafe0,00000001,00f83e0f83e10000,0000000000000000,000000000000000000
+200cafe0,00000001,01f07c1f07c20000,0000000000000000,000000000000000000
+200cafe0,00000001,02e8ba2e8ba30000,0000000000000000,000000000000000000
+200cafe0,00000001,03e0f83e0f840000,0000000000000000,000000000000000000
+200cafe0,00000001,04d9364d93650000,0000000000000000,000000000000000000
+200cafe0,00000001,05d1745d17460000,0000000000000000,000000000000000000
+200cafe0,00000001,06c9b26c9b270000,0000000000000000,000000000000000000
+200cafe0,00000001,07c1f07c1f080000,0000000000000000,000000000000000000
+200cafe0,00000001,08ba2e8ba2e90000,0000000000000000,000000000000000000
+200cafe0,00000001,09b26c9b26ca0000
+
+
+# Once you have PRAMS, how do you use it? 
+# running llcontrol -- ./llcontrol --help
+
+
+# a series of "job" files have been set up in PRAMS/jobs:
+# CHECK that the BD number matches the slot# of your board, then just run:
+
+# eg, on our VMIC system, ACQ216 BoardD is in slot 3:
+
+export BD=3;
+./PRAMS/JOBS/job4
+
+
+Currently defined JOBS are:
+
+PRAMS/JOBS/job1 : test 2 channel antiphase mode, clock 60..80M 
+(effective sample rate 120..160MSPS).
+PRAMS=PRAMS/rampfast60\:80.bin SHOTS=20 NSAM=4096 NCHAN=2
+
+PRAMS/JOBS/job2 : test 4 channel regular mode, clock 60..80M
+PRAMS=PRAMS/rampfast60\:80.bin SHOTS=20 NSAM=4096 NCHAN=4
+
+PRAMS/JOBS/job3 : test 4 channel regular mode using a slow clock ramp
+PRAMS=PRAMS/rampfast.ftw.bin SHOTS=20 NSAM=4096 NCHAN=4
+
+PRAMS/JOBS/job4 : test voltage range settings for 4 channels
+PRAMS=PRAMS/M5-vranges.bin SHOTS=20 NSAM=4096 NCHAN=4
+
+PRAMS/JOBS/job5 : test voltage range settings for 12 channels
+PRAMS=PRAMS/M5-vranges.bin SHOTS=20 NSAM=1024 NCHAN=12
+
+PRAMS/JOBS/job6 : test 8 channel mode
+PRAMS=PRAMS/rampfast.ftw.bin SHOTS=20 NSAM=1024 NCHAN=8
+
+PRAMS/JOBS/jobQ : scan the clock mark:space range to find optimum 
+PRAMS=PRAMS/qdac161_300.bin NCHAN=4 NSAM=4096 SHOTS=140
+
+
+For reliability testing, we run jobs in a loop
+
+eg
+forxv 1000 ./PRAMS/JOBS/job2
+
+
+# viewing the data: by default llcontrol outputs to a data file.
+# we use gnu-octave to analyse and view data.
+# the process_llc script builds data sets for a single channel
+# see process_llc for details
+
+octave -fp PRAMS/OCTAVE:
+octave>[psx, chx, chx_plot] = process_llc(file,shots,samples,channels,offset);
+
+
+
+
+
+
+
+**************************************************************************
+
+# ACQ216HS : now things get a little bit tricky :-)
+# Hardware modification:
+# ADC sites 1:8 : 80MSPS parts.
+# Channel Mask 0000111100000000 : 4 x 80MSPS mode
+
+acqcmd setChannelMask 0000111100000000
+
+# Channel Mask 1111000000000000   2 x 160MSPS, antiphase mode.
+
+acqcmd setChannelMask 1111000000000000
+set.dtacq antiphase 1
+
+## LLCONTROL will now configure the parameters correctly
+
+export ACQ216HS=1
+NCHAN=2 selects 2 x 160MSPS mode on channels 01+02, 03+04
+NCHAN=4 selects 4 x 80MSPS mode on channels 05..08
+NCHAN=8 selects 8 x 25MSPS mode on channels 05..12
+NCHAN=12 selects 12 x 16MSPS mode on channels 05..16
+
+# Then things get interesting.
+# First, as before the data is delivered in raw channel order, so the
+# mapping from get.dtacq channel_mapping must be applied to get physical
+# channel order.
+# NB: this mapping changes with channel mask, and antiphase mode.
+# Second, in antiphase mode, it's critical that the component data streams
+# match in both vertical scale (voltage) and horizontal (time).
+# Fortunately we can adjust the time matching by adjusting the mark:space
+# ratio from the DDS. This is built into every card's boot data.
+# But, for voltage matching the data must be calibrated.
+# Before data is taken, the host software needs to know the calibration factors
+# for every channel, for every shot in the sequence.
+
+# We can gather this information beforehand using a "dummy run" :
+PRAMS=PRAMS/rampfast60:80.bin NSAM=2048 SHOTS=10 NCHAN=4 ./get.cal.job
+
+# NB: "Dummy run" only needed for case where input voltage range VIN varies in-job
+# for job where VIN is fixed, it is only necessary to record the current value:
+acqcmd -s $BD get.vin >vin.log
+
+# Next, vin.log needs to be processed for use by octave:
+# Here we use the convention "vin20.log" to indicate 20 shots in the log.
+
+./PRAMS/bin/cook-a-vin /tmp/vin20.log
+
+[peter@rhum LOWLATENCY]$ cd PRAMS
+[peter@rhum PRAMS]$ ./bin/cook-a-vin /tmp/vin20.log
+source file /tmp/vin20.log source_base /tmp/vin20 ofile /tmp/vin20.octave
+
+# now get your data:
+
+octave -fp ./PRAMS/OCTAVE/:
+octave:1> interleave_4channels
+functions load_calvin(), interleave(), process_shot() defined
+octave:2> calvin=load_calvin('/tmp/vin20.octave');
+
+octave:4> [v2,v1] = interleave(
+	'/tmp/dds.ftw-10-4-2048.3.userbuf',
+	10,2048,4,
+	calvin);
+
+# For the case channels==4:
+# v1 is the channels 1:4, non interleaved
+# v2 is A:B, interleaved
+
+# plot shot 1, channel A (256 points for clearer plot).
+plot(vec(v1(1,1,1:256)))
+#plot shot1, channel A+B
+plot([vec(v2(1,1,1:256)),vec(v2(1,2,1:256))])
+
+# pull in the analysis code - this is the D-TACQ standard analysis packaged
+# in the file ffta.m
+ffta
+
+# analyse the data, shot1, channel A
+octave:9> [freq ,db] = fftanalysis_local(vec(v2(1,1,:)), 60000000, 'gashfile',0,0);
+FS:6.000e+07 Hz F0:1.102e+07 Hz SNR =  25.74dB SINAD =  25.37dB THD = -36.26dB SFDR =  37.91dBFS
+
+# plot the spectrum
+octave:10> plot(freq, db)
+
+# analyse all the data
+
+
+octave:13> for shot=1:20
+> fftanalysis_local(vec(v2(shot,1,:)), (60+shot)*1000000, sprintf("shot.%02d.", shot),0,0);
+> endfor
+FS:6.100e+07 Hz F0:1.120e+07 Hz SNR =  25.74dB SINAD =  25.37dB THD = -36.26dB SFDR =  37.91dBFS
+FS:6.200e+07 Hz F0:1.120e+07 Hz SNR =  25.82dB SINAD =  24.99dB THD = -32.55dB SFDR =  38.04dBFS
+FS:6.300e+07 Hz F0:1.120e+07 Hz SNR =  25.38dB SINAD =  24.91dB THD = -34.82dB SFDR =  35.72dBFS
+FS:6.400e+07 Hz F0:1.119e+07 Hz SNR =  25.18dB SINAD =  24.82dB THD = -35.87dB SFDR =  37.47dBFS
+FS:6.500e+07 Hz F0:1.119e+07 Hz SNR =  25.84dB SINAD =  25.33dB THD = -34.82dB SFDR =  38.31dBFS
+FS:6.600e+07 Hz F0:1.118e+07 Hz SNR =  25.88dB SINAD =  25.08dB THD = -32.84dB SFDR =  37.27dBFS
+FS:6.700e+07 Hz F0:1.119e+07 Hz SNR =  25.83dB SINAD =  -4.51dB THD =   4.51dB SFDR =  37.04dBFS
+FS:6.800e+07 Hz F0:1.117e+07 Hz SNR =  26.12dB SINAD =  24.90dB THD = -31.01dB SFDR =  36.26dBFS
+FS:6.900e+07 Hz F0:1.119e+07 Hz SNR =  25.55dB SINAD =  24.86dB THD = -33.18dB SFDR =  36.63dBFS
+FS:7.000e+07 Hz F0:1.118e+07 Hz SNR =  25.36dB SINAD =  24.79dB THD = -33.85dB SFDR =  35.29dBFS
+FS:7.100e+07 Hz F0:1.118e+07 Hz SNR =  25.27dB SINAD =  24.79dB THD = -34.65dB SFDR =  35.56dBFS
+FS:7.200e+07 Hz F0:1.118e+07 Hz SNR =  25.25dB SINAD =  24.99dB THD = -37.43dB SFDR =  36.49dBFS
+FS:7.300e+07 Hz F0:1.117e+07 Hz SNR =  25.65dB SINAD =  24.96dB THD = -33.30dB SFDR =  36.25dBFS
+FS:7.400e+07 Hz F0:1.117e+07 Hz SNR =  25.91dB SINAD =  25.25dB THD = -33.73dB SFDR =  36.69dBFS
+FS:7.500e+07 Hz F0:1.117e+07 Hz SNR =  25.16dB SINAD =  24.55dB THD = -33.35dB SFDR =  35.89dBFS
+FS:7.600e+07 Hz F0:1.117e+07 Hz SNR =  25.86dB SINAD =  24.89dB THD = -31.86dB SFDR =  35.42dBFS
+FS:7.700e+07 Hz F0:1.117e+07 Hz SNR =  26.17dB SINAD =  24.98dB THD = -31.17dB SFDR =  36.33dBFS
+FS:7.800e+07 Hz F0:1.116e+07 Hz SNR =  25.71dB SINAD =  -3.02dB THD =   3.01dB SFDR =  35.70dBFS
+FS:7.900e+07 Hz F0:1.117e+07 Hz SNR =  25.63dB SINAD =  24.64dB THD = -31.52dB SFDR =  34.93dBFS
+FS:8.000e+07 Hz F0:1.115e+07 Hz SNR =  25.24dB SINAD =  24.76dB THD = -34.50dB SFDR =  34.91dBFS
+
+
+D-TACQ has some scripts for more extensive analysis, please contact D-TACQ for details
+
+

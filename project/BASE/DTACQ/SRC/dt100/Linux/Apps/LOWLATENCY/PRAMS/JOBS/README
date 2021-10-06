@@ -1,0 +1,13 @@
+# JOBS
+# sample test shots for various scenarios
+# run from base directory
+
+# ensure board number is correct for your installation
+# eg
+BD=7 ./PRAMS/JOBS/job4
+
+# get.cal.job collects all voltage input ranges for a PRAMS file PRAMS
+
+BD=7 ./PRAMS/JOBS/get.cal.job
+
+

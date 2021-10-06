@@ -1,0 +1,2 @@
+#!/bin/bash
+PRAMS=PRAMS/qdac161_300.bin NCHAN=4 NSAM=4096 SHOTS=140 ${0%*`basename $0`}job

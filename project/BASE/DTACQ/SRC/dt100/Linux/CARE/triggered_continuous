@@ -1,0 +1,54 @@
+#!/bin/bash
+
+BN=${1:-37}   			;# set board number - default 37
+INTCLK=${2:-250000} 		;# set int clk - default 250K
+PRE=${3:-102400}
+POST=${4:-102400}
+
+
+rsh() {
+	#echo 
+	acqcmd -f /dev/acq200/acq200.$BN.rsh-to $*
+}
+
+cmd() {
+	#echo 
+	acqcmd -b $BN $*
+}
+
+
+
+
+cmd setAbort
+# rsh BUG: needs to get some data coming back or it hangs
+# workaround: combine set with query
+rsh 'set.route D0 in mezz out;get.route'
+echo disable TRG
+rsh 'set.route D3 in fpga out;get.route'
+rsh 'set.route D3 in mezz out fpga;get.route'
+# event handling - only event0 supported for now
+rsh 'set.event event0 DI3 falling;get.event event0'
+cmd setInternalClock $INTCLK
+cmd getInternalClock
+cmd setModeTriggeredContinuous $PRE $POST
+cmd setArm
+sleep 1
+cmd -v 2 --until ST_STOP
+
+cmd getState
+cmd getNumSamples
+
+#test abort if no trigger - NB eth setAbort currently only good to 200kHz.
+#sleep 1
+#cmd setAbort
+
+cmd getNumSamples
+
+#for ch in 01 02 95 96
+for ch in 01 96
+do
+	time dd if=/dev/acq32/acq32.$BN.$ch of=/dev/null bs=4096
+done
+
+cmd getNumSamples
+

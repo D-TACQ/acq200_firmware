@@ -1,0 +1,72 @@
+.TH "TimingStats" 3 "1 Dec 2005" "llcontrol" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+TimingStats \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <llcontrol.h>\fP
+.PP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "int \fBiter\fP"
+.br
+.ti -1c
+.RI "\fBu32\fP \fBtlatch\fP"
+.br
+.RI "\fIiteration. \fP"
+.ti -1c
+.RI "\fBu32\fP \fBtinst\fP"
+.br
+.RI "\fITlatch: time the adc was clocked at. \fP"
+.ti -1c
+.RI "\fBu32\fP \fBtprocess\fP"
+.br
+.RI "\fITinst: time the counter was read at. \fP"
+.ti -1c
+.RI "int \fBhb_poll\fP"
+.br
+.RI "\fIProcess time on target. \fP"
+.ti -1c
+.RI "int \fBtarget_poll\fP"
+.br
+.RI "\fIHost buffer poll count. \fP"
+.ti -1c
+.RI "\fBu32\fP \fBtest_points\fP [MAXTEST]"
+.br
+.in -1c
+.SH "Field Documentation"
+.PP 
+.SS "int \fBTimingStats::hb_poll\fP"
+.PP
+Process time on target. 
+.PP
+.SS "int \fBTimingStats::iter\fP"
+.PP
+.SS "int \fBTimingStats::target_poll\fP"
+.PP
+Host buffer poll count. 
+.PP
+first card, indicates amount of slack time other cards, should be small
+.SS "\fBu32\fP \fBTimingStats::test_points\fP[MAXTEST]"
+.PP
+.SS "\fBu32\fP \fBTimingStats::tinst\fP"
+.PP
+Tlatch: time the adc was clocked at. 
+.PP
+.SS "\fBu32\fP \fBTimingStats::tlatch\fP"
+.PP
+iteration. 
+.PP
+.SS "\fBu32\fP \fBTimingStats::tprocess\fP"
+.PP
+Tinst: time the counter was read at. 
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for llcontrol from the source code.

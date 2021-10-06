@@ -1,0 +1,51 @@
+#!/bin/bash
+# wav232.load - loads acq200 device driver
+
+
+
+# if not in same dir as script, go to std prod dir and try there
+
+if [ ! -f wav232.load ]; 
+then
+    cd /home/dt100/modules
+fi
+
+module="acq200-drv"
+device="wav232"
+group="wheel"
+mode="a+rw"
+
+root="/dev/wav232"
+
+# add any custom prams here
+
+acq32_prams=
+acq32_boot_prams=`./cmdline_lookup acq32_ print_keyvalue_pair`
+
+echo "acq32 driver custom prams $acq32_prams $acq32_boot_prams"
+
+# load driver here, quit on fault
+
+/sbin/insmod ${module}.o $acq32_prams $acq32_boot_prams $* || exit 1
+
+
+# and now build all the device nodes
+rm -Rf /dev/acq200;mkdir /dev/acq200
+rm -Rf /dev/wav232;mkdir /dev/wav232
+
+
+
+slotbased=`./cmdline_lookup acq32.load_order`
+
+# script root procroot model slotbased [test]
+./wav232-mknod.pl $root /proc acq200 $slotbased
+ 
+chgrp -R $group $root /dev/acq200/*
+chmod -R $mode  $root /dev/acq200/*
+
+./wav232-init.pl $root /proc acq200 $slotbased
+
+
+
+
+

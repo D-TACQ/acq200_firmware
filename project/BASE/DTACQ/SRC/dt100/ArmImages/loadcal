@@ -1,0 +1,11 @@
+#!/bin/sh
+# load cal $1 is the cal file name
+
+serial=$1
+shift
+
+name=$serial/`date +%y%m%d`
+
+pfmu $* 'delete 2'
+pfmu $* 'deleteblock 18'
+pfmu $* "program 2 $name $serial.axf 18"

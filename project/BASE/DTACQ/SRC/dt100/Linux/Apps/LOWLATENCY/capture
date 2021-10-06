@@ -1,0 +1,58 @@
+#!/bin/bash
+
+
+CARDS=$1
+NC=$2
+NSAM=$3
+OUTFILE=${OUTFILE:-/tmp/aidat}
+shift;shift;shift
+
+CARDL="`echo $CARDS | sed -e 's/,/ /g'`"
+
+HBP="--hbpoll -W"
+DAC="--dacs aoramps"
+
+set -x
+./llcontrol -b $CARDS -o $OUTFILE \
+	$HBP $DAC -t --bigbuf --channels $NC -n $NSAM $@ >$OUTFILE.tlog
+set -
+
+# have a quick look see of the tstats
+echo iter : iteration
+echo tinst, tlatch, tprocess: normal timing
+echo tclock: tlatch[n] - tlatch[n-1]
+echo hpol, tpoll : host buffer, target polling counts
+echo
+if [ $NSAM -gt 20 ]
+then
+    echo head:
+    head $OUTFILE.tlog;
+    echo tail:
+    tail $OUTFILE.tlog
+else
+    cat $OUTFILE.tlog
+fi
+
+# do some tests on the data
+for c in $CARDL
+do
+echo Post Process CARD $CARDL
+echo post shot data from dmabuf _should_ equal data copied in RT
+
+	cmp $OUTFILE.$c.dmabuf $OUTFILE.$c.userbuf
+
+echo collect a hexdump for further analysis
+
+	for typ in dmabuf userbuf
+	do
+		echo dump $c $typ
+		hexdump $OUTFILE.$c.$typ >$OUTFILE.$c.$typ.hxd
+	done
+
+echo channelize and look for flat lines
+
+	./channelize.196 $NC $NSAM $OUTFILE.$c.dmabuf ;# output: .ch
+	echo >&2 flatline $OUTFILE.$c.dmabuf.ch \
+                `./flatline $OUTFILE.$c.dmabuf.ch`
+done
+

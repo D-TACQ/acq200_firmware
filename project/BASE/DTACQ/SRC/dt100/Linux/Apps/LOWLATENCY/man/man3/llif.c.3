@@ -1,0 +1,342 @@
+.TH "llif.c" 3 "1 Dec 2005" "llcontrol" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+llif.c \- implementation of device driver interface for LLC. 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'local.h'\fP
+.br
+\fC#include <assert.h>\fP
+.br
+\fC#include 'llif.h'\fP
+.br
+\fC#include <stdio.h>\fP
+.br
+\fC#include <stdlib.h>\fP
+.br
+\fC#include <errno.h>\fP
+.br
+\fC#include <fcntl.h>\fP
+.br
+\fC#include <sys/ioctl.h>\fP
+.br
+\fC#include <sys/mman.h>\fP
+.br
+\fC#include <sys/stat.h>\fP
+.br
+\fC#include <sys/types.h>\fP
+.br
+\fC#include <unistd.h>\fP
+.br
+\fC#include 'acq32ioctl.h'\fP
+.br
+
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fBMU\fP"
+.br
+.ti -1c
+.RI "struct \fBSegmentMap\fP"
+.br
+.ti -1c
+.RI "struct \fBDmaBuffer\fP"
+.br
+.in -1c
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBUSE_IOCTL_DOC\fP   'NOT USE_IOCTL memory mapped - x86 only FAST'"
+.br
+.ti -1c
+.RI "#define \fBFNAME_FMT\fP   '/dev/acq32/acq32.%d.'"
+.br
+.ti -1c
+.RI "#define \fBFNAME_FMT_MBOX\fP   FNAME_FMT 'raw'"
+.br
+.ti -1c
+.RI "#define \fBFNAME_FMT_DMABUF\fP   FNAME_FMT '01'"
+.br
+.ti -1c
+.RI "#define \fBFNAME_FMT_HOST\fP   FNAME_FMT 'host'"
+.br
+.ti -1c
+.RI "#define \fBMAX_MAPPING\fP   0x00100000"
+.br
+.ti -1c
+.RI "#define \fBMAX_SEG\fP   0x00020000"
+.br
+.ti -1c
+.RI "#define \fBMAX_SEGMENTS\fP   (MAX_MAPPING/MAX_SEG)"
+.br
+.ti -1c
+.RI "#define \fBFN\fP   'mmapDmaBuffer() '"
+.br
+.ti -1c
+.RI "#define \fBACQ32_BIG_BUF_BASE\fP   \fBacq32_big_buf_base\fP"
+.br
+.ti -1c
+.RI "#define \fBACQ32_BIG_BUF_LEN\fP   \fBacq32_big_buf_len\fP"
+.br
+.ti -1c
+.RI "#define \fBFN\fP   'mmapDmaBuffer() '"
+.br
+.ti -1c
+.RI "#define \fBMARKER\fP   0xdeadbeef"
+.br
+.in -1c
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef volatile \fBu32\fP \fBr32\fP"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "int \fBsetMbox\fP (struct \fBMU\fP *m, int ibox, \fBu32\fP value)"
+.br
+.RI "\fIset a mail mbox register: ibox [0-3]. \fP"
+.ti -1c
+.RI "void \fBshowLastWrites\fP (struct \fBMU\fP *m)"
+.br
+.ti -1c
+.RI "int \fBsetMboxBits\fP (struct \fBMU\fP *m, int ibox, \fBu32\fP bits_to_set)"
+.br
+.RI "\fIjust set these bits. \fP"
+.ti -1c
+.RI "int \fBclrMboxBits\fP (struct \fBMU\fP *m, int ibox, \fBu32\fP bits_to_clr)"
+.br
+.RI "\fIjust clr these bits. \fP"
+.ti -1c
+.RI "int \fBsetMboxField\fP (struct \fBMU\fP *m, int ibox, \fBu32\fP field_mask, \fBu32\fP field_value)"
+.br
+.RI "\fIset the field in the register only. \fP"
+.ti -1c
+.RI "\fBu32\fP \fBgetMbox\fP (struct \fBMU\fP *m, int ibox)"
+.br
+.RI "\fIget contents of mailbox register: ibox [0-3] \fP"
+.ti -1c
+.RI "\fBu32\fP \fBgetMboxShadow\fP (struct \fBMU\fP *m, int ibox)"
+.br
+.RI "\fIget last contents of mailbox register: ibox [0-3] \fP"
+.ti -1c
+.RI "\fBu32\fP \fBpollMboxBits\fP (struct \fBMU\fP *m, int ibox, \fBu32\fP mask, \fBu32\fP goal)"
+.br
+.RI "\fIreturn when any of the bits become true. \fP"
+.ti -1c
+.RI "void \fBsetMboxPollcount\fP (struct \fBMU\fP *m, int poll_count)"
+.br
+.ti -1c
+.RI "int \fBgetMboxPollcount\fP (struct \fBMU\fP *m)"
+.br
+.ti -1c
+.RI "\fBMU\fP * \fBmmapMbox\fP (int iboard)"
+.br
+.RI "\fIiboard [1-3]. \fP"
+.ti -1c
+.RI "int \fBgetDmaBufferLen\fP (struct \fBDmaBuffer\fP *\fBbuffer\fP)"
+.br
+.ti -1c
+.RI "\fBDmaBuffer\fP * \fBmmapDmaBuffer\fP (int iboard, unsigned nbytes)"
+.br
+.ti -1c
+.RI "\fBu32\fP \fBgetBusAddr\fP (struct \fBDmaBuffer\fP *d, \fBu32\fP offset)"
+.br
+.ti -1c
+.RI "\fBu32\fP * \fBgetVaddr\fP (struct \fBDmaBuffer\fP *db, \fBu32\fP offset)"
+.br
+.ti -1c
+.RI "void \fBacq32_enableInts\fP (struct \fBMU\fP *mbx, unsigned mask)"
+.br
+.ti -1c
+.RI "void \fBacq32_maskInts\fP (struct \fBMU\fP *mbx, unsigned mask)"
+.br
+.ti -1c
+.RI "static void \fB_getBigBufPrams\fP ()"
+.br
+.ti -1c
+.RI "static void \fBgetBigBufPrams\fP ()"
+.br
+.ti -1c
+.RI "static void \fBacq196_get_physical\fP (int fd, struct \fBDmaBuffer\fP *d)"
+.br
+.ti -1c
+.RI "\fBDmaBuffer\fP * \fBmmapBigBuffer\fP (int iboard, unsigned nbytes)"
+.br
+.ti -1c
+.RI "void \fBmmapValidateDmaBuffer\fP (struct \fBMU\fP *m, int nsamples)"
+.br
+.ti -1c
+.RI "static void \fBudelay\fP (int usecs)"
+.br
+.ti -1c
+.RI "void \fBhbPrimeBuffer\fP (struct \fBDmaBuffer\fP *buf)"
+.br
+.ti -1c
+.RI "void \fBhbPrimePoll\fP (struct \fBDmaBuffer\fP *buf, int offset, int sample_len)"
+.br
+.ti -1c
+.RI "int \fBhbPoll\fP (struct \fBDmaBuffer\fP *buf, int offset, int sample_len)"
+.br
+.ti -1c
+.RI "\fBMFA\fP \fBmu_reserveOutbound\fP (struct \fBMU\fP *mu)"
+.br
+.RI "\fII2O Q ports: OUTBOUND: host reserves free MFA, puts MFA as command INBOUND: host gets message MFA, replaces MFA when done. \fP"
+.ti -1c
+.RI "int \fBmu_putOutbound\fP (struct \fBMU\fP *mu, \fBMFA\fP mfa)"
+.br
+.ti -1c
+.RI "\fBMFA\fP \fBmu_getInbound\fP (struct \fBMU\fP *mu)"
+.br
+.ti -1c
+.RI "int \fBmu_returnInbound\fP (struct \fBMU\fP *mu, \fBMFA\fP mfa)"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "static int \fBacq32_big_buf_base\fP"
+.br
+.ti -1c
+.RI "static int \fBacq32_big_buf_len\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+implementation of device driver interface for LLC. 
+
+define USE_IOCTL to use ioctls to access mbox. this is slow, but guaranteed portable
+.PP
+if undefined, memory mapped accesss is used - much faster, but x86 only
+.SH "Define Documentation"
+.PP 
+.SS "#define ACQ32_BIG_BUF_BASE   \fBacq32_big_buf_base\fP"
+.PP
+.SS "#define ACQ32_BIG_BUF_LEN   \fBacq32_big_buf_len\fP"
+.PP
+.SS "#define FN   'mmapDmaBuffer() '"
+.PP
+.SS "#define FN   'mmapDmaBuffer() '"
+.PP
+.SS "#define FNAME_FMT   '/dev/acq32/acq32.%d.'"
+.PP
+.SS "#define FNAME_FMT_DMABUF   FNAME_FMT '01'"
+.PP
+.SS "#define FNAME_FMT_HOST   FNAME_FMT 'host'"
+.PP
+.SS "#define FNAME_FMT_MBOX   FNAME_FMT 'raw'"
+.PP
+.SS "#define MARKER   0xdeadbeef"
+.PP
+.SS "#define MAX_MAPPING   0x00100000"
+.PP
+.SS "#define MAX_SEG   0x00020000"
+.PP
+.SS "#define MAX_SEGMENTS   (MAX_MAPPING/MAX_SEG)"
+.PP
+.SS "#define USE_IOCTL_DOC   'NOT USE_IOCTL memory mapped - x86 only FAST'"
+.PP
+.SH "Typedef Documentation"
+.PP 
+.SS "typedef volatile \fBu32\fP \fBr32\fP"
+.PP
+.SH "Function Documentation"
+.PP 
+.SS "static void _getBigBufPrams ()\fC [static]\fP"
+.PP
+.SS "static void acq196_get_physical (int fd, struct \fBDmaBuffer\fP * d)\fC [static]\fP"
+.PP
+.SS "void acq32_enableInts (struct \fBMU\fP * mbx, unsigned mask)"
+.PP
+.SS "void acq32_maskInts (struct \fBMU\fP * mbx, unsigned mask)"
+.PP
+.SS "int clrMboxBits (struct \fBMU\fP * m, int ibox, \fBu32\fP bits_to_clr)"
+.PP
+just clr these bits. 
+.PP
+.SS "static void getBigBufPrams ()\fC [static]\fP"
+.PP
+.SS "\fBu32\fP getBusAddr (struct \fBDmaBuffer\fP * d, \fBu32\fP offset)"
+.PP
+.SS "int getDmaBufferLen (struct \fBDmaBuffer\fP * buffer)"
+.PP
+.SS "\fBu32\fP getMbox (struct \fBMU\fP * m, int ibox)"
+.PP
+get contents of mailbox register: ibox [0-3] 
+.PP
+.SS "int getMboxPollcount (struct \fBMU\fP * m)"
+.PP
+.SS "\fBu32\fP getMboxShadow (struct \fBMU\fP * m, int ibox)"
+.PP
+get last contents of mailbox register: ibox [0-3] 
+.PP
+.SS "\fBu32\fP* getVaddr (struct \fBDmaBuffer\fP * db, \fBu32\fP offset)"
+.PP
+.SS "int hbPoll (struct \fBDmaBuffer\fP * buf, int offset, int sample_len)"
+.PP
+.SS "void hbPrimeBuffer (struct \fBDmaBuffer\fP * buf)"
+.PP
+.SS "void hbPrimePoll (struct \fBDmaBuffer\fP * buf, int offset, int sample_len)"
+.PP
+.SS "struct \fBDmaBuffer\fP* mmapBigBuffer (int iboard, unsigned nbytes)"
+.PP
+.SS "struct \fBDmaBuffer\fP* mmapDmaBuffer (int iboard, unsigned nbytes)"
+.PP
+.SS "struct \fBMU\fP* mmapMbox (int iboard)"
+.PP
+iboard [1-3]. 
+.PP
+return mapping on success. 
+.SS "void mmapValidateDmaBuffer (struct \fBMU\fP * m, int nsamples)"
+.PP
+.SS "\fBMFA\fP mu_getInbound (struct \fBMU\fP * mu)"
+.PP
+.SS "int mu_putOutbound (struct \fBMU\fP * mu, \fBMFA\fP mfa)"
+.PP
+.SS "\fBMFA\fP mu_reserveOutbound (struct \fBMU\fP * mu)"
+.PP
+I2O Q ports: OUTBOUND: host reserves free MFA, puts MFA as command INBOUND: host gets message MFA, replaces MFA when done. 
+.PP
+NB: direction with respect to HOST!
+.SS "int mu_returnInbound (struct \fBMU\fP * mu, \fBMFA\fP mfa)"
+.PP
+.SS "\fBu32\fP pollMboxBits (struct \fBMU\fP * m, int ibox, \fBu32\fP mask, \fBu32\fP goal)"
+.PP
+return when any of the bits become true. 
+.PP
+.SS "int setMbox (struct \fBMU\fP * m, int ibox, \fBu32\fP value)"
+.PP
+set a mail mbox register: ibox [0-3]. 
+.PP
+return 0 on success 
+.SS "int setMboxBits (struct \fBMU\fP * m, int ibox, \fBu32\fP bits_to_set)"
+.PP
+just set these bits. 
+.PP
+.SS "int setMboxField (struct \fBMU\fP * m, int ibox, \fBu32\fP field_mask, \fBu32\fP field_value)"
+.PP
+set the field in the register only. 
+.PP
+.SS "void setMboxPollcount (struct \fBMU\fP * m, int poll_count)"
+.PP
+.SS "void showLastWrites (struct \fBMU\fP * m)"
+.PP
+.SS "static void udelay (int usecs)\fC [static]\fP"
+.PP
+.SH "Variable Documentation"
+.PP 
+.SS "int \fBacq32_big_buf_base\fP\fC [static]\fP"
+.PP
+.SS "int \fBacq32_big_buf_len\fP\fC [static]\fP"
+.PP
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for llcontrol from the source code.

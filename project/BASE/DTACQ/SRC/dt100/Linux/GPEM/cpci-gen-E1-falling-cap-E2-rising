@@ -1,0 +1,39 @@
+#!/bin/bash
+
+AIP1_LEN=1024
+AIP2_LEN=1000000
+AOP1_LEN=20000
+AOP2_LEN=0
+
+echo $0 'On Arm: AI=>P1'
+echo $0 'On Falling Edge Trig In: AI=>P2, AO=>P1 (cyclic)'
+
+acqcmd -v 1 << EOF
+resetGUT
+#
+setInternalClock 2000000
+setClock AI INTERNAL_CLOCK
+setClock AO INTERNAL_CLOCK
+setClock DO INTERNAL_CLOCK
+#
+setSyncRoute DI2 MI2
+#
+setPhase AI P1 $AIP1_LEN
+setPhase AI P2 $AIP2_LEN
+setEvent AI E1 EV_TRUE
+setEvent AI E2 EV_TRIGGER_FALLING DI2
+setEvent AI E3 EV_NONE
+#
+reserveAO $AOP1_LEN
+setPhase AO P1 $AOP1_LEN
+setPhase AO P2 $AOP2_LEN
+setEvent AO E1 EV_TRIGGER_FALLING DI2
+setEvent AO E2 EV_NONE
+setEvent AO E3 EV_TRUE
+EOF
+echo now copy your signal file eg
+echo 'cat AO/sin1000q.dat >/dev/acq32/acq32.1.AOfr'
+echo then
+echo acqcmd setArm
+echo give it a falling edge to trigger
+

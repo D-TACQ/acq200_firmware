@@ -1,0 +1,9 @@
+#!/bin/bash
+
+rm -f load-acq16.all load-acq32.all lca-loader.axf
+
+ln -s load66.all load-acq16.all
+ln -s load66.all load-acq32.all
+
+ln -s acq32-lca-loader.axf lca-loader.axf
+

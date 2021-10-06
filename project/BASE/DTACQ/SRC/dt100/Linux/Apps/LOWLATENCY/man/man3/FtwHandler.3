@@ -1,0 +1,41 @@
+.TH "FtwHandler" 3 "1 Dec 2005" "llcontrol" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+FtwHandler \- processes DDS Frequency Tuning Word.  
+
+.PP
+.SH SYNOPSIS
+.br
+.PP
+Inherits \fBInputLineHandler< struct LLC200_INIT >\fP.
+.PP
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBFtwHandler\fP ()"
+.br
+.ti -1c
+.RI "virtual void \fBhandleLine\fP (char myline[])"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+processes DDS Frequency Tuning Word. 
+.PP
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "FtwHandler::FtwHandler ()\fC [inline]\fP"
+.PP
+.SH "Member Function Documentation"
+.PP 
+.SS "virtual void FtwHandler::handleLine (char myline[])\fC [inline, virtual]\fP"
+.PP
+myline contains a sequence of 12 hex digits. output as 6 uchars
+.PP
+Reimplemented from \fBInputLineHandler< struct LLC200_INIT >\fP.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for llcontrol from the source code.

@@ -1,0 +1,61 @@
+.TH "MESSAGE" 3 "1 Dec 2005" "llcontrol" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+MESSAGE \- I2O message handling.  
+
+.PP
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <acq32busprot.h>\fP
+.PP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "\fBMessageHeader\fP \fBheader\fP"
+.br
+.ti -1c
+.RI "union {"
+.br
+.ti -1c
+.RI "   unsigned \fBshort\fP \fBsdata\fP [MESSAGE_DATA_LEN/sizeof(unsigned \fBshort\fP)]"
+.br
+.ti -1c
+.RI "   unsigned \fBldata\fP [MESSAGE_DATA_LEN/sizeof(unsigned)]"
+.br
+.ti -1c
+.RI "   char \fBcdata\fP [MESSAGE_DATA_LEN]"
+.br
+.ti -1c
+.RI "   \fBHOST_REQUEST_DATA_RECORD\fP \fBhrdr\fP [MESSAGE_HRDR_LEN]"
+.br
+.ti -1c
+.RI "} \fBpayload\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+I2O message handling. 
+.PP
+.SH "Field Documentation"
+.PP 
+.SS "char \fBMESSAGE::cdata\fP[MESSAGE_DATA_LEN]"
+.PP
+.SS "\fBMessageHeader\fP \fBMESSAGE::header\fP"
+.PP
+.SS "struct \fBHOST_REQUEST_DATA_RECORD\fP \fBMESSAGE::hrdr\fP[MESSAGE_HRDR_LEN]"
+.PP
+.SS "unsigned \fBMESSAGE::ldata\fP[MESSAGE_DATA_LEN/sizeof(unsigned)]"
+.PP
+.SS "union { ... } 
+	     \fBMESSAGE::payload\fP"
+.PP
+.SS "unsigned \fBshort\fP \fBMESSAGE::sdata\fP[MESSAGE_DATA_LEN/sizeof(unsigned \fBshort\fP)]"
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for llcontrol from the source code.

@@ -1,0 +1,9 @@
+#!/bin/bash
+# gen-P1-E2-rising
+
+E1="EV_TRUE"
+E2="EV_TRIGGER_RISING DI2"
+
+. ./genbody
+
+

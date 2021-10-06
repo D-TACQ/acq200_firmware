@@ -1,0 +1,2 @@
+#!/bin/bash
+PRAMS=PRAMS/rampfast60\:80.bin SHOTS=20 NSAM=4096 NCHAN=2 ${0%*`basename $0`}job

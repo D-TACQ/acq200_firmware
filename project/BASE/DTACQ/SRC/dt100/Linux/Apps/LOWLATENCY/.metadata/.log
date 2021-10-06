@@ -1,0 +1,27 @@
+!SESSION 2006-02-07 15:18:52.671 -----------------------------------------------
+eclipse.buildId=I20050401-1645
+java.version=1.5.0_04
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=linux, ARCH=x86, WS=gtk, NL=en_US
+Command-line arguments:  -os linux -ws gtk -arch x86 -data /home/pgm/PROJECTS/ACQ200/project/LOWLATENCY
+
+!ENTRY org.eclipse.team.cvs.core 4 0 2006-02-07 15:18:52.672
+!MESSAGE Project LLAPI does not contain CVS folder meta-information
+!STACK 1
+org.eclipse.team.internal.ccvs.core.CVSException: Project LLAPI does not contain CVS folder meta-information
+	at org.eclipse.team.internal.ccvs.core.CVSTeamProvider.setProject(CVSTeamProvider.java:158)
+	at org.eclipse.team.core.RepositoryProvider.mapNewProvider(RepositoryProvider.java:176)
+	at org.eclipse.team.core.RepositoryProvider.mapExistingProvider(RepositoryProvider.java:205)
+	at org.eclipse.team.core.RepositoryProvider.getProvider(RepositoryProvider.java:473)
+	at org.eclipse.team.internal.ccvs.ui.CVSLightweightDecorator.getCVSProviderFor(CVSLightweightDecorator.java:124)
+	at org.eclipse.team.internal.ccvs.ui.CVSLightweightDecorator.decorate(CVSLightweightDecorator.java:161)
+	at org.eclipse.ui.internal.decorators.LightweightDecoratorDefinition.decorate(LightweightDecoratorDefinition.java:220)
+	at org.eclipse.ui.internal.decorators.LightweightDecoratorManager$LightweightRunnable.run(LightweightDecoratorManager.java:65)
+	at org.eclipse.core.internal.runtime.InternalPlatform.run(InternalPlatform.java:1021)
+	at org.eclipse.core.runtime.Platform.run(Platform.java:757)
+	at org.eclipse.ui.internal.decorators.LightweightDecoratorManager.decorate(LightweightDecoratorManager.java:287)
+	at org.eclipse.ui.internal.decorators.LightweightDecoratorManager.getDecorations(LightweightDecoratorManager.java:273)
+	at org.eclipse.ui.internal.decorators.DecorationScheduler$2.run(DecorationScheduler.java:326)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:67)
+!SUBENTRY 1 org.eclipse.team.cvs.core 4 4 2006-02-07 15:18:52.674
+!MESSAGE Project LLAPI does not contain CVS folder meta-information

@@ -1,0 +1,9 @@
+cd /tmp
+acqcmd <<EOF
+setDIO --0------
+setDIO ---------
+setDIO --0------
+getDIO
+setDIO ---------
+EOF
+

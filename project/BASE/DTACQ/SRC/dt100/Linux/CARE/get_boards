@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# for another combination, first do eg export BOARDS="1 2 3"
+BOARDS=${BOARDS:-"1 2 3 4"}
+export BOARDS
+
+let "NBOARDS=0"
+
+for b in $BOARDS
+do
+	let "NBOARDS=$NBOARDS+1"
+done
+
+if [ $NBOARDS -eq 1 ]; then
+    for b in $BOARDS
+    do
+	MTRGBOARD=${MTRGBOARD:-$b}
+    done
+    MCLKBOARD=$MTRGBOARD;
+else
+    for b in $BOARDS
+    do
+	MTRGBOARD=${MTRGBOARD:-$b}
+	MCLKBOARD=$b                 ;# will end up different to MTRGBOARD
+    done
+fi
+

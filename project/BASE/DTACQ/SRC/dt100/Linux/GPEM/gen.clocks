@@ -1,0 +1,5 @@
+acqcmd setInternalClock 2000000
+acqcmd setClock AI DI0
+acqcmd setClock AO INTERNAL_CLOCK
+acqcmd setClock DO INTERNAL_CLOCK
+

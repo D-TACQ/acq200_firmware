@@ -1,0 +1,2 @@
+ch1=fetch8x(33);plot8(ch1);
+pause

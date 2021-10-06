@@ -1,0 +1,7 @@
+./MakeCalBin -s D1234567 -- - <boxcar.def 
+[pgm@lewis CAL]$                    
+[pgm@lewis CAL]$ 
+[pgm@lewis CAL]$ echo $HOME
+/home/pgm/BASE/DTACQ/SRC/dt100
+[pgm@lewis CAL]$ 
+

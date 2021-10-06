@@ -1,0 +1,30 @@
+#!/bin/bash
+# mode1 (and 2) - digital trigger
+
+. get_boards
+. acqcmd_all
+
+CLK=${1:-2000000}
+PRE=${2:-1024}
+PST=${3:-22000}
+TRG=${4:-DI2}
+
+acqcmd -b 1 setInternalClock $CLK DO3
+acqcmd_allx setExternalClock DI0
+acqcmd_allx clearThresholds
+acqcmd_allx setDistributor NORMAL
+
+acqcmd_allx setModeTriggeredContinuous $PRE $PST $TRG
+
+acqcmd_allx setArm
+
+acqcmd -b 1 --until ST_RUN
+acqcmd_all getState | joinup $NBOARDS
+sleep 1
+acqcmd_allx setAbort
+acqcmd -b 1 --until ST_STOP
+
+acqcmd_all getState | joinup $NBOARDS
+
+
+

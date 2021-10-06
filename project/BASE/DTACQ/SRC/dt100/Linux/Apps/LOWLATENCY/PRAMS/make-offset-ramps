@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+
+use strict;
+
+my $X1=-1024;
+my $X2=1024;
+my $step=128;
+
+
+for (my $xx = $X1; $xx <= $X2; $xx += $step){
+	for (my $ic = 0; $ic != 16; ++$ic){
+		my $sep = $ic == 15? "\n": ",";
+		printf("%5d%s", $xx, $sep);
+	}
+}
+
+

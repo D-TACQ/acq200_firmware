@@ -1,0 +1,27 @@
+#!/bin/bash
+# collect the calibration data for each shot defined by $PRAMS.
+# NB: ensure NCHAN will work at the frequency in question
+#     (NCHAN=4) at high frequencies
+# @todo - maybe NCHAN default 4 is safest?
+PRAMS=${PRAMS:-PRAMS/M5-vranges.bin}
+BD=${BD:-3}                               # we used slot 3
+NCHAN=${NCHAN:-4}
+
+export ACQ216=1
+let NSAM="`./PRAMS/bin/dump.prams $PRAMS | wc -l`"
+LOG=/tmp/vin${NSAM}.log
+echo NSAM $NSAM BOARD $BD LOG $LOG
+
+let nn=0
+rm -f $LOG
+touch $LOG
+
+while [ $nn -lt $NSAM ]
+do
+	./llcontrol -b $BD -t --hbpoll --bigbuf -n $nn -c $NCHAN --samples 512 --prams $PRAMS -O -W SCM 2>/dev/null | tail -n 1
+	acqcmd -s $BD get.vin >>$LOG
+	let nn="$nn+1"
+done
+
+echo $LOG created
+

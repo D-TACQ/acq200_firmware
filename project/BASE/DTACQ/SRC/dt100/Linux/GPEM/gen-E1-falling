@@ -1,0 +1,9 @@
+#!/bin/bash
+# gen-E1-falling
+
+E1="EV_TRIGGER_FALLING DI2"
+E3="EV_TRUE"
+
+. ./genbody
+
+

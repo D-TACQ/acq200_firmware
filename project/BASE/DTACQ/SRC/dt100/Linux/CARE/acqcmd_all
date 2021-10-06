@@ -1,0 +1,25 @@
+#!/bin/bash
+# acqcmd_all
+
+BOARDS=${BOARDS:-"1 2 3 4"}
+
+function acqcmd_all {
+	for board in $BOARDS
+	do 
+		acqcmd -b $board $@
+	done
+}
+
+function acqcmd_allx {
+	for board in $BOARDS
+	do
+		acqcmd -b $board $@ >/dev/null
+	done
+}
+
+if [ $# -ge 1 ]; then
+	prog=${0##*/}
+    	if [ "$prog" = "acqcmd_all" ]; then
+		$prog $*	;# not an include file - do something!
+	fi
+fi

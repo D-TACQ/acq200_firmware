@@ -1,0 +1,15 @@
+#!/bin/bash
+# set all DI as outputs
+# for all boards try 
+# for b in 1 2 3 4
+# do
+# ./set-all-pxi -b $b
+# done
+
+acqcmd $* <<EOF
+setSyncRoute DI0 PXI_TRIG0
+setSyncRoute DI1 PXI_TRIG1
+setSyncRoute DI2 PXI_TRIG2
+setSyncRoute DI3 PXI_TRIG3
+setSyncRoute DI4 PXI_TRIG4
+EOF

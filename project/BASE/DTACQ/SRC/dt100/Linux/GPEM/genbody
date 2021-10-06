@@ -1,0 +1,88 @@
+#!/bin/bash
+# genbody - general workfunction for gpem generation
+
+# Validate and set defaults
+
+# args [board] [data-file] [verbosity]
+
+#set -vx
+
+BN=${1:-1}
+DF=${2:-~dt100/AO/sin1000q.dat}
+VB=${3:-1}
+
+# function AO or DO valid, default AO
+
+FN=${FN:-AO}
+
+
+DEVROOT=/dev/acq32/acq32.${BN}
+
+# get the data set length
+
+if [ -f $DF ]; then
+	len=`wc -c $DF`
+	let LEN="${len% *}/4"
+	echo FILE length $LEN samples
+else
+	echo ERROR $DF is not a file
+	exit 1
+fi
+
+#compute phase lengths
+
+if [ "$P1" = "LENGTH" ]; then
+    P1=$LEN
+fi
+if [ "$P2" = "LENGTH" ]; then
+    P2=$LEN
+fi
+
+P2=${P2:-0}
+
+if [ "$P2" = "0" ]; then
+	echo P2 is zero, set P1 $LEN
+    P1=${P1:-$LEN}
+	if [ "$P1" = "0" ]; then
+		P1=$LEN;		#we have ways of forcing this
+	fi
+else
+	echo P2 non zero
+    P1=${P1:-0}
+fi
+
+# build destination device name
+
+if [ "$P1" != "0" ]; then
+    DD=${DD:-${DEVROOT}.${FN}fr}
+fi
+if [ "$P2" != "0" ];then
+    DD=${DD:-${DEVROOT}.${FN}f}
+fi
+
+E1=${E1:-EV_NONE}
+E2=${E2:-EV_NONE}
+E3=${E3:-EV_NONE}
+
+
+
+pushd /tmp
+
+# Command Script Starts here
+
+if [ "$FN" = "AO" ]; then
+    acqcmd -b $BN -v $VB reserveAO $LEN
+fi
+
+acqcmd -b $BN -v $VB <<EOF
+setPhase $FN P1 $P1
+setPhase $FN P2 $P2
+setEvent $FN E1 $E1
+setEvent $FN E2 $E2
+setEvent $FN E3 $E3
+EOF
+
+popd
+
+echo NOW cat $DF to $DD
+cat $DF > $DD

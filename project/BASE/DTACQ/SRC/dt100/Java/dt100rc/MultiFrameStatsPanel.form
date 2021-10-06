@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="MultiframeStatsPanel">
+  <grid id="29a3d" binding="panel" row-count="2" column-count="3" hgap="-1" vgap="-1">
+    <margin top="5" left="5" bottom="5" right="5"/>
+    <constraints>
+      <xy x="63" y="74" width="667" height="399"/>
+      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3"/>
+    </constraints>
+    <properties/>
+    <border type="etched" title="Multi Frame Stats"/>
+    <children>
+      <grid id="6a474" binding="topPanel" row-count="3" column-count="3" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
+        <constraints>
+          <xy x="11" y="26" width="645" height="125"/>
+          <grid row="0" column="0" row-span="1" col-span="3" vsize-policy="1" hsize-policy="3" anchor="0" fill="3"/>
+        </constraints>
+        <properties/>
+        <border type="etched"/>
+        <children>
+          <component id="afced" class="javax.swing.JLabel">
+            <constraints>
+              <xy x="105" y="12" width="54" height="15"/>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+            </constraints>
+            <properties>
+              <text value="Update #"/>
+            </properties>
+          </component>
+          <component id="dcad6" class="javax.swing.JLabel">
+            <constraints>
+              <xy x="190" y="12" width="25" height="15"/>
+              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+            </constraints>
+            <properties>
+              <text value="Path"/>
+            </properties>
+          </component>
+          <component id="ebfed" class="javax.swing.JLabel">
+            <constraints>
+              <xy x="2" y="54" width="88" height="15"/>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+            </constraints>
+            <properties>
+              <text value="Current Second"/>
+            </properties>
+          </component>
+          <component id="f03ed" class="javax.swing.JTextField" binding="currentNumber">
+            <constraints>
+              <xy x="105" y="51" width="75" height="22"/>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="0">
+                <preferred-size width="75" height="-1"/>
+              </grid>
+            </constraints>
+            <properties>
+              <editable value="false"/>
+            </properties>
+          </component>
+          <component id="824f6" class="javax.swing.JTextField" binding="previousNumber">
+            <constraints>
+              <xy x="105" y="93" width="75" height="22"/>
+              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="0">
+                <preferred-size width="75" height="-1"/>
+              </grid>
+            </constraints>
+            <properties>
+              <editable value="false"/>
+            </properties>
+          </component>
+          <component id="85e1f" class="javax.swing.JTextField" binding="currentSecond">
+            <constraints>
+              <xy x="190" y="51" width="453" height="22"/>
+              <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1">
+                <preferred-size width="400" height="-1"/>
+              </grid>
+            </constraints>
+            <properties>
+              <editable value="false"/>
+            </properties>
+          </component>
+          <component id="a2f8b" class="javax.swing.JTextField" binding="previousSecond">
+            <constraints>
+              <xy x="190" y="93" width="453" height="22"/>
+              <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1">
+                <preferred-size width="150" height="-1"/>
+              </grid>
+            </constraints>
+            <properties>
+              <editable value="false"/>
+            </properties>
+          </component>
+          <component id="ee1a4" class="javax.swing.JLabel">
+            <constraints>
+              <xy x="2" y="97" width="93" height="15"/>
+              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+            </constraints>
+            <properties>
+              <text value="Previous Second"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="e950c" binding="bottomPanel" row-count="7" column-count="2" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
+        <constraints>
+          <xy x="11" y="156" width="625" height="232"/>
+          <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="1" hsize-policy="1" anchor="0" fill="3"/>
+        </constraints>
+        <properties/>
+        <border type="etched"/>
+        <children>
+          <component id="b7f74" class="javax.swing.JLabel">
+            <constraints>
+              <xy x="2" y="8" width="63" height="15"/>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+            </constraints>
+            <properties>
+              <text value="MultiFrame"/>
+            </properties>
+          </component>
+          <component id="9c23b" class="javax.swing.JCheckBox" binding="isMF">
+            <constraints>
+              <xy x="112" y="5" width="21" height="21"/>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0"/>
+            </constraints>
+            <properties>
+              <enabled value="false"/>
+              <text value=""/>
+            </properties>
+          </component>
+          <component id="9bc7a" class="javax.swing.JLabel">
+            <constraints>
+              <xy x="2" y="110" width="29" height="15"/>
+              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+            </constraints>
+            <properties>
+              <text value="BLEN"/>
+            </properties>
+          </component>
+          <component id="1224a" class="javax.swing.JTextField" binding="blen">
+            <constraints>
+              <xy x="112" y="106" width="150" height="22"/>
+              <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="0">
+                <preferred-size width="150" height="-1"/>
+              </grid>
+            </constraints>
+            <properties>
+              <editable value="false"/>
+              <enabled value="true"/>
+            </properties>
+          </component>
+          <component id="381ea" class="javax.swing.JLabel">
+            <constraints>
+              <xy x="2" y="42" width="31" height="15"/>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+            </constraints>
+            <properties>
+              <text value="Jiffies"/>
+            </properties>
+          </component>
+          <component id="62c53" class="javax.swing.JLabel">
+            <constraints>
+              <xy x="2" y="76" width="42" height="15"/>
+              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+            </constraints>
+            <properties>
+              <text value="Pulse #"/>
+            </properties>
+          </component>
+          <component id="13125" class="javax.swing.JTextField" binding="jiffies">
+            <constraints>
+              <xy x="112" y="38" width="150" height="22"/>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="0">
+                <preferred-size width="150" height="-1"/>
+              </grid>
+            </constraints>
+            <properties>
+              <editable value="false"/>
+            </properties>
+          </component>
+          <component id="e64eb" class="javax.swing.JTextField" binding="pulseNumber">
+            <constraints>
+              <xy x="112" y="72" width="150" height="22"/>
+              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="0">
+                <preferred-size width="150" height="-1"/>
+              </grid>
+            </constraints>
+            <properties>
+              <editable value="false"/>
+            </properties>
+          </component>
+          <component id="4005e" class="javax.swing.JLabel">
+            <constraints>
+              <xy x="2" y="209" width="46" height="15"/>
+              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+            </constraints>
+            <properties>
+              <text value="Overrun"/>
+            </properties>
+          </component>
+          <component id="70d23" class="javax.swing.JCheckBox" binding="isOverrun">
+            <constraints>
+              <xy x="112" y="206" width="21" height="21"/>
+              <grid row="6" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0"/>
+            </constraints>
+            <properties>
+              <enabled value="false"/>
+              <text value=""/>
+            </properties>
+          </component>
+          <component id="11c91" class="javax.swing.JLabel">
+            <constraints>
+              <xy x="2" y="143" width="98" height="15"/>
+              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+            </constraints>
+            <properties>
+              <text value="Dropped Frames"/>
+            </properties>
+          </component>
+          <component id="818c" class="javax.swing.JTextField" binding="droppedFrames">
+            <constraints>
+              <xy x="112" y="140" width="150" height="22"/>
+              <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="0">
+                <preferred-size width="150" height="-1"/>
+              </grid>
+            </constraints>
+            <properties>
+              <editable value="false"/>
+            </properties>
+          </component>
+          <component id="752a" class="javax.swing.JLabel">
+            <constraints>
+              <xy x="2" y="176" width="100" height="15"/>
+              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+            </constraints>
+            <properties>
+              <text value="Accepted Frames"/>
+            </properties>
+          </component>
+          <component id="a154" class="javax.swing.JTextField" binding="acceptedFrames">
+            <constraints>
+              <xy x="112" y="173" width="150" height="22"/>
+              <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="0">
+                <preferred-size width="150" height="-1"/>
+              </grid>
+            </constraints>
+            <properties>
+              <editable value="false"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>

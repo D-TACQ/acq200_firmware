@@ -1,0 +1,216 @@
+/* ------------------------------------------------------------------------- */
+/* README for LLCONTROL                                                      */
+/* ------------------------------------------------------------------------- */
+/*   Copyright (C) 2004 Peter Milne, D-TACQ Solutions Ltd
+ *                      <Peter dot Milne at D hyphen TACQ dot com>
+                                                                               
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of Version 2 of the GNU Lesser Public License
+    as published by the Free Software Foundation;
+                                                                               
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+                                                                               
+    You should have received a copy of the GNU Lesser Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
+/* ------------------------------------------------------------------------- */
+
+Please view html doc at ./html/index.html, Main Page
+
+
+Test harness for testing llcontrol
+----------------------------------
+
+Standard test method is to use on ACQ196 in chassis to trigger another.
+
+
+Pre-requisites:
+--------------
+
+2 or more ACQ196 in chassis
+Host running Linux, driver loaded.
+
+Select a Master Board  MB (supplies clock and trigger)
+Select a Slave Board SB (exercises llcontrol).
+
+
+Ensure llc driver module loaded on target:
+-----------------------------------------
+
+acq2sh load.llc;acq2sh ls /dev/llc/  ;# should be non-empty
+
+
+Setting up clock and trigger.
+----------------------------
+For an auto triggered test setup, with a Master board triggering a 
+Slave board, please use supplied bash script.
+
+First dot run it so that it becomes part of your current session:
+
+
+. ./setup.clocks2 mb sb nc cb
+
+^ DOT SPACE DOT/setup.clocks
+
+mb: master board
+sb: slave board    ;# 0 : NO slave
+nc: num channels
+cb: clock board    ;# 0 : MB uses front panel
+                   ;# emulates external clock, trigger sources. 
+
+
+setup.clocks provides a number of shell functions:
+
+init_clocks : do this once to setup
+toggle_trigger : toggles trigger from master board (with 1 sec delay)
+run_llc     : runs llc
+run_llc_auto: runs llc in a 100x loop
+
+
+run_llc calls llcontrol with a lot of common options set.
+but you will have to add further options to complete the experiment.
+
+
+Example:
+
+
+. ./setup.clocks 4 2 64
+
+Set environment for Master 4, Slave 2, 64 channels.
+
+# one time setup:
+
+init_clocks
+
+# schedule a trigger and run a shot:
+
+toggle_trigger;run_llc -n 10 ECM 50
+
+
+
+Example with feedback:
+
+toggle_trigger;run_llc -n 1000 --dacs aoramps -F 0 -o /tmp/aidat ECM 50
+
+-n 1000 : 1000 shots
+--dacs aoramps : source dac data from local data file
+-F 0    : update DAC[0] ie AOO1 from data file. Copy AI01 to DAC02:16
+-o /tmp/aidat : store data post shot to this file
+
+ECM 50 : External Clock Master div 50
+
+
+Viewing the data: D-TACQ uses Octave. It's good and it's free:
+
+
+./channelize.196 64 1000 /tmp/aidat  ;# data munge helps octave
+octave
+octave:1> xx=fetchbs("/tmp/aidat.ch",1,32,1000);
+octave:2> plot(xx(1:100,1:4));
+## note on use of octave: user milne has a ~/.octaverc path set up to find the
+## fetchbs script. Other uses need to make sure they are in the same directory
+## as fetchbs (copy in LOWLATENCY/).
+
+
+
+
+
+Realtime
+--------
+
+Better realtime behaviour can be forced by masking interrupts.
+
+To mask at the target end:
+
+echo ffffffff >/dev/llc/imask
+
+To mask at the host end:
+
+use the llcontrol opt:
+
+-M ffff      ;# only masks 16 lines - may be enough for x86?.
+
+
+
+Running with front panel clock and trigger
+
+Assuming default routing set at crate start up run from fresh boot with :
+
+. ./setup.clocks 0 2 64 0
+
+Set environment for Slave 2, 64 channels, Master assumed previously set up,
+bring your own trigger.
+
+
+
+Raw Channel Ordering.
+
+AI data is in Raw channel order. 
+A lookup table to map to physical channel is provided on the embedded system at
+
+root@acq196_041 ~ #head /dev/dtacq/channel_mapping
+ 1  0
+ 2 16
+ 3  1
+ 4 17
+
+
+Maps physical channel to [word offset in memory]
+
+
+Embedded webpages. 
+------------------
+For setting up, it's strongly recommended to view the embedded webpages,
+especially dio.cgi.
+
+To forward the embedded port to your local machine:
+
+
+[pgm@islay pgm]$ ssh -f -C -N -L3280:192.168.0.3:80 milne@sherman.psfc.mit.edu
+milne@sherman.psfc.mit.edu's password:
+[pgm@islay pgm]$ ssh -f -C -N -L3180:192.168.0.2:80 milne@sherman.psfc.mit.edu
+milne@sherman.psfc.mit.edu's password:
+[pgm@islay pgm]$ ssh -f -C -N -L3080:192.168.0.1:80 milne@sherman.psfc.mit.edu
+milne@sherman.psfc.mit.edu's password:
+
+
+view on:
+
+http://localhost:3080/cgi-bin/dio.cgi
+http://localhost:3180/cgi-bin/dio.cgi
+http://localhost:3280/cgi-bin/dio.cgi
+
+
+
+
+Limits
+------
+There is a system-dependent upper limit on the rep rate.
+The standard test at D-TACQ is --hbpoll, ECM 30 (1MHz clock).
+
+There is also a limit t host memory size - each peripheral board is assigned a 
+16MB window, of which 15MB is available for data capture. 
+(the top 1MB is used for messaging).
+
+This is limit is felt when running in non-overwrite mode. Clearly, in overwrite
+mode, where it is assumed that data is copied out of the target area, there is 
+no hard limit to data set length.
+
+
+
+Loop testing:
+------------
+
+run_llc_auto -n 1000 --dacs aoramps -F 0 -o /tmp/aidat ECM 50
+
+runs a 100X test loop, for 1000 samples.
+
+The standard "endurance" test at D-TACQ is 1M samples, 100 loops 
+(running in overwrite mode).
+
+=> set interrupt mask first on target (see next).
+
+run_llc_auto --overwrite -n 1000000 -F 0 --dacs ramp1_16.dat -m 1000 ECM 30

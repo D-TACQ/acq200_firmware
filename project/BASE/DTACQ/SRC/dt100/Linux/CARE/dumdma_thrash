@@ -1,0 +1,25 @@
+#!/bin/bash
+
+. get_boards
+. acqcmd_all
+
+CLK=${1:-2000000}
+PRE=${2:-524288}
+PST=${3:-1048576}
+TRG=${4:-DI2}
+
+./testbody $CLK $PRE $PST $TRG
+
+let NCH=12
+let len="$PRE+$PST";
+
+for board in $BOARDS
+do
+	let iboard="$board-1"
+	let ch1="$iboard*32 + 1";
+	let ch2="$ch1+$NCH-1";
+
+
+	echo "ch1 $ch1 ch2 $ch2 len $len"
+	acq32fetch -S $ch1..$ch2 $len
+done

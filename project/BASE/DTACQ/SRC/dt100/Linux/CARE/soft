@@ -1,0 +1,10 @@
+
+CLK=${1:-200000}
+PST=${2:-0x10000}
+
+acqcmd setInternalClock $CLK
+acqcmd setMode SOFT_TRANSIENT $PST
+acqcmd setArm
+acqcmd --until ST_STOP
+acqcmd getNumSamples
+

@@ -1,0 +1,103 @@
+#!/usr/bin/expectk
+# example host side control gui - run on an X desktop
+# gpem.gui <target> [opts]
+# expectsexample host side control gui - run on an X desktop
+# gpem.gui <target> [opts]
+# expect prompt of the form "[dt100@* "
+
+list buttons
+set x 0
+
+
+exec xhost +
+set user ""
+
+set target [lindex $argv 0]
+
+if {[string compare $target ""] == 0} {
+	puts "Usage:gpem.gui <target> \[opts -eg ACQCMD_DEV=/dev/acq32/acq32.2.m2\]"
+	exit
+}
+
+set prompt "\\\[dt100@* "
+
+proc addDt100Button { command } {
+	global buttons x 
+	button .button$x -text $command -command "dt100_send $command"
+	lappend buttons .button$x
+	incr x
+}
+
+proc addShellButton {txt command} {
+	global buttons x
+	button .button$x -text $txt -command "shell_cmd \"$command\""
+	lappend buttons .button$x
+	incr x
+}
+
+addDt100Button setArm
+addDt100Button { "fireEvent AI E1" }
+addDt100Button { "fireEvent AI E2" }
+addDt100Button { "fireEvent AO E1" }
+addDt100Button { "fireEvent AO E2" }
+addDt100Button { "fireEvent DO E1" }
+addDt100Button { "fireEvent DO E2" }
+addDt100Button { "getFwrev" }
+addDt100Button { "getCaptureStats" }
+
+addShellButton getStatus GPEM/getStatus
+addShellButton llc "llcontrol -T + -t -o - -n 40 ECM 50 | od -t d4 |decimate | keepcount"
+addShellButton clear "echo 0 >/tmp/keepcount"
+addShellButton who "who am i"
+
+button .quit -text "Quit" -command "doQuit"
+
+
+foreach btn $buttons {
+	pack $btn
+}
+
+pack .quit 
+
+set cmdn 0
+
+proc shell_cmd { command } {
+	global prompt
+	global target
+	global cmdn
+
+	exp_send "$command\r"
+	expect {
+		$prompt {
+			incr cmdn 
+			puts "$cmdn OK" 
+		}
+		timeout { puts "WARNING: timeout" }
+	}
+}	
+proc dt100_send { command } {
+	shell_cmd "acqcmd $command"
+}
+
+proc doQuit {} {
+	exit
+}
+
+
+spawn rlogin -l dt100 $target
+
+
+expect "Password:" 
+exp_send "dt100\r"
+expect $prompt
+
+exp_send "export DISPLAY=$env(HOSTNAME)$env(DISPLAY)\r"
+expect $prompt
+
+set argc 1
+while {[ string length [lindex $argv $argc]]} {
+	puts "exec [lindex $argv $argc]"
+	exp_send "[lindex $argv $argc]\r"
+	expect $prompt
+	incr argc
+}

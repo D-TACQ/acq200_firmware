@@ -1,0 +1,6 @@
+#!/bin/bash
+# gen-ST-P1
+
+. ./genbody
+
+

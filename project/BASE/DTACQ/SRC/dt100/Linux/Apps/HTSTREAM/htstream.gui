@@ -1,0 +1,194 @@
+#!/usr/bin/expectk
+# example host side control gui - run on an X desktop
+# fullspeed.gui <target> [opts]
+# expectsexample host side control gui - run on an X desktop
+# expect prompt of the form "[dt100@* "
+
+list buttons
+list boards
+
+set x 0
+
+set maxtrigchannels 1
+
+#exec xhost +
+set user ""
+
+set prompt "\\\[dt100@* "
+
+proc addDt100Button { command } {
+	global buttons x 
+	button .button$x -text $command -command "dt100_send $command"
+	lappend buttons .button$x
+	incr x
+}
+
+proc addDt100ShellButton {txt command args} {
+	global buttons x
+	button .button$x -text $txt -command "dt100_shell_cmd $command $args"
+	lappend buttons .button$x
+	incr x
+}
+
+proc addDt100Button1 { command } {
+	global buttons x 
+	button .button$x -text $command -foreground red \
+	                   -command "dt100_send1 $command"
+	lappend buttons .button$x
+	incr x
+}
+
+proc addShellButton {txt command} {
+	global buttons x
+	button .button$x -text $txt -command "shell_cmd \"$command\""
+	lappend buttons .button$x
+	incr x
+}
+
+addDt100Button { "setInternalClock 1000000" }
+addDt100Button { "setInternalClock 1100000" }
+addDt100Button { "setInternalClock 1200000" }
+addDt100Button { "setInternalClock 1300000" }
+addDt100Button { "setInternalClock 1400000" }
+addDt100Button { "setInternalClock 1500000" }
+addDt100Button { "setInternalClock 1600000" }
+addDt100Button { "setInternalClock 1700000" }
+addDt100Button { "setInternalClock 1800000" }
+addDt100Button { "setInternalClock 1900000" }
+addDt100Button { "setInternalClock 2000000" }
+addDt100Button { "setInternalClock 2300000" }
+addDt100Button { "setInternalClock 2400000" }
+addDt100Button { "setInternalClock 2500000" }
+addDt100Button { "getInternalClock" }
+addDt100Button { "getChannelMask" }
+addDt100ShellButton htstream  htstream -l -s S 0x2000000
+
+
+
+addShellButton history {history | cut -c 8- | grep ^acqcmd }
+
+button .quit -text "Quit" -command "doQuit"
+
+
+# make a board selector frame
+
+frame .mf -relief groove -borderwidth 2 
+label .mtitle -text "Select Boards"
+
+foreach board {1 2 3 4 5 6 7 8} {
+	checkbutton .m$board -text $board -variable m$board
+	lappend boards m$board
+}
+
+pack .mtitle -in .mf
+foreach bb $boards {
+	pack .$bb -in .mf -side left -anchor n
+}
+
+pack .mf -fill x
+
+foreach btn $buttons {
+	pack $btn
+}
+
+pack .quit 
+
+set cmdn 0
+
+
+proc shell_cmd { command } {
+	global prompt
+	global target
+	global cmdn
+
+	exp_send "$command\r"
+	expect {
+		$prompt {
+			incr cmdn 
+			puts "$cmdn OK" 
+		}
+		timeout { puts "WARNING: timeout" }
+	}
+}	
+
+
+proc dt100_shell_cmd { command args } {
+
+	global boards
+
+	set done_specific_boards 0
+
+	set job "date;"
+
+	set iboard 0
+	foreach board $boards {
+		global $board		
+	    	incr iboard
+		set ref_enable \$$board
+
+		if {[expr $ref_enable] == 1} {
+			append job "nice time -p $command -b $iboard $args &"
+			set done_specific_boards 1
+		}
+	}
+
+	set iboard 0
+	foreach board $boards {
+		global $board		
+	    	incr iboard
+		set ref_enable \$$board
+
+		if {[expr $ref_enable] == 1} {
+			append job "wait;"
+		}
+	}
+
+	append job "date"
+	shell_cmd $job
+	
+# default - if no bards selected, just do a regual acqcmd
+	if {$done_specific_boards == 0} {
+		shell_cmd "acqcmd $command"
+	}
+}
+
+proc dt100_send { command } {
+
+	global boards
+
+	set done_specific_boards 0
+
+	set iboard 0
+	foreach board $boards {
+		global $board		
+	    	incr iboard
+		set ref_enable \$$board
+
+		if {[expr $ref_enable] == 1} {
+			shell_cmd "acqcmd -b $iboard $command"
+			set done_specific_boards 1
+		}
+	}
+	
+# default - if no bards selected, just do a regual acqcmd
+	if {$done_specific_boards == 0} {
+		shell_cmd "acqcmd $command"
+	}
+}
+
+proc doQuit {} {
+	exit
+}
+
+
+spawn bash
+expect $prompt
+
+set argc 1
+while {[ string length [lindex $argv $argc]]} {
+	puts "exec [lindex $argv $argc]"
+	exp_send "[lindex $argv $argc]\r"
+	expect $prompt
+	incr argc
+}
+

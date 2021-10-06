@@ -1,0 +1,7 @@
+#!/bin/bash
+# cap-E2-falling
+
+E1="EV_TRUE"
+E2="EV_TRIGGER_FALLING DI2"
+
+. ./capbody

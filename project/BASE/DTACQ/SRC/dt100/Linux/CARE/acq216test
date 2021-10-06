@@ -1,0 +1,73 @@
+#!/bin/bash
+
+
+CLK=${1:-10000000}
+#PRE=${2:-0}
+#PST=${3:-524288}
+PST=${3:-8388608}
+maxcount=${4:-100}
+verbose=1
+read=${read:-1}
+CMASK=${CMASK:-11111111111111110000000000000000}
+CHANNELS=${CHANNELS:-'01 02 03 04 05 06 07 08 09 10 11 12'}
+
+BOARDS=${BOARDS:-"1 2"}
+
+. acqcmd_all
+
+
+acqcmd_all setChannelMask $CMASK
+acqcmd_all setInternalClock $CLK
+acqcmd_all setMode SOFT_TRANSIENT $PST
+let "count=0"
+
+set -e
+
+while [ $count -ne $maxcount ]
+do
+if [ $verbose -ne 0 ]; then
+	echo 
+	echo
+	echo "forxv $* iteration $count"
+	echo
+fi
+acqcmd_all setArm
+# now snag it
+acqcmd_all getNumSamples
+echo -n Capture Time
+time acqcmd_all --while ST_RUN 
+echo -n PostProcess  
+time acqcmd_all --until ST_STOP
+
+stats="stats $count "
+
+for BRD in $BOARDS
+do
+        stats=`acqcmd -b $BRD getCaptureStats | \
+	    grep 'status\|shot\|samp\|usec' |
+	    perl -np -e 's/\n//;s/ACQ32:/ACQ32:\n/;'`
+	 echo $stats
+done  
+
+
+#acqcmd_all getCaptureStats
+
+report=`acqcmd_all getNumSamples | matchup pre=$PRE post=$PST`
+
+if [ $read -ne 0 ]; then
+    for BRD in $BOARDS
+    do
+	for CH in $CHANNELS
+	do
+		echo -n Read Board $BRD $CH '... '
+		time echo `dd if=/dev/acq32/acq32.$BRD.$CH bs=1000000 | wc -c`\
+			 bytes
+	done
+      
+    done
+fi
+
+echo OK $count
+let "count=$count+1"
+done
+

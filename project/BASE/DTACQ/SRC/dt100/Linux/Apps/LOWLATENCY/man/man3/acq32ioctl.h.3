@@ -1,0 +1,886 @@
+.TH "acq32ioctl.h" 3 "1 Dec 2005" "llcontrol" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+acq32ioctl.h \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <asm/ioctl.h>\fP
+.br
+\fC#include <asm/types.h>\fP
+.br
+
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fBACQ32_RW_DEF\fP"
+.br
+.ti -1c
+.RI "struct \fBACQ32_WAIT_DEF\fP"
+.br
+.ti -1c
+.RI "struct \fBREAD_LOCALBUF_DESCR\fP"
+.br
+.in -1c
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBSEEK_TRIG\fP   (SEEK_END+1)"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOC_MAGIC\fP   'a'"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOCRESET\fP   _IO(ACQ32_IOC_MAGIC, 0)"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOCGMEM\fP   _IOR(ACQ32_IOC_MAGIC,   1, sizeof(void*))"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOSLIMIT\fP   _IO (ACQ32_IOC_MAGIC,  2 )"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOSFORMAT\fP   _IO (ACQ32_IOC_MAGIC,  3 )"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOARMSPIN\fP   _IO(ACQ32_IOC_MAGIC,  4 )"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOARMRESET\fP   _IO(ACQ32_IOC_MAGIC,  5 )"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOSDEBUG\fP   _IOW(ACQ32_IOC_MAGIC, 6, 4)"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IO_MBX_NR\fP   10"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOSMBX\fP(ix)   _IO (ACQ32_IOC_MAGIC,  ACQ32_IO_MBX_NR+(ix) )"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOGMBX\fP(ix)   _IOR(ACQ32_IOC_MAGIC, ACQ32_IO_MBX_NR +(ix), sizeof(unsigned*))"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOSROM_WORD_A01\fP   _IO( ACQ32_IOC_MAGIC, 14 )"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOCHARDRESET\fP   _IO (ACQ32_IOC_MAGIC, 15 )"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOSENDI2O\fP   _IO (ACQ32_IOC_MAGIC, 16 )"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOREAD_LOCALBUF\fP   _IO (ACQ32_IOC_MAGIC, 17 )"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOREAD_GETPHYSICAL\fP   _IO (ACQ32_IOC_MAGIC, 18 )"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOG_PCIREGS_OFFSET\fP   _IOR(ACQ32_IOC_MAGIC, 19, sizeof(unsigned*) )"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOG_READ32\fP   _IO (ACQ32_IOC_MAGIC, 20 )"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOS_WRITE32\fP   _IO (ACQ32_IOC_MAGIC, 21 )"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOG_READ16\fP   _IO (ACQ32_IOC_MAGIC, 22 )"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOS_WRITE16\fP   _IO (ACQ32_IOC_MAGIC, 23 )"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOS_WAIT_EVENT\fP   _IO (ACQ32_IOC_MAGIC, 24 )"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOS_INTS_ENABLE\fP   _IOW(ACQ32_IOC_MAGIC, 25, 4 )"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOS_INTS_DISABLE\fP   _IOW(ACQ32_IOC_MAGIC, 26, 4 )"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOS_SWALLOW_KMEM\fP   _IOW(ACQ32_IOC_MAGIC, 27, 4 )"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOS_VALIDATE_BIGBUF\fP   _IOW(ACQ32_IOC_MAGIC, 28, 4 )"
+.br
+.ti -1c
+.RI "#define \fBACQ32_IOC_MAXNR\fP   29"
+.br
+.ti -1c
+.RI "#define \fBCC_FORMAT\fP   'format'"
+.br
+.ti -1c
+.RI "#define \fBCC_FORMAT_BIN\fP   'bin'"
+.br
+.ti -1c
+.RI "#define \fBCC_FORMAT_BIGEND\fP   'bigendian'"
+.br
+.ti -1c
+.RI "#define \fBCC_FORMAT_HEX\fP   'hex'"
+.br
+.ti -1c
+.RI "#define \fBCC_FORMAT_DEC\fP   'dec'"
+.br
+.ti -1c
+.RI "#define \fBCC_FORMAT_VOLTS\fP   'volts'"
+.br
+.ti -1c
+.RI "#define \fBCC_FORMAT_LINENUMS\fP   'lines'"
+.br
+.ti -1c
+.RI "#define \fBCC_FORMAT_DOS\fP   'dos'"
+.br
+.ti -1c
+.RI "#define \fBCC_LIMIT\fP   'limit'"
+.br
+.ti -1c
+.RI "#define \fBCC_SEEK\fP   'seek'"
+.br
+.ti -1c
+.RI "#define \fBCC_SEEK_BEGIN\fP   'start'"
+.br
+.ti -1c
+.RI "#define \fBCC_SEEK_END\fP   'end'"
+.br
+.ti -1c
+.RI "#define \fBCC_SEEK_CURRENT\fP   'current'"
+.br
+.ti -1c
+.RI "#define \fBCC_SEEK_TRIG\fP   'trig'"
+.br
+.ti -1c
+.RI "#define \fBCC_STREAM\fP   'stream'"
+.br
+.ti -1c
+.RI "#define \fBMC_GET_HELP\fP   'help'"
+.br
+.ti -1c
+.RI "#define \fBMC_GET_NUMCHANNELS\fP   'getNumChannels'"
+.br
+.ti -1c
+.RI "#define \fBMC_GET_NUMSAMPLES\fP   'getNumSamples'"
+.br
+.ti -1c
+.RI "#define \fBMC_GET_SETSAMPLES\fP   'getSetNumSamples'"
+.br
+.ti -1c
+.RI "#define \fBMC_GET_STATE\fP   'getState'"
+.br
+.ti -1c
+.RI "#define \fBMC_SET_CHANNEL_MASK\fP   'setChannelMask'"
+.br
+.ti -1c
+.RI "#define \fBMC_GET_CHANNEL_MASK\fP   'getChannelMask'"
+.br
+.ti -1c
+.RI "#define \fBMC_GET_MEMORY_DEPTH\fP   'getMemoryDepth'"
+.br
+.ti -1c
+.RI "#define \fBMC_SET_MODE\fP   'setMode'"
+.br
+.ti -1c
+.RI "#define \fBMC_GET_MODE\fP   'getMode'"
+.br
+.ti -1c
+.RI "#define \fBMC_SET_ARM\fP   'setArm'"
+.br
+.ti -1c
+.RI "#define \fBMC_SET_ABORT\fP   'setAbort'"
+.br
+.ti -1c
+.RI "#define \fBMC_SET_DATA_ROUTE\fP   'setDataRoute'"
+.br
+.ti -1c
+.RI "#define \fBMC_SET_DISTRIBUTOR\fP   'setDistributor'"
+.br
+.ti -1c
+.RI "#define \fBMC_MODE_GATED_TRANSIENT\fP   'GATED_TRANSIENT'"
+.br
+.ti -1c
+.RI "#define \fBMC_MODE_GATED_CONTINUOUS\fP   'GATED_CONTINUOUS'"
+.br
+.ti -1c
+.RI "#define \fBMC_MODE_SOFT_TRANSIENT\fP   'SOFT_TRANSIENT'"
+.br
+.ti -1c
+.RI "#define \fBMC_MODE_SOFT_CONTINUOUS\fP   'SOFT_CONTINUOUS'"
+.br
+.ti -1c
+.RI "#define \fBMC_MODE_TRIGGERED_CONTINUOUS\fP   'TRIGGERED_CONTINUOUS'"
+.br
+.ti -1c
+.RI "#define \fBMC_SET_MODE_GC\fP   'setModeGatedContinuous'"
+.br
+.ti -1c
+.RI "#define \fBMC_SET_MODE_TRC\fP   'setModeTriggeredContinuous'"
+.br
+.ti -1c
+.RI "#define \fBDIX_DEFAULT\fP   4"
+.br
+.ti -1c
+.RI "#define \fBMC_STATE_STOP\fP   'ST_STOP'"
+.br
+.ti -1c
+.RI "#define \fBMC_STATE_ARM\fP   'ST_ARM'"
+.br
+.ti -1c
+.RI "#define \fBMC_STATE_RUN\fP   'ST_RUN'"
+.br
+.ti -1c
+.RI "#define \fBMC_STATE_TRIGGER\fP   'ST_TRIGGER'"
+.br
+.ti -1c
+.RI "#define \fBMC_STATE_POSTPROCESS\fP   'ST_POSTPROCESS'"
+.br
+.ti -1c
+.RI "#define \fBMC_MODE_RUN_BLOCK\fP   'RUN_BLOCK'"
+.br
+.ti -1c
+.RI "#define \fBMC_SET_ARMED\fP   'setArmed'"
+.br
+.ti -1c
+.RI "#define \fBMC_SET_ABORT\fP   'setAbort'"
+.br
+.ti -1c
+.RI "#define \fBMC_GET_NUMSAMPLES\fP   'getNumSamples'"
+.br
+.ti -1c
+.RI "#define \fBMC_SET_INTERNAL_CLOCK\fP   'setInternalClock'"
+.br
+.ti -1c
+.RI "#define \fBMC_GET_INTERNAL_CLOCK\fP   'getInternalClock'"
+.br
+.ti -1c
+.RI "#define \fBMC_SET_SAMPLE_TAGGING\fP   'setSampleTagging'"
+.br
+.ti -1c
+.RI "#define \fBMC_SET_EXTERNAL_CLOCK\fP   'setExternalClock'"
+.br
+.ti -1c
+.RI "#define \fBMC_BIGDUMP\fP   'bigdump'"
+.br
+.ti -1c
+.RI "#define \fBMC_GET_FWREV\fP   'getFwrev'"
+.br
+.ti -1c
+.RI "#define \fBMC_GET_CONFIG\fP   'getConfig'"
+.br
+.ti -1c
+.RI "#define \fBMC_GET_CALINFO\fP   'getCalinfo'"
+.br
+.ti -1c
+.RI "#define \fBMC_GET_CAPTURESTATS\fP   'getCaptureStats'"
+.br
+.ti -1c
+.RI "#define \fBMC_GET_DEBUG\fP   'getDebug'"
+.br
+.ti -1c
+.RI "#define \fBMC_GET_MAX_CHANNELS\fP   'getAvailableChannels'"
+.br
+.ti -1c
+.RI "#define \fBMC_GET_VRANGE\fP   'getVoltsRange'"
+.br
+.ti -1c
+.RI "#define \fBMC_SET_CAL\fP   'setCal'"
+.br
+.ti -1c
+.RI "#define \fBMC_WAIT_STATE\fP   'waitState'"
+.br
+.ti -1c
+.RI "#define \fBMC_RESERVE_AO\fP   'reserveAO'"
+.br
+.ti -1c
+.RI "#define \fBMC_GET_RESERVED_AO\fP   'getReservedAO'"
+.br
+.ti -1c
+.RI "#define \fBMC_TH_CLEAR_ALL\fP   'clearThresholds'"
+.br
+.ti -1c
+.RI "#define \fBMC_TH_SELECT\fP   'selectThresholdDistributor'"
+.br
+.ti -1c
+.RI "#define \fBMC_TH_SELECT1\fP   'selectThresholdDetector'"
+.br
+.ti -1c
+.RI "#define \fBMC_TH_BILEVEL\fP   'BILEVEL'"
+.br
+.ti -1c
+.RI "#define \fBMC_TH_BILEVEL_MULTI\fP   'BILEVEL_MULTI'"
+.br
+.ti -1c
+.RI "#define \fBMC_TH_EDGE\fP   'EDGE'"
+.br
+.ti -1c
+.RI "#define \fBMC_TH_EDGE_MULTI\fP   'EDGE_MULTI'"
+.br
+.ti -1c
+.RI "#define \fBMC_TH_FAST_MULTI\fP   'FAST_MULTI'"
+.br
+.ti -1c
+.RI "#define \fBMC_TH_CHANNEL_SET\fP   'setChannelThreshold'"
+.br
+.ti -1c
+.RI "#define \fBMC_SET_SYNC_ROUTE\fP   'setSyncRoute'"
+.br
+.ti -1c
+.RI "#define \fBMC_GET_SYNC_ROUTE\fP   'getSyncRoute'"
+.br
+.ti -1c
+.RI "#define \fBMC_SET_USER_LED\fP   'setUserLed'"
+.br
+.ti -1c
+.RI "#define \fBMC_SET_USER_LED_ON\fP   'ON'"
+.br
+.ti -1c
+.RI "#define \fBMC_SET_USER_LED_OFF\fP   'OFF'"
+.br
+.ti -1c
+.RI "#define \fBMC_SET_USER_LED_FLASH\fP   'FLASH'"
+.br
+.ti -1c
+.RI "#define \fBSC_SET_DIO\fP   'setDIO'"
+.br
+.ti -1c
+.RI "#define \fBSC_GET_DIO\fP   'getDIO'"
+.br
+.ti -1c
+.RI "#define \fBSC_SET_CHANNEL\fP   'setChannel'"
+.br
+.ti -1c
+.RI "#define \fBSC_SET_STREAMING\fP   'stream'"
+.br
+.ti -1c
+.RI "#define \fBDIO_MASK_INPUT\fP   '-'"
+.br
+.ti -1c
+.RI "#define \fBDIO_MASK_OUTPUT1\fP   '1'"
+.br
+.ti -1c
+.RI "#define \fBDIO_MASK_OUTPUT0\fP   '0'"
+.br
+.ti -1c
+.RI "#define \fBDIO_MASK_INPUT0\fP   'L'"
+.br
+.ti -1c
+.RI "#define \fBDIO_MASK_INPUT1\fP   'H'"
+.br
+.ti -1c
+.RI "#define \fBDIO_CT_ACTIVE\fP   'A'"
+.br
+.ti -1c
+.RI "#define \fBDIO_CT_INACTIVE\fP   'x'"
+.br
+.ti -1c
+.RI "#define \fBACQ32_ACK\fP   'ACQ32:'"
+.br
+.ti -1c
+.RI "#define \fBACQ32_ACK_FAIL\fP   'ERROR'"
+.br
+.ti -1c
+.RI "#define \fBSIGCOND_ACK\fP   'SIGCOND:'"
+.br
+.ti -1c
+.RI "#define \fBREAD_LOCALBUF_DESCR_FLAGS_NOWAIT\fP   0x80000000"
+.br
+.ti -1c
+.RI "#define \fBREAD_LOCALBUF_MAXCHUNK\fP   0x200000"
+.br
+.ti -1c
+.RI "#define \fBMI\fP(n)   'MI'#n"
+.br
+.ti -1c
+.RI "#define \fBMO\fP(n)   'MO'#n"
+.br
+.ti -1c
+.RI "#define \fBJ5\fP(n)   'J5'#n"
+.br
+.ti -1c
+.RI "#define \fBJ3\fP(n)   'J3'#n"
+.br
+.ti -1c
+.RI "#define \fBPXI_TRIG\fP(n)   'PXI_TRIG'#n"
+.br
+.ti -1c
+.RI "#define \fBPXI_STAR\fP   'PXI_STAR'"
+.br
+.ti -1c
+.RI "#define \fBPXI_CLOCK10\fP   'PXI_CLOCK10'"
+.br
+.ti -1c
+.RI "#define \fBDI\fP(n)   'DI'#n"
+.br
+.ti -1c
+.RI "#define \fBAICLK\fP   'AICLK'"
+.br
+.ti -1c
+.RI "#define \fBAITRIG\fP   'AITRIG'"
+.br
+.ti -1c
+.RI "#define \fBAOCLK\fP   'AOCLK'"
+.br
+.ti -1c
+.RI "#define \fBAOTRIG\fP   'AOTRIG'"
+.br
+.ti -1c
+.RI "#define \fBDOCLK\fP   'DOCLK'"
+.br
+.ti -1c
+.RI "#define \fBDOTRIG\fP   'DOTRIG'"
+.br
+.ti -1c
+.RI "#define \fBDO\fP(n)   'DO'#n"
+.br
+.ti -1c
+.RI "#define \fBGUT_FXN_AO\fP   'AO'"
+.br
+.ti -1c
+.RI "#define \fBGUT_FXN_AI\fP   'AI'"
+.br
+.ti -1c
+.RI "#define \fBGUT_FXN_DO\fP   'DO'"
+.br
+.ti -1c
+.RI "#define \fBGUT_PHASE\fP(p)   'P'#p"
+.br
+.ti -1c
+.RI "#define \fBGUT_EVENT\fP(e)   'E'#e"
+.br
+.ti -1c
+.RI "#define \fBGUT_SETPHASE\fP   'setPhase'"
+.br
+.ti -1c
+.RI "#define \fBGUT_GETPHASE\fP   'getPhase'"
+.br
+.ti -1c
+.RI "#define \fBGUT_GETPHASE_KEY_REQUESTED_SAMPLES\fP   'requested-samples'"
+.br
+.ti -1c
+.RI "#define \fBGUT_GETPHASE_KEY_ACTUAL_SAMPLES\fP   'actual-samples'"
+.br
+.ti -1c
+.RI "#define \fBGUT_GETPHASE_KEY_STATE\fP   'state'"
+.br
+.ti -1c
+.RI "#define \fBGUT_SETEVENT\fP   'setEvent'"
+.br
+.ti -1c
+.RI "#define \fBGUT_GETEVENT\fP   'getEvent'"
+.br
+.ti -1c
+.RI "#define \fBGUT_FIRE_EVENT\fP   'fireEvent'"
+.br
+.ti -1c
+.RI "#define \fBSOFT_CLOCK\fP   'SOFT_CLOCK'"
+.br
+.ti -1c
+.RI "#define \fBINTERNAL_CLOCK\fP   'INTERNAL_CLOCK'"
+.br
+.ti -1c
+.RI "#define \fBGUT_SET_CLOCK\fP   'setClock'"
+.br
+.ti -1c
+.RI "#define \fBGUT_FIRE_CLOCK\fP   'clockNow'"
+.br
+.ti -1c
+.RI "#define \fBGUT_RESET\fP   'resetGUT'"
+.br
+.ti -1c
+.RI "#define \fBEV_TRUE\fP   'EV_TRUE'"
+.br
+.ti -1c
+.RI "#define \fBEV_SOFT\fP   'EV_SOFT'"
+.br
+.ti -1c
+.RI "#define \fBEV_TRIGGER_RISING\fP   'EV_TRIGGER_RISING'"
+.br
+.ti -1c
+.RI "#define \fBEV_TRIGGER_FALLING\fP   'EV_TRIGGER_FALLING'"
+.br
+.ti -1c
+.RI "#define \fBEV_NONE\fP   'EV_NONE'"
+.br
+.ti -1c
+.RI "#define \fBEV_DATA_EXCEEDS\fP   'EV_DATA_EXCEEDS'"
+.br
+.ti -1c
+.RI "#define \fBEV_DATA_BELOW\fP   'EV_DATA_BELOW'"
+.br
+.in -1c
+.SS "Enumerations"
+
+.in +1c
+.ti -1c
+.RI "enum \fBChannelMode\fP { \fBCM_BINARY\fP, \fBCM_HEX\fP, \fBCM_DEC\fP, \fBCM_VOLTS\fP, \fBCM_BIGEND\fP, \fBCM_EXCLUSIVE_OPTS\fP =  0xf, \fBCM_LINENUMS\fP =  0x40, \fBCM_DOS_LINES\fP =  0x80 }"
+.br
+.ti -1c
+.RI "enum { \fBEACQ32_NO_INCOMING_I2O\fP =  3200, \fBEACQ32_NO_MAPPING\fP, \fBEACQ32_OUT_OF_MAPPING_RANGE\fP, \fBEACQ32_OFFSET_NOT_ON_WHOLE_BUFFER_BOUNDARY\fP }"
+.br
+.in -1c
+.SH "Define Documentation"
+.PP 
+.SS "#define ACQ32_ACK   'ACQ32:'"
+.PP
+.SS "#define ACQ32_ACK_FAIL   'ERROR'"
+.PP
+.SS "#define ACQ32_IO_MBX_NR   10"
+.PP
+.SS "#define ACQ32_IOARMRESET   _IO(ACQ32_IOC_MAGIC,  5 )"
+.PP
+.SS "#define ACQ32_IOARMSPIN   _IO(ACQ32_IOC_MAGIC,  4 )"
+.PP
+.SS "#define ACQ32_IOC_MAGIC   'a'"
+.PP
+.SS "#define ACQ32_IOC_MAXNR   29"
+.PP
+.SS "#define ACQ32_IOCGMEM   _IOR(ACQ32_IOC_MAGIC,   1, sizeof(void*))"
+.PP
+.SS "#define ACQ32_IOCHARDRESET   _IO (ACQ32_IOC_MAGIC, 15 )"
+.PP
+.SS "#define ACQ32_IOCRESET   _IO(ACQ32_IOC_MAGIC, 0)"
+.PP
+.SS "#define ACQ32_IOG_PCIREGS_OFFSET   _IOR(ACQ32_IOC_MAGIC, 19, sizeof(unsigned*) )"
+.PP
+.SS "#define ACQ32_IOG_READ16   _IO (ACQ32_IOC_MAGIC, 22 )"
+.PP
+.SS "#define ACQ32_IOG_READ32   _IO (ACQ32_IOC_MAGIC, 20 )"
+.PP
+.SS "#define ACQ32_IOGMBX(ix)   _IOR(ACQ32_IOC_MAGIC, ACQ32_IO_MBX_NR +(ix), sizeof(unsigned*))"
+.PP
+.SS "#define ACQ32_IOREAD_GETPHYSICAL   _IO (ACQ32_IOC_MAGIC, 18 )"
+.PP
+.SS "#define ACQ32_IOREAD_LOCALBUF   _IO (ACQ32_IOC_MAGIC, 17 )"
+.PP
+.SS "#define ACQ32_IOS_INTS_DISABLE   _IOW(ACQ32_IOC_MAGIC, 26, 4 )"
+.PP
+.SS "#define ACQ32_IOS_INTS_ENABLE   _IOW(ACQ32_IOC_MAGIC, 25, 4 )"
+.PP
+.SS "#define ACQ32_IOS_SWALLOW_KMEM   _IOW(ACQ32_IOC_MAGIC, 27, 4 )"
+.PP
+.SS "#define ACQ32_IOS_VALIDATE_BIGBUF   _IOW(ACQ32_IOC_MAGIC, 28, 4 )"
+.PP
+.SS "#define ACQ32_IOS_WAIT_EVENT   _IO (ACQ32_IOC_MAGIC, 24 )"
+.PP
+.SS "#define ACQ32_IOS_WRITE16   _IO (ACQ32_IOC_MAGIC, 23 )"
+.PP
+.SS "#define ACQ32_IOS_WRITE32   _IO (ACQ32_IOC_MAGIC, 21 )"
+.PP
+.SS "#define ACQ32_IOSDEBUG   _IOW(ACQ32_IOC_MAGIC, 6, 4)"
+.PP
+.SS "#define ACQ32_IOSENDI2O   _IO (ACQ32_IOC_MAGIC, 16 )"
+.PP
+.SS "#define ACQ32_IOSFORMAT   _IO (ACQ32_IOC_MAGIC,  3 )"
+.PP
+.SS "#define ACQ32_IOSLIMIT   _IO (ACQ32_IOC_MAGIC,  2 )"
+.PP
+.SS "#define ACQ32_IOSMBX(ix)   _IO (ACQ32_IOC_MAGIC,  ACQ32_IO_MBX_NR+(ix) )"
+.PP
+.SS "#define ACQ32_IOSROM_WORD_A01   _IO( ACQ32_IOC_MAGIC, 14 )"
+.PP
+.SS "#define AICLK   'AICLK'"
+.PP
+.SS "#define AITRIG   'AITRIG'"
+.PP
+.SS "#define AOCLK   'AOCLK'"
+.PP
+.SS "#define AOTRIG   'AOTRIG'"
+.PP
+.SS "#define CC_FORMAT   'format'"
+.PP
+.SS "#define CC_FORMAT_BIGEND   'bigendian'"
+.PP
+.SS "#define CC_FORMAT_BIN   'bin'"
+.PP
+.SS "#define CC_FORMAT_DEC   'dec'"
+.PP
+.SS "#define CC_FORMAT_DOS   'dos'"
+.PP
+.SS "#define CC_FORMAT_HEX   'hex'"
+.PP
+.SS "#define CC_FORMAT_LINENUMS   'lines'"
+.PP
+.SS "#define CC_FORMAT_VOLTS   'volts'"
+.PP
+.SS "#define CC_LIMIT   'limit'"
+.PP
+.SS "#define CC_SEEK   'seek'"
+.PP
+.SS "#define CC_SEEK_BEGIN   'start'"
+.PP
+.SS "#define CC_SEEK_CURRENT   'current'"
+.PP
+.SS "#define CC_SEEK_END   'end'"
+.PP
+.SS "#define CC_SEEK_TRIG   'trig'"
+.PP
+.SS "#define CC_STREAM   'stream'"
+.PP
+.SS "#define DI(n)   'DI'#n"
+.PP
+.SS "#define DIO_CT_ACTIVE   'A'"
+.PP
+.SS "#define DIO_CT_INACTIVE   'x'"
+.PP
+.SS "#define DIO_MASK_INPUT   '-'"
+.PP
+.SS "#define DIO_MASK_INPUT0   'L'"
+.PP
+.SS "#define DIO_MASK_INPUT1   'H'"
+.PP
+.SS "#define DIO_MASK_OUTPUT0   '0'"
+.PP
+.SS "#define DIO_MASK_OUTPUT1   '1'"
+.PP
+.SS "#define DIX_DEFAULT   4"
+.PP
+.SS "#define DO(n)   'DO'#n"
+.PP
+.SS "#define DOCLK   'DOCLK'"
+.PP
+.SS "#define DOTRIG   'DOTRIG'"
+.PP
+.SS "#define EV_DATA_BELOW   'EV_DATA_BELOW'"
+.PP
+.SS "#define EV_DATA_EXCEEDS   'EV_DATA_EXCEEDS'"
+.PP
+.SS "#define EV_NONE   'EV_NONE'"
+.PP
+.SS "#define EV_SOFT   'EV_SOFT'"
+.PP
+.SS "#define EV_TRIGGER_FALLING   'EV_TRIGGER_FALLING'"
+.PP
+.SS "#define EV_TRIGGER_RISING   'EV_TRIGGER_RISING'"
+.PP
+.SS "#define EV_TRUE   'EV_TRUE'"
+.PP
+.SS "#define GUT_EVENT(e)   'E'#e"
+.PP
+.SS "#define GUT_FIRE_CLOCK   'clockNow'"
+.PP
+.SS "#define GUT_FIRE_EVENT   'fireEvent'"
+.PP
+.SS "#define GUT_FXN_AI   'AI'"
+.PP
+.SS "#define GUT_FXN_AO   'AO'"
+.PP
+.SS "#define GUT_FXN_DO   'DO'"
+.PP
+.SS "#define GUT_GETEVENT   'getEvent'"
+.PP
+.SS "#define GUT_GETPHASE   'getPhase'"
+.PP
+.SS "#define GUT_GETPHASE_KEY_ACTUAL_SAMPLES   'actual-samples'"
+.PP
+.SS "#define GUT_GETPHASE_KEY_REQUESTED_SAMPLES   'requested-samples'"
+.PP
+.SS "#define GUT_GETPHASE_KEY_STATE   'state'"
+.PP
+.SS "#define GUT_PHASE(p)   'P'#p"
+.PP
+.SS "#define GUT_RESET   'resetGUT'"
+.PP
+.SS "#define GUT_SET_CLOCK   'setClock'"
+.PP
+.SS "#define GUT_SETEVENT   'setEvent'"
+.PP
+.SS "#define GUT_SETPHASE   'setPhase'"
+.PP
+.SS "#define INTERNAL_CLOCK   'INTERNAL_CLOCK'"
+.PP
+.SS "#define J3(n)   'J3'#n"
+.PP
+.SS "#define J5(n)   'J5'#n"
+.PP
+.SS "#define MC_BIGDUMP   'bigdump'"
+.PP
+.SS "#define MC_GET_CALINFO   'getCalinfo'"
+.PP
+.SS "#define MC_GET_CAPTURESTATS   'getCaptureStats'"
+.PP
+.SS "#define MC_GET_CHANNEL_MASK   'getChannelMask'"
+.PP
+.SS "#define MC_GET_CONFIG   'getConfig'"
+.PP
+.SS "#define MC_GET_DEBUG   'getDebug'"
+.PP
+.SS "#define MC_GET_FWREV   'getFwrev'"
+.PP
+.SS "#define MC_GET_HELP   'help'"
+.PP
+.SS "#define MC_GET_INTERNAL_CLOCK   'getInternalClock'"
+.PP
+.SS "#define MC_GET_MAX_CHANNELS   'getAvailableChannels'"
+.PP
+.SS "#define MC_GET_MEMORY_DEPTH   'getMemoryDepth'"
+.PP
+.SS "#define MC_GET_MODE   'getMode'"
+.PP
+.SS "#define MC_GET_NUMCHANNELS   'getNumChannels'"
+.PP
+.SS "#define MC_GET_NUMSAMPLES   'getNumSamples'"
+.PP
+.SS "#define MC_GET_NUMSAMPLES   'getNumSamples'"
+.PP
+.SS "#define MC_GET_RESERVED_AO   'getReservedAO'"
+.PP
+.SS "#define MC_GET_SETSAMPLES   'getSetNumSamples'"
+.PP
+.SS "#define MC_GET_STATE   'getState'"
+.PP
+.SS "#define MC_GET_SYNC_ROUTE   'getSyncRoute'"
+.PP
+.SS "#define MC_GET_VRANGE   'getVoltsRange'"
+.PP
+.SS "#define MC_MODE_GATED_CONTINUOUS   'GATED_CONTINUOUS'"
+.PP
+.SS "#define MC_MODE_GATED_TRANSIENT   'GATED_TRANSIENT'"
+.PP
+.SS "#define MC_MODE_RUN_BLOCK   'RUN_BLOCK'"
+.PP
+.SS "#define MC_MODE_SOFT_CONTINUOUS   'SOFT_CONTINUOUS'"
+.PP
+.SS "#define MC_MODE_SOFT_TRANSIENT   'SOFT_TRANSIENT'"
+.PP
+.SS "#define MC_MODE_TRIGGERED_CONTINUOUS   'TRIGGERED_CONTINUOUS'"
+.PP
+.SS "#define MC_RESERVE_AO   'reserveAO'"
+.PP
+.SS "#define MC_SET_ABORT   'setAbort'"
+.PP
+.SS "#define MC_SET_ABORT   'setAbort'"
+.PP
+.SS "#define MC_SET_ARM   'setArm'"
+.PP
+.SS "#define MC_SET_ARMED   'setArmed'"
+.PP
+.SS "#define MC_SET_CAL   'setCal'"
+.PP
+.SS "#define MC_SET_CHANNEL_MASK   'setChannelMask'"
+.PP
+.SS "#define MC_SET_DATA_ROUTE   'setDataRoute'"
+.PP
+.SS "#define MC_SET_DISTRIBUTOR   'setDistributor'"
+.PP
+.SS "#define MC_SET_EXTERNAL_CLOCK   'setExternalClock'"
+.PP
+.SS "#define MC_SET_INTERNAL_CLOCK   'setInternalClock'"
+.PP
+.SS "#define MC_SET_MODE   'setMode'"
+.PP
+.SS "#define MC_SET_MODE_GC   'setModeGatedContinuous'"
+.PP
+.SS "#define MC_SET_MODE_TRC   'setModeTriggeredContinuous'"
+.PP
+.SS "#define MC_SET_SAMPLE_TAGGING   'setSampleTagging'"
+.PP
+.SS "#define MC_SET_SYNC_ROUTE   'setSyncRoute'"
+.PP
+.SS "#define MC_SET_USER_LED   'setUserLed'"
+.PP
+.SS "#define MC_SET_USER_LED_FLASH   'FLASH'"
+.PP
+.SS "#define MC_SET_USER_LED_OFF   'OFF'"
+.PP
+.SS "#define MC_SET_USER_LED_ON   'ON'"
+.PP
+.SS "#define MC_STATE_ARM   'ST_ARM'"
+.PP
+.SS "#define MC_STATE_POSTPROCESS   'ST_POSTPROCESS'"
+.PP
+.SS "#define MC_STATE_RUN   'ST_RUN'"
+.PP
+.SS "#define MC_STATE_STOP   'ST_STOP'"
+.PP
+.SS "#define MC_STATE_TRIGGER   'ST_TRIGGER'"
+.PP
+.SS "#define MC_TH_BILEVEL   'BILEVEL'"
+.PP
+.SS "#define MC_TH_BILEVEL_MULTI   'BILEVEL_MULTI'"
+.PP
+.SS "#define MC_TH_CHANNEL_SET   'setChannelThreshold'"
+.PP
+.SS "#define MC_TH_CLEAR_ALL   'clearThresholds'"
+.PP
+.SS "#define MC_TH_EDGE   'EDGE'"
+.PP
+.SS "#define MC_TH_EDGE_MULTI   'EDGE_MULTI'"
+.PP
+.SS "#define MC_TH_FAST_MULTI   'FAST_MULTI'"
+.PP
+.SS "#define MC_TH_SELECT   'selectThresholdDistributor'"
+.PP
+.SS "#define MC_TH_SELECT1   'selectThresholdDetector'"
+.PP
+.SS "#define MC_WAIT_STATE   'waitState'"
+.PP
+.SS "#define MI(n)   'MI'#n"
+.PP
+.SS "#define MO(n)   'MO'#n"
+.PP
+.SS "#define PXI_CLOCK10   'PXI_CLOCK10'"
+.PP
+.SS "#define PXI_STAR   'PXI_STAR'"
+.PP
+.SS "#define PXI_TRIG(n)   'PXI_TRIG'#n"
+.PP
+.SS "#define READ_LOCALBUF_DESCR_FLAGS_NOWAIT   0x80000000"
+.PP
+.SS "#define READ_LOCALBUF_MAXCHUNK   0x200000"
+.PP
+.SS "#define SC_GET_DIO   'getDIO'"
+.PP
+.SS "#define SC_SET_CHANNEL   'setChannel'"
+.PP
+.SS "#define SC_SET_DIO   'setDIO'"
+.PP
+.SS "#define SC_SET_STREAMING   'stream'"
+.PP
+.SS "#define SEEK_TRIG   (SEEK_END+1)"
+.PP
+.SS "#define SIGCOND_ACK   'SIGCOND:'"
+.PP
+.SS "#define SOFT_CLOCK   'SOFT_CLOCK'"
+.PP
+.SH "Enumeration Type Documentation"
+.PP 
+.SS "anonymous enum"
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fIEACQ32_NO_INCOMING_I2O \fP\fP
+.TP
+\fB\fIEACQ32_NO_MAPPING \fP\fP
+.TP
+\fB\fIEACQ32_OUT_OF_MAPPING_RANGE \fP\fP
+.TP
+\fB\fIEACQ32_OFFSET_NOT_ON_WHOLE_BUFFER_BOUNDARY \fP\fP
+
+.SS "enum \fBChannelMode\fP"
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fICM_BINARY \fP\fP
+.TP
+\fB\fICM_HEX \fP\fP
+.TP
+\fB\fICM_DEC \fP\fP
+.TP
+\fB\fICM_VOLTS \fP\fP
+.TP
+\fB\fICM_BIGEND \fP\fP
+.TP
+\fB\fICM_EXCLUSIVE_OPTS \fP\fP
+.TP
+\fB\fICM_LINENUMS \fP\fP
+.TP
+\fB\fICM_DOS_LINES \fP\fP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for llcontrol from the source code.

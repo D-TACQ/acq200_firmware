@@ -1,0 +1,10 @@
+#!/bin/as
+# cap-E2-rising-null-P2
+
+E1="EV_TRUE"
+E2="EV_TRIGGER_RISING DI2"
+E3="EV_TRUE"
+
+. ./capbody
+
+
